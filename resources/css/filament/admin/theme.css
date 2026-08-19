@@ -10,8 +10,6 @@
 
 @import '/vendor/filament/filament/resources/css/theme.css';
 
-
-
 @theme {
     /* 1. Primary Colors */
     --color-pms-primary: #00838F;
@@ -75,6 +73,43 @@
 
 .fi-sidebar-item.fi-active .fi-sidebar-item-icon {
     @apply text-pms-primary-dark;
+}
+
+.fi-sidebar-item-button {
+    @apply rounded-xl mx-2 my-0.5 text-pms-text-secondary;
+}
+
+.fi-sidebar-item-button:hover {
+    @apply bg-pms-bg-sidebar-hover;
+}
+
+.fi-sidebar-item-icon {
+    @apply text-pms-icon-color;
+}
+
+.fi-sidebar-nav {
+    @apply px-2;
+}
+
+.fi-logo {
+    @apply text-pms-primary-dark font-bold;
+}
+
+/* Sidebar footer card (MediCare Pharmacy - Healthier Today card) */
+.pms-sidebar-footer-card {
+    @apply flex items-center gap-3 bg-pms-bg-sidebar-active rounded-xl p-3 mx-3 mb-3 mt-4;
+}
+
+.pms-sidebar-footer-icon {
+    @apply w-9 h-9 rounded-lg bg-pms-primary text-white flex items-center justify-center shrink-0;
+}
+
+.pms-sidebar-footer-title {
+    @apply text-sm font-semibold text-pms-text-primary leading-tight;
+}
+
+.pms-sidebar-footer-sub {
+    @apply text-xs text-pms-text-muted leading-tight;
 }
 
 .fi-sidebar-item-button:hover {
@@ -262,6 +297,63 @@
 }
 
 /* --------------------------------------------------------------------------
+   11. SIDEBAR NAVIGATION (Pill style like MediCare reference)
+   -------------------------------------------------------------------------- */
+
+.fi-sidebar-nav {
+    @apply px-3;
+}
+
+/* Hide Filament's default/auto-discovered nav items — humara custom-sidebar.blade.php
+   inhi ki jagah render hoga. Sidebar <aside> wrapper khud zinda rehta hai. */
+.fi-sidebar-nav>ul {
+    @apply hidden;
+}
+
+.fi-sidebar-item {
+    @apply mb-1;
+}
+
+.fi-sidebar-item-button {
+    @apply rounded-lg px-3 py-2.5 text-sm text-pms-text-secondary transition-colors relative;
+}
+
+.fi-sidebar-item-button:hover {
+    @apply bg-pms-bg-sidebar-hover text-pms-primary-dark;
+}
+
+.fi-sidebar-item.fi-active .fi-sidebar-item-button {
+    @apply bg-pms-primary text-white font-semibold shadow-sm;
+}
+
+.fi-sidebar-item.fi-active .fi-sidebar-item-icon {
+    @apply text-white;
+}
+
+.fi-sidebar-item-icon {
+    @apply text-pms-text-muted w-5 h-5;
+}
+
+/* Chevron arrow on the right of every nav item (decorative, like reference image) */
+.fi-sidebar-item-button::after {
+    content: '';
+    @apply ml-auto w-2 h-2 border-t-2 border-r-2 border-current opacity-40;
+    transform: rotate(45deg);
+}
+
+.fi-sidebar-item.fi-active .fi-sidebar-item-button::after {
+    @apply opacity-80;
+}
+
+/* --------------------------------------------------------------------------
+   12. SIDEBAR BRAND / LOGO AREA
+   -------------------------------------------------------------------------- */
+
+.fi-logo {
+    @apply text-pms-primary-dark font-bold text-lg flex items-center gap-2;
+}
+
+/* --------------------------------------------------------------------------
    13. SIDEBAR FOOTER CARD (MediCare info card at bottom of sidebar)
    -------------------------------------------------------------------------- */
 
@@ -279,4 +371,162 @@
 
 .pms-sidebar-footer-subtitle {
     @apply text-xs text-pms-text-muted leading-tight;
+}
+
+/* --------------------------------------------------------------------------
+   14. FULLY CUSTOM SIDEBAR (resources/views/filament/custom-sidebar.blade.php)
+   -------------------------------------------------------------------------- */
+
+.pms-sidebar {
+    @apply flex flex-col h-full bg-pms-bg-sidebar border-r border-pms-border;
+}
+
+/* Brand / Logo */
+.pms-sidebar-brand {
+    @apply flex items-center gap-2 px-4 py-5;
+}
+
+.pms-sidebar-brand-icon {
+    @apply w-8 h-8 rounded-lg bg-pms-primary text-white flex items-center justify-center flex-shrink-0;
+}
+
+.pms-sidebar-brand-title {
+    @apply text-base font-bold text-pms-text-primary leading-tight;
+}
+
+.pms-sidebar-brand-subtitle {
+    @apply text-[11px] text-pms-text-muted leading-tight;
+}
+
+/* Navigation */
+.pms-sidebar-nav {
+    @apply flex-1 overflow-y-auto px-3 space-y-1;
+}
+
+.pms-nav-item {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-pms-text-secondary transition-colors;
+}
+
+.pms-nav-item:hover {
+    @apply bg-pms-bg-sidebar-hover text-pms-primary-dark;
+}
+
+.pms-nav-icon {
+    @apply w-5 h-5 flex-shrink-0 text-pms-text-muted;
+}
+
+.pms-nav-label {
+    @apply flex-1 font-medium;
+}
+
+.pms-nav-chevron {
+    @apply w-3.5 h-3.5 flex-shrink-0 opacity-40;
+}
+
+.pms-nav-badge {
+    @apply bg-pms-notification-red text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0;
+}
+
+/* Active state — teal pill like reference image */
+.pms-nav-item-active {
+    @apply bg-pms-primary text-white font-semibold shadow-sm;
+}
+
+.pms-nav-item-active .pms-nav-icon,
+.pms-nav-item-active .pms-nav-chevron {
+    @apply text-white opacity-90;
+}
+
+.pms-nav-item-active:hover {
+    @apply bg-pms-primary text-white;
+}
+
+/* Footer card */
+.pms-sidebar-footer-card {
+    @apply bg-pms-bg-sidebar-active border border-pms-border rounded-xl p-3 m-3 flex items-center gap-3 flex-shrink-0;
+}
+
+/* ==========================================================
+   SUPPLIERS PARENT MENU
+   ========================================================== */
+
+.pms-nav-item.pms-supplier-parent-active {
+    background: #D4F3F4 !important;
+    color: #006064 !important;
+    font-weight: 600;
+}
+
+.pms-nav-item.pms-supplier-parent-active .pms-nav-icon {
+    color: #00838F !important;
+    opacity: 1;
+}
+
+.pms-nav-item.pms-supplier-parent-active .pms-nav-label {
+    color: #006064 !important;
+}
+
+.pms-nav-item.pms-supplier-parent-active .pms-nav-chevron {
+    color: #00838F !important;
+    opacity: 1;
+}
+
+/* Hover */
+.pms-nav-item.pms-supplier-parent-active:hover {
+    background: #E0F2F1 !important;
+    color: #006064 !important;
+}
+
+
+/* ==========================================================
+   SUPPLIER SUBMENU
+   ========================================================== */
+
+.pms-submenu {
+    margin-left: 18px;
+    padding-left: 18px;
+    border-left: 1px solid #DCEEEE;
+    margin-top: 3px;
+    margin-bottom: 5px;
+}
+
+.pms-submenu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    min-height: 38px;
+    padding: 8px 12px;
+
+    color: #718792;
+    font-size: 13px;
+    font-weight: 500;
+
+    text-decoration: none;
+    border-radius: 8px;
+
+    transition: all 0.2s ease;
+}
+
+.pms-submenu-item:hover {
+    background: #E0F2F1;
+    color: #006064;
+}
+
+.pms-submenu-item-active {
+    background: #D4F3F4;
+    color: #006064;
+    font-weight: 600;
+}
+
+.pms-submenu-dot {
+    width: 5px;
+    height: 5px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #98A7AF;
+}
+
+.pms-submenu-item-active .pms-submenu-dot {
+    background: #00838F;
+    box-shadow: 0 0 6px rgba(0, 131, 143, 0.35);
 }
