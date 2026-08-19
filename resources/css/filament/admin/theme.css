@@ -1,0 +1,282 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+
+/* ==========================================================================
+   MediCare Pharmacy System — Filament Admin Theme
+   Path: resources/css/filament/admin/theme.css
+   ========================================================================== */
+
+@import '/vendor/filament/filament/resources/css/theme.css';
+
+
+
+@theme {
+    /* 1. Primary Colors */
+    --color-pms-primary: #00838F;
+    --color-pms-primary-light: #00ACC1;
+    --color-pms-primary-dark: #006064;
+    --color-pms-accent: #26A69A;
+
+    /* 2. Background Colors */
+    --color-pms-bg-page: #F8FAFA;
+    --color-pms-bg-surface: #FFFFFF;
+    --color-pms-bg-sidebar: #F0FAFA;
+    --color-pms-bg-sidebar-active: #D4F3F4;
+    --color-pms-bg-sidebar-hover: #E0F2F1;
+
+    /* 3. Text Colors */
+    --color-pms-text-primary: #123047;
+    --color-pms-text-secondary: #405A68;
+    --color-pms-text-muted: #718792;
+    --color-pms-text-light: #98A7AF;
+    --color-pms-text-placeholder: #B0BEC5;
+
+    /* 4. Status Colors */
+    --color-pms-success: #2E7D5B;
+    --color-pms-warning: #F59E0B;
+    --color-pms-danger: #DC4C4C;
+
+    /* 5. Status Light Backgrounds */
+    --color-pms-success-light: #E8F5EF;
+    --color-pms-warning-light: #FFF7E6;
+    --color-pms-danger-light: #FDECEC;
+
+    /* 6. Border & Divider */
+    --color-pms-border: #E2EEEE;
+    --color-pms-divider: #EEF2F3;
+
+    /* 7. Other UI Elements */
+    --color-pms-notification-red: #FF5252;
+    --color-pms-icon-color: #26A69A;
+    --color-pms-icon-light: #80CBC4;
+    --color-pms-chart-line: #00838F;
+    --color-pms-chart-area: #E0F7FA;
+    --color-pms-link-highlight: #00838F;
+}
+
+/* --------------------------------------------------------------------------
+   1. BASE PAGE / LAYOUT
+   -------------------------------------------------------------------------- */
+
+.fi-body,
+.fi-main {
+    @apply bg-pms-bg-page;
+}
+
+.fi-sidebar {
+    @apply bg-pms-bg-sidebar border-r border-pms-border;
+}
+
+.fi-sidebar-item.fi-active .fi-sidebar-item-button {
+    @apply bg-pms-bg-sidebar-active text-pms-primary-dark font-semibold;
+}
+
+.fi-sidebar-item.fi-active .fi-sidebar-item-icon {
+    @apply text-pms-primary-dark;
+}
+
+.fi-sidebar-item-button:hover {
+    @apply bg-pms-bg-sidebar-hover;
+}
+
+.fi-topbar {
+    @apply bg-white border-b border-pms-border;
+}
+
+/* --------------------------------------------------------------------------
+   2. TEXT UTILITIES
+   -------------------------------------------------------------------------- */
+
+.pms-text-heading {
+    @apply text-pms-text-primary font-semibold;
+}
+
+.pms-text-body {
+    @apply text-pms-text-secondary;
+}
+
+.pms-text-muted {
+    @apply text-pms-text-muted text-sm;
+}
+
+/* --------------------------------------------------------------------------
+   3. CARDS (Stat Cards, Widget Cards)
+   -------------------------------------------------------------------------- */
+
+.pms-card {
+    @apply bg-pms-bg-surface rounded-xl border border-pms-border p-4;
+    box-shadow: 0 4px 16px rgba(16, 48, 71, 0.06);
+}
+
+.pms-stat-card {
+    @apply bg-pms-bg-surface rounded-xl border border-pms-border p-4 flex flex-col gap-2;
+    box-shadow: 0 4px 16px rgba(16, 48, 71, 0.06);
+}
+
+.pms-stat-card-icon {
+    @apply w-10 h-10 rounded-lg flex items-center justify-center bg-pms-success-light text-pms-primary;
+}
+
+.pms-stat-value {
+    @apply text-2xl font-bold text-pms-text-primary;
+}
+
+.pms-stat-label {
+    @apply text-sm text-pms-text-muted;
+}
+
+.pms-stat-trend-up {
+    @apply text-pms-success text-xs font-medium flex items-center gap-1;
+}
+
+.pms-stat-trend-down {
+    @apply text-pms-danger text-xs font-medium flex items-center gap-1;
+}
+
+/* --------------------------------------------------------------------------
+   4. HERO / BANNER (Smart Pharmacy Management section)
+   -------------------------------------------------------------------------- */
+
+.pms-hero-banner {
+    @apply rounded-2xl p-6 text-white flex items-center justify-between overflow-hidden;
+    background-image: linear-gradient(135deg, #00838F 0%, #26A69A 100%);
+}
+
+.pms-hero-title {
+    @apply text-xl md:text-2xl font-bold text-white;
+}
+
+.pms-hero-subtitle {
+    @apply text-white/80 text-sm mt-1;
+}
+
+.pms-hero-btn-primary {
+    @apply bg-white text-pms-primary-dark px-4 py-2 rounded-lg font-medium text-sm hover:bg-white/90 transition;
+}
+
+.pms-hero-btn-outline {
+    @apply border border-white/60 text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-white/10 transition;
+}
+
+/* --------------------------------------------------------------------------
+   5. BADGES / STATUS LABELS
+   -------------------------------------------------------------------------- */
+
+.pms-badge-success {
+    @apply bg-pms-success-light text-pms-success text-xs font-medium px-2 py-1 rounded-full;
+}
+
+.pms-badge-warning {
+    @apply bg-pms-warning-light text-pms-warning text-xs font-medium px-2 py-1 rounded-full;
+}
+
+.pms-badge-danger {
+    @apply bg-pms-danger-light text-pms-danger text-xs font-medium px-2 py-1 rounded-full;
+}
+
+.pms-badge-low-stock {
+    @apply bg-pms-warning-light text-pms-warning text-xs font-medium px-2 py-1 rounded-full;
+}
+
+.pms-badge-out-of-stock {
+    @apply bg-pms-danger-light text-pms-danger text-xs font-medium px-2 py-1 rounded-full;
+}
+
+.pms-badge-in-stock {
+    @apply bg-pms-success-light text-pms-success text-xs font-medium px-2 py-1 rounded-full;
+}
+
+/* --------------------------------------------------------------------------
+   6. TABLES (Recent Sales, Low Stock Alerts, Top Selling)
+   -------------------------------------------------------------------------- */
+
+.pms-table-header {
+    @apply bg-pms-bg-page text-pms-text-muted uppercase text-xs font-semibold tracking-wide;
+}
+
+.pms-table-row {
+    @apply border-b border-pms-divider hover:bg-pms-bg-page transition;
+}
+
+.pms-table-cell {
+    @apply text-sm text-pms-text-secondary py-3 px-4;
+}
+
+/* --------------------------------------------------------------------------
+   7. CHARTS (Sales Trend, Stock Status)
+   -------------------------------------------------------------------------- */
+
+.pms-chart-card {
+    @apply bg-pms-bg-surface rounded-xl border border-pms-border p-4;
+    box-shadow: 0 4px 16px rgba(16, 48, 71, 0.06);
+}
+
+.pms-chart-tab-active {
+    @apply bg-pms-primary text-white text-xs font-medium px-3 py-1 rounded-full;
+}
+
+.pms-chart-tab {
+    @apply text-pms-text-muted text-xs font-medium px-3 py-1 rounded-full hover:bg-pms-bg-page;
+}
+
+/* --------------------------------------------------------------------------
+   8. ALERT / TRACKER LIST ITEMS (Low Stock, Expiry Tracker)
+   -------------------------------------------------------------------------- */
+
+.pms-alert-item {
+    @apply flex items-center justify-between py-2 border-b border-pms-divider last:border-0;
+}
+
+.pms-alert-item-title {
+    @apply text-sm font-medium text-pms-text-primary;
+}
+
+.pms-alert-item-sub {
+    @apply text-xs text-pms-danger;
+}
+
+.pms-alert-action-btn {
+    @apply text-xs font-medium text-pms-primary hover:underline;
+}
+
+/* --------------------------------------------------------------------------
+   9. BUTTONS
+   -------------------------------------------------------------------------- */
+
+.pms-btn-primary {
+    @apply bg-pms-primary text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-pms-primary-dark transition;
+}
+
+.pms-btn-outline {
+    @apply border border-pms-primary text-pms-primary text-sm font-medium px-4 py-2 rounded-lg hover:bg-pms-success-light transition;
+}
+
+/* --------------------------------------------------------------------------
+   10. NOTIFICATION DOT
+   -------------------------------------------------------------------------- */
+
+.pms-notification-dot {
+    @apply bg-pms-notification-red text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center;
+}
+
+/* --------------------------------------------------------------------------
+   13. SIDEBAR FOOTER CARD (MediCare info card at bottom of sidebar)
+   -------------------------------------------------------------------------- */
+
+.pms-sidebar-footer-card {
+    @apply bg-pms-bg-sidebar-active border border-pms-border rounded-xl p-3 m-3 flex items-center gap-3;
+}
+
+.pms-sidebar-footer-icon {
+    @apply w-9 h-9 rounded-full bg-pms-primary text-white flex items-center justify-center flex-shrink-0;
+}
+
+.pms-sidebar-footer-title {
+    @apply text-sm font-semibold text-pms-text-primary leading-tight;
+}
+
+.pms-sidebar-footer-subtitle {
+    @apply text-xs text-pms-text-muted leading-tight;
+}
