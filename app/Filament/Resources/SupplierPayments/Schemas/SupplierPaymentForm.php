@@ -42,7 +42,7 @@ class SupplierPaymentForm
                         TextInput::make('amount')
                             ->label('Payment Amount')
                             ->numeric()
-                            ->prefix('PKR')
+                            ->prefix('USD')
                             ->minValue(0.01)
                             ->required(),
 

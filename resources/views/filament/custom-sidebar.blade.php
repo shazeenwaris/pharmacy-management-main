@@ -1,5 +1,5 @@
-<div class="pms-sidebar">
-
+<!-- <div class="pms-sidebar"> -->
+<div class="pms-sidebar" style="width:280px; min-width:280px;">
     {{-- ===== LOGO / BRAND ===== --}}
     <div class="pms-sidebar-brand">
         <div class="pms-sidebar-brand-icon">
