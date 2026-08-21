@@ -27,7 +27,8 @@ class adminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->viteTheme('resources/css/filament/admin/theme.css')
+             
+        ->viteTheme('resources/css/filament/admin/theme.css')
             ->login()
             ->brandName('MediCare Pharmacy System')
             ->colors([
@@ -45,14 +46,20 @@ class adminPanelProvider extends PanelProvider
                     950 => '0, 51, 56',
                 ],
             ])
-            ->renderHook(
-                PanelsRenderHook::SIDEBAR_NAV_START,
-                fn (): string => view('filament.custom-sidebar')->render(),
-            )
-            ->renderHook(
-                PanelsRenderHook::SIDEBAR_FOOTER,
-                fn (): string => view('filament.sidebar-footer')->render(),
-            )
+          ->renderHook(
+    PanelsRenderHook::BODY_START,
+    fn (): string => request()->is('admin/login')
+        ? ''
+        : view('filament.custom-navbar')->render(),
+)
+           ->renderHook(
+    PanelsRenderHook::SIDEBAR_START,
+    fn (): string => view('filament.custom-sidebar')->render(),
+)
+            // ->renderHook(
+            //     PanelsRenderHook::SIDEBAR_FOOTER,
+            //     fn (): string => view('filament.sidebar-footer')->render(),
+            // )
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([

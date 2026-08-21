@@ -142,12 +142,12 @@
 
 .pms-card {
     @apply bg-pms-bg-surface rounded-xl border border-pms-border p-4;
-    box-shadow: 0 4px 16px rgba(16, 48, 71, 0.06);
+    box-shadow: 0 4px 16px rgba(19, 68, 104, 0.06);
 }
 
 .pms-stat-card {
     @apply bg-pms-bg-surface rounded-xl border border-pms-border p-4 flex flex-col gap-2;
-    box-shadow: 0 4px 16px rgba(16, 48, 71, 0.06);
+    box-shadow: 0 4px 16px rgba(17, 61, 92, 0.06);
 }
 
 .pms-stat-card-icon {
@@ -529,4 +529,3090 @@
 .pms-submenu-item-active .pms-submenu-dot {
     background: #00838F;
     box-shadow: 0 0 6px rgba(0, 131, 143, 0.35);
+}
+
+/* =========================================================
+   MEDICARE SUPPLIERS PAGE
+   CLEAN + COMPACT + PROPERLY ALIGNED
+========================================================= */
+
+
+/* =========================================================
+   1. SUPPLIER STATS OUTER WRAPPER
+========================================================= */
+
+.supplier-stats-widget,
+.supplier-stats-widget.fi-wi,
+.supplier-stats-widget.fi-wi-widget,
+.supplier-stats-widget.fi-wi-stats-overview {
+
+    background: transparent !important;
+    background-color: transparent !important;
+
+    border: 0 !important;
+    box-shadow: none !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    border-radius: 0 !important;
+}
+
+
+/* Remove Filament wrappers around stats */
+
+.fi-wi:has(.supplier-stat-card),
+.fi-wi-widget:has(.supplier-stat-card),
+.fi-wi-stats-overview:has(.supplier-stat-card),
+.fi-section:has(.supplier-stat-card) {
+
+    background: transparent !important;
+    background-color: transparent !important;
+
+    border: 0 !important;
+    box-shadow: none !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+
+/* =========================================================
+   2. PAGE HEADER WIDGET AREA
+   REDUCE LARGE FILAMENT SPACING
+========================================================= */
+
+.fi-page:has(.supplier-stats-widget) .fi-wi {
+
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+
+/* Header widgets main grid */
+
+.fi-page:has(.supplier-stats-widget) .fi-wi-grid {
+
+    row-gap: 12px !important;
+    column-gap: 0 !important;
+
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+
+/* =========================================================
+   3. STATS GRID
+========================================================= */
+
+.supplier-stats-widget .fi-wi-stats-overview-stats-ctn {
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr)) !important;
+
+    gap: 14px !important;
+
+    width: 100% !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+
+/* =========================================================
+   4. SUPPLIER STAT CARD
+========================================================= */
+
+.supplier-stats-widget .supplier-stat-card {
+
+    position: relative !important;
+
+    height: 88px !important;
+    min-height: 88px !important;
+
+    padding: 11px 14px !important;
+
+    margin: 0 !important;
+
+    border-radius: 10px !important;
+
+    border: 1px solid #dfe7e8 !important;
+
+    background: #ffffff !important;
+
+    box-shadow:
+        0 2px 7px rgba(15, 45, 50, 0.045) !important;
+
+    overflow: hidden !important;
+
+    transition:
+        transform 0.18s ease,
+        box-shadow 0.18s ease,
+        border-color 0.18s ease !important;
+
+    --tw-ring-offset-shadow: 0 0 transparent !important;
+    --tw-ring-shadow: 0 0 transparent !important;
+    --tw-shadow: none !important;
+
+    outline: none !important;
+}
+
+
+/* =========================================================
+   5. CARD HOVER
+========================================================= */
+
+.supplier-stats-widget .supplier-stat-card:hover {
+
+    transform: translateY(-2px) !important;
+
+    border-color: #c8dfe1 !important;
+
+    box-shadow:
+        0 7px 18px rgba(15, 45, 50, 0.08) !important;
+}
+
+
+/* =========================================================
+   6. LEFT ACCENT LINE
+========================================================= */
+
+.supplier-stats-widget .supplier-stat-card::before {
+
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 10px;
+    bottom: 10px;
+
+    width: 3px;
+
+    border-radius:
+        0 4px 4px 0;
+}
+
+
+/* Total */
+
+.supplier-stats-widget .supplier-stat-total::before {
+    background: #008892;
+}
+
+
+/* Active */
+
+.supplier-stats-widget .supplier-stat-active::before {
+    background: #16a36a;
+}
+
+
+/* Payable */
+
+.supplier-stats-widget .supplier-stat-payable::before {
+    background: #df941d;
+}
+
+
+/* Inactive */
+
+.supplier-stats-widget .supplier-stat-inactive::before {
+    background: #d75b64;
+}
+
+
+/* =========================================================
+   7. LABEL
+========================================================= */
+
+.supplier-stats-widget .supplier-stat-card .fi-wi-stats-overview-stat-label {
+
+    font-size: 11px !important;
+
+    line-height: 1.15 !important;
+
+    font-weight: 500 !important;
+
+    color: #64748b !important;
+
+    margin: 0 !important;
+}
+
+
+/* =========================================================
+   8. VALUE
+========================================================= */
+
+.supplier-stats-widget .supplier-stat-card .fi-wi-stats-overview-stat-value {
+
+    margin-top: 4px !important;
+
+    font-size: 21px !important;
+
+    line-height: 1 !important;
+
+    font-weight: 700 !important;
+
+    color: #0f172a !important;
+}
+
+
+/* =========================================================
+   9. DESCRIPTION
+========================================================= */
+
+.supplier-stats-widget .supplier-stat-card .fi-wi-stats-overview-stat-description {
+
+    margin-top: 4px !important;
+
+    font-size: 9px !important;
+
+    line-height: 1.1 !important;
+
+    color: #64748b !important;
+}
+
+
+/* =========================================================
+   10. MAIN ICON
+========================================================= */
+
+.supplier-stats-widget .supplier-stat-card .fi-wi-stats-overview-stat-icon {
+
+    width: 30px !important;
+    height: 30px !important;
+
+    padding: 7px !important;
+
+    border-radius: 8px !important;
+
+    background: #edf8f8 !important;
+
+    color: #008892 !important;
+}
+
+
+/* Total */
+
+.supplier-stat-total .fi-wi-stats-overview-stat-icon {
+
+    background: #edf8f8 !important;
+    color: #008892 !important;
+}
+
+
+/* Active */
+
+.supplier-stat-active .fi-wi-stats-overview-stat-icon {
+
+    background: #edf8f2 !important;
+    color: #16a36a !important;
+}
+
+
+/* Payable */
+
+.supplier-stat-payable .fi-wi-stats-overview-stat-icon {
+
+    background: #fff7e9 !important;
+    color: #df941d !important;
+}
+
+
+/* Inactive */
+
+.supplier-stat-inactive .fi-wi-stats-overview-stat-icon {
+
+    background: #fff0f1 !important;
+    color: #d75b64 !important;
+}
+
+
+/* =========================================================
+   11. DESCRIPTION ICON
+========================================================= */
+
+.supplier-stats-widget .fi-wi-stats-overview-stat-description-icon {
+
+    width: 12px !important;
+    height: 12px !important;
+}
+
+
+/* =========================================================
+   12. SUPPLIER ACTION BUTTON AREA
+========================================================= */
+
+/*
+   Add Supplier widget ko right side par rakhein
+*/
+
+.fi-page:has(.supplier-stats-widget) .fi-wi:has(.supplier-actions-widget) {
+
+    display: flex !important;
+
+    justify-content: flex-end !important;
+
+    width: 100% !important;
+
+    margin-top: 2px !important;
+    margin-bottom: 0 !important;
+}
+
+
+/*
+   Agar custom widget ka class different ho
+   to generic widget positioning
+*/
+
+.fi-page:has(.supplier-stats-widget) .fi-header-widgets>.fi-wi:last-child {
+
+    display: flex !important;
+
+    justify-content: flex-end !important;
+
+    width: 100% !important;
+
+    margin-top: 0 !important;
+}
+
+
+/* =========================================================
+   13. ADD SUPPLIER BUTTON
+========================================================= */
+
+.fi-page:has(.supplier-stats-widget) .fi-wi:last-child .fi-btn {
+
+    min-height: 42px !important;
+
+    padding:
+        0 18px !important;
+
+    border-radius: 10px !important;
+
+    font-size: 13px !important;
+
+    font-weight: 600 !important;
+
+    box-shadow:
+        0 3px 8px rgba(0, 136, 146, 0.12) !important;
+
+    margin: 0 !important;
+}
+
+
+/* =========================================================
+   14. TABLE TOP SPACING
+========================================================= */
+
+.fi-page:has(.supplier-stats-widget) .fi-ta-ctn {
+
+    margin-top: 12px !important;
+}
+
+
+/* =========================================================
+   15. HIDE EMPTY SUPPLIER TABLE
+   WHEN THERE ARE NO SUPPLIERS
+========================================================= */
+
+/*
+   Agar supplier data = 0 ho:
+   table + search + filter + table header hide.
+*/
+
+.fi-page:has(.supplier-stats-widget) .fi-ta-ctn:has(.fi-ta-empty-state) {
+
+    display: none !important;
+}
+
+
+/*
+   Fallback for Filament empty-state heading
+*/
+
+.fi-page:has(.supplier-stats-widget) .fi-ta-ctn:has(.fi-ta-empty-state-heading) {
+
+    display: none !important;
+}
+
+
+/* =========================================================
+   16. WHEN TABLE HAS DATA
+========================================================= */
+
+.fi-page:has(.supplier-stats-widget) .fi-ta-ctn:not(:has(.fi-ta-empty-state)) {
+
+    margin-top: 12px !important;
+}
+
+
+/* =========================================================
+   17. REMOVE UNNECESSARY PAGE HEADER SPACING
+========================================================= */
+
+.fi-page:has(.supplier-stats-widget) .fi-header {
+
+    margin-bottom: 8px !important;
+}
+
+
+/* Breadcrumb/title area */
+
+.fi-page:has(.supplier-stats-widget) .fi-header-heading {
+
+    margin-bottom: 0 !important;
+}
+
+/* =========================================================
+   SUPPLIER TABLE PAGINATION
+   Hide "Showing..." + move Per Page to right
+========================================================= */
+
+/* Hide Showing results text */
+.supplier-table-widget .fi-pagination-records {
+    display: none !important;
+}
+
+/* Pagination footer */
+.supplier-table-widget .fi-pagination {
+    display: flex !important;
+    justify-content: flex-end !important;
+    width: 100% !important;
+}
+
+/* Per page section */
+.supplier-table-widget .fi-pagination-items-per-page {
+    margin-left: auto !important;
+}
+
+/* Hide "Showing 1 to 2 of 2 results" */
+.fi-pagination-records {
+    display: none !important;
+}
+
+/* Move Per Page dropdown to right */
+.fi-pagination {
+    display: flex !important;
+    justify-content: flex-end !important;
+    width: 100% !important;
+}
+
+.fi-pagination-items-per-page {
+    margin-left: auto !important;
+}
+
+/* =========================================================
+   18. DESKTOP
+========================================================= */
+
+@media (min-width: 1051px) {
+
+    .supplier-stats-widget .fi-wi-stats-overview-stats-ctn {
+
+        grid-template-columns:
+            repeat(4, minmax(0, 1fr)) !important;
+
+        gap: 14px !important;
+    }
+
+    .supplier-stats-widget .supplier-stat-card {
+
+        height: 88px !important;
+        min-height: 88px !important;
+    }
+}
+
+
+/* =========================================================
+   19. TABLET
+========================================================= */
+
+@media (max-width: 1050px) {
+
+    .supplier-stats-widget .fi-wi-stats-overview-stats-ctn {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+
+        gap: 12px !important;
+    }
+
+    .supplier-stats-widget .supplier-stat-card {
+
+        height: 88px !important;
+        min-height: 88px !important;
+    }
+}
+
+
+/* =========================================================
+   20. MOBILE
+========================================================= */
+
+@media (max-width: 640px) {
+
+    .supplier-stats-widget .fi-wi-stats-overview-stats-ctn {
+
+        grid-template-columns: 1fr !important;
+
+        gap: 10px !important;
+    }
+
+    .supplier-stats-widget .supplier-stat-card {
+
+        height: 82px !important;
+        min-height: 82px !important;
+    }
+
+    .fi-page:has(.supplier-stats-widget) .fi-wi:has(.supplier-actions-widget) {
+
+        justify-content: stretch !important;
+    }
+
+    .fi-page:has(.supplier-stats-widget) .fi-wi:last-child .fi-btn {
+
+        width: 100% !important;
+    }
+}
+
+/* =========================================================
+   MEDICARE MODERN TOPBAR
+========================================================= */
+
+.pms-topbar {
+    height: 72px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 24px;
+
+    background: rgba(255, 255, 255, 0.96);
+
+    border-bottom: 1px solid #e4eeee;
+
+    box-shadow:
+        0 4px 18px rgba(0, 96, 100, 0.05);
+
+    position: relative;
+    z-index: 30;
+
+    backdrop-filter: blur(12px);
+}
+
+
+/* LEFT */
+
+.pms-topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+
+.pms-page-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+
+.pms-page-title {
+    color: #263238;
+    font-size: 15px;
+    font-weight: 750;
+    letter-spacing: -0.01em;
+}
+
+
+.pms-page-subtitle {
+    color: #90a4ae;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+
+/* RIGHT */
+
+.pms-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+/* ACTION BUTTON */
+
+.pms-topbar-action {
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #e4eeee;
+    border-radius: 12px;
+
+    background: #ffffff;
+
+    color: #607d83;
+
+    cursor: pointer;
+
+    transition:
+        background 0.25s ease,
+        color 0.25s ease,
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+.pms-topbar-action svg {
+    width: 19px;
+    height: 19px;
+}
+
+
+.pms-topbar-action:hover {
+    color: #00838f;
+
+    background: #e0f7fa;
+
+    border-color: #b2ebf2;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 6px 14px rgba(0, 131, 143, 0.10);
+}
+
+
+/* NOTIFICATION */
+
+.pms-notification-btn {
+    position: relative;
+}
+
+
+.pms-notification-dot {
+    position: absolute;
+
+    top: 7px;
+    right: 7px;
+
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #ef5350;
+
+    border: 2px solid #ffffff;
+}
+
+
+/* DIVIDER */
+
+.pms-topbar-divider {
+    width: 1px;
+    height: 32px;
+
+    background: #e5eeee;
+
+    margin: 0 8px;
+}
+
+
+/* USER */
+
+.pms-user {
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 6px 8px 6px 6px;
+
+    border-radius: 14px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+.pms-user:hover {
+    background: #f0fafa;
+
+    box-shadow:
+        0 5px 16px rgba(4, 128, 133, 0.07);
+}
+
+
+/* AVATAR */
+
+.pms-user-avatar {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 11px;
+
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 750;
+
+    background:
+        linear-gradient(135deg,
+            #00838f,
+            #006064);
+
+    box-shadow:
+        0 5px 12px rgba(5, 143, 148, 0.18);
+}
+
+
+/* USER INFO */
+
+.pms-user-info {
+    display: flex;
+    flex-direction: column;
+
+    min-width: 100px;
+}
+
+
+.pms-user-name {
+    color: #2b5f79;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+
+.pms-user-role {
+    color: #90a4ae;
+
+    font-size: 10px;
+    font-weight: 500;
+}
+
+
+/* CHEVRON */
+
+.pms-user-chevron {
+    width: 15px;
+    height: 15px;
+
+    color: #90a4ae;
+
+    transition:
+        transform 0.25s ease,
+        color 0.25s ease;
+}
+
+
+.pms-user:hover .pms-user-chevron {
+    color: #00838f;
+
+    transform: rotate(180deg);
+}
+
+
+/* MOBILE */
+
+.pms-mobile-menu {
+    display: none;
+}
+
+
+.pms-mobile-menu button {
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #e4eeee;
+    border-radius: 11px;
+
+    background: #ffffff;
+
+    color: #607d83;
+}
+
+
+.pms-mobile-menu svg {
+    width: 20px;
+    height: 20px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .pms-topbar {
+        height: 64px;
+        padding: 0 14px;
+    }
+
+    .pms-mobile-menu {
+        display: block;
+    }
+
+    .pms-page-subtitle {
+        display: none;
+    }
+
+    .pms-user-info {
+        display: none;
+    }
+
+    .pms-user-chevron {
+        display: none;
+    }
+
+    .pms-topbar-action {
+        width: 36px;
+        height: 36px;
+    }
+
+    .pms-user-avatar {
+        width: 36px;
+        height: 36px;
+    }
+
+    .pms-topbar-divider {
+        margin: 0 3px;
+    }
+
+}
+
+
+@media (max-width: 480px) {
+
+    .pms-search-btn {
+        display: none;
+    }
+
+    .pms-topbar {
+        padding: 0 10px;
+    }
+
+}
+
+/* =========================================================
+   HIDE FILAMENT DEFAULT TOPBAR
+========================================================= */
+
+
+/* Remove Filament topbar spacing */
+.fi-main-ctn {
+    padding-top: 0 !important;
+}
+
+/* Hide Filament default topbar */
+.fi-topbar {
+    display: none !important;
+}
+
+/* Remove space reserved for topbar */
+.fi-main {
+    padding-top: 72px !important;
+}
+
+/* Keep custom navbar visible */
+.pms-topbar {
+    height: 72px;
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 24px;
+
+    background: #ffffff;
+    border-bottom: 1px solid #e4eeee;
+
+    box-shadow: 0 4px 18px rgba(3, 133, 138, 0.05);
+
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    z-index: 9999;
+}
+
+.pms-sidebar {
+    @apply flex flex-col h-full bg-pms-bg-sidebar border-r border-pms-border;
+}
+
+/* =========================================================
+   SUPPLIER FORM — COMPACT PREMIUM
+========================================================= */
+
+.fi-section {
+    border: 1px solid #e2eeee !important;
+    border-radius: 14px !important;
+    background: #ffffff !important;
+    box-shadow: 0 3px 12px rgba(0, 96, 100, 0.04) !important;
+}
+
+
+/* Header */
+
+.fi-section-header {
+    padding: 14px 18px !important;
+    background: #fbfefe !important;
+    border-bottom: 1px solid #edf4f4 !important;
+}
+
+.fi-section-header-heading {
+    color: #006064 !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+}
+
+.fi-section-header-icon {
+    color: #00838f !important;
+}
+
+
+/* Body */
+
+.fi-section-content {
+    padding: 18px !important;
+}
+
+
+/* Labels */
+
+.fi-fo-field-wrp-label {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #455a64 !important;
+}
+
+
+/* Inputs */
+
+.fi-input,
+.fi-select-input,
+.fi-fo-textarea {
+    min-height: 40px !important;
+    border-radius: 9px !important;
+    border-color: #dcebec !important;
+    font-size: 13px !important;
+}
+
+
+/* Focus */
+
+.fi-input:focus,
+.fi-select-input:focus,
+.fi-fo-textarea:focus {
+    border-color: #00838f !important;
+
+    box-shadow:
+        0 0 0 2px rgba(0, 131, 143, 0.08) !important;
+}
+
+
+/* Prefix icons */
+
+.fi-input-wrp-prefix svg {
+    color: #00838f !important;
+}
+
+
+/* Textarea */
+
+.fi-fo-textarea {
+    min-height: 70px !important;
+}
+
+
+/* Form spacing */
+
+.fi-fo-component-ct {
+    gap: 14px !important;
+}
+
+/* =========================================================
+   MEDICARE SUPPLIER VIEW
+   CLEAN MODERN ERP DESIGN
+========================================================= */
+
+
+
+.fi-page {
+    background: #f7fbfb !important;
+}
+
+/* =========================================================
+   MEDICARE SUPPLIER VIEW
+   MODERN PROFESSIONAL ERP DESIGN
+========================================================= */
+
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.fi-main {
+    background: #f5f8fa !important;
+}
+
+.fi-in {
+    max-width: 1280px !important;
+    margin-inline: auto !important;
+    padding-bottom: 50px !important;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.fi-header {
+    margin-bottom: 24px !important;
+}
+
+.fi-header-heading {
+    color: #102a36 !important;
+    font-size: 27px !important;
+    font-weight: 750 !important;
+    letter-spacing: -0.035em !important;
+}
+
+.fi-header-subheading {
+    color: #80929a !important;
+    font-size: 13px !important;
+    margin-top: 4px !important;
+}
+
+
+/* =========================================================
+   HEADER BUTTON
+========================================================= */
+
+.fi-page-header-actions .fi-btn {
+    min-height: 40px !important;
+    padding: 0 18px !important;
+
+    border-radius: 10px !important;
+
+    font-size: 13px !important;
+    font-weight: 700 !important;
+
+    box-shadow:
+        0 5px 14px rgba(0, 125, 135, .14) !important;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease !important;
+}
+
+.fi-page-header-actions .fi-btn:hover {
+    transform: translateY(-2px) !important;
+
+    box-shadow:
+        0 9px 20px rgba(0, 125, 135, .18) !important;
+}
+
+
+/* =========================================================
+   SUPPLIER OVERVIEW
+========================================================= */
+
+.supplier-overview {
+
+    position: relative !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid #e3ecef !important;
+
+    border-radius: 18px !important;
+
+    overflow: hidden !important;
+
+    box-shadow:
+        0 8px 25px rgba(25, 65, 75, .055) !important;
+
+    margin-bottom: 20px !important;
+}
+
+
+/* top line */
+
+.supplier-overview::before {
+
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 4px;
+
+    background:
+        linear-gradient(90deg,
+            #007f89,
+            #16a6a6,
+            #7bd1c9);
+
+    z-index: 2;
+}
+
+
+/* =========================================================
+   OVERVIEW CONTENT
+========================================================= */
+
+.supplier-overview .fi-section-content {
+
+    padding: 28px !important;
+
+    background:
+        linear-gradient(135deg,
+            #ffffff 0%,
+            #fbfefe 100%) !important;
+}
+
+
+/* =========================================================
+   OVERVIEW ENTRIES
+========================================================= */
+
+.supplier-overview .fi-in-entry {
+
+    min-width: 0 !important;
+
+    padding: 3px 4px !important;
+
+    transition: transform .2s ease;
+}
+
+.supplier-overview .fi-in-entry:hover {
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   OVERVIEW LABEL
+========================================================= */
+
+.supplier-overview .fi-in-entry-label {
+
+    color: #8b9ba1 !important;
+
+    font-size: 9px !important;
+
+    font-weight: 750 !important;
+
+    text-transform: uppercase;
+
+    letter-spacing: .10em !important;
+
+    margin-bottom: 6px !important;
+}
+
+
+/* =========================================================
+   OVERVIEW VALUE
+========================================================= */
+
+.supplier-overview .fi-in-entry-content {
+
+    color: #253d46 !important;
+
+    font-size: 13px !important;
+
+    font-weight: 650 !important;
+
+    line-height: 1.5 !important;
+}
+
+
+/* =========================================================
+   SUPPLIER NAME
+========================================================= */
+
+.supplier-overview-name .fi-in-entry-content {
+
+    color: #073b44 !important;
+
+    font-size: 22px !important;
+
+    font-weight: 800 !important;
+
+    letter-spacing: -.035em !important;
+}
+
+
+/* =========================================================
+   COMPANY
+========================================================= */
+
+.supplier-overview-company .fi-in-entry-content {
+
+    color: #49636b !important;
+
+    font-size: 14px !important;
+
+    font-weight: 600 !important;
+}
+
+
+/* =========================================================
+   ICONS
+========================================================= */
+
+.supplier-overview .fi-in-entry-icon {
+
+    width: 15px !important;
+
+    height: 15px !important;
+
+    color: #008b95 !important;
+
+    opacity: .85 !important;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.supplier-overview-status .fi-badge {
+
+    border-radius: 999px !important;
+
+    padding: 5px 11px !important;
+
+    font-size: 10px !important;
+
+    font-weight: 750 !important;
+
+    letter-spacing: .02em !important;
+}
+
+
+/* =========================================================
+   MODERN INFORMATION CARDS
+========================================================= */
+
+.supplier-modern-card {
+
+    background: #ffffff !important;
+
+    border: 1px solid #e2eaed !important;
+
+    border-radius: 16px !important;
+
+    overflow: hidden !important;
+
+    box-shadow:
+        0 5px 20px rgba(26, 62, 71, .045) !important;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        border-color .2s ease !important;
+}
+
+
+.supplier-modern-card:hover {
+
+    transform: translateY(-2px) !important;
+
+    border-color: #cbdde0 !important;
+
+    box-shadow:
+        0 12px 28px rgba(26, 62, 71, .075) !important;
+}
+
+
+/* =========================================================
+   CARD HEADER
+========================================================= */
+
+.supplier-modern-card .fi-section-header {
+
+    min-height: 62px !important;
+
+    padding:
+        13px 20px !important;
+
+    background: #ffffff !important;
+
+    border-bottom:
+        1px solid #edf2f3 !important;
+}
+
+
+/* =========================================================
+   CARD TITLE
+========================================================= */
+
+.supplier-modern-card .fi-section-header-heading {
+
+    color: #263f47 !important;
+
+    font-size: 13px !important;
+
+    font-weight: 750 !important;
+
+    letter-spacing: -.01em !important;
+}
+
+
+/* =========================================================
+   CARD DESCRIPTION
+========================================================= */
+
+.supplier-modern-card .fi-section-header-description {
+
+    color: #96a5aa !important;
+
+    font-size: 10px !important;
+
+    margin-top: 2px !important;
+}
+
+
+/* =========================================================
+   CARD ICON
+========================================================= */
+
+.supplier-modern-card .fi-section-header-icon {
+
+    width: 18px !important;
+
+    height: 18px !important;
+
+    padding: 8px !important;
+
+    box-sizing: content-box !important;
+
+    border-radius: 9px !important;
+
+    background: #edf8f8 !important;
+
+    color: #008792 !important;
+}
+
+
+/* =========================================================
+   CARD BODY
+========================================================= */
+
+.supplier-modern-card .fi-section-content {
+
+    padding: 22px !important;
+
+    background: #ffffff !important;
+}
+
+
+/* =========================================================
+   CARD LABEL
+========================================================= */
+
+.supplier-modern-card .fi-in-entry-label {
+
+    color: #93a1a6 !important;
+
+    font-size: 9px !important;
+
+    font-weight: 750 !important;
+
+    text-transform: uppercase;
+
+    letter-spacing: .08em !important;
+
+    margin-bottom: 5px !important;
+}
+
+
+/* =========================================================
+   CARD VALUE
+========================================================= */
+
+.supplier-modern-card .fi-in-entry-content {
+
+    color: #30474e !important;
+
+    font-size: 13px !important;
+
+    font-weight: 600 !important;
+
+    line-height: 1.5 !important;
+}
+
+
+/* =========================================================
+   CARD ENTRY ICON
+========================================================= */
+
+.supplier-modern-card .fi-in-entry-icon {
+
+    width: 15px !important;
+
+    height: 15px !important;
+
+    color: #81979d !important;
+
+    opacity: .8 !important;
+}
+
+
+/* =========================================================
+   CONTACT CARD
+========================================================= */
+
+.supplier-contact-card {
+
+    border-top: 3px solid #008b95 !important;
+}
+
+
+/* =========================================================
+   FINANCIAL CARD
+========================================================= */
+
+.supplier-financial-card {
+
+    border-top: 3px solid #008892 !important;
+
+    background:
+        linear-gradient(145deg,
+            #ffffff 0%,
+            #fffdfa 100%) !important;
+}
+
+
+/* financial icon */
+
+.supplier-financial-card .fi-section-header-icon {
+
+    background: #fff6e6 !important;
+
+    color: #dc921e !important;
+}
+
+
+/* financial values */
+
+.supplier-financial-card .fi-in-entry-content {
+
+    color: #8a5b13 !important;
+
+    font-size: 15px !important;
+
+    font-weight: 750 !important;
+}
+
+
+/* financial labels */
+
+.supplier-financial-card .fi-in-entry-label {
+
+    color: #a28d6c !important;
+}
+
+
+/* =========================================================
+   FINANCIAL DIVIDERS
+========================================================= */
+
+.supplier-financial-card .fi-in-entry {
+
+    padding-bottom: 14px !important;
+
+    margin-bottom: 14px !important;
+
+    border-bottom:
+        1px solid #f0e8da !important;
+}
+
+.supplier-financial-card .fi-in-entry:last-child {
+
+    padding-bottom: 0 !important;
+
+    margin-bottom: 0 !important;
+
+    border-bottom: 0 !important;
+}
+
+
+/* =========================================================
+   NOTES CARD
+========================================================= */
+
+.supplier-notes-card {
+
+    border-top: 3px solid #607d8b !important;
+}
+
+
+/* notes icon */
+
+.supplier-notes-card .fi-section-header-icon {
+
+    background: #f0f4f5 !important;
+
+    color: #607d8b !important;
+}
+
+
+/* notes body */
+
+.supplier-notes-card .fi-section-content {
+
+    min-height: 85px !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+}
+
+
+/* notes text */
+
+.supplier-notes-card .fi-in-entry-content {
+
+    color: #687b82 !important;
+
+    font-size: 13px !important;
+
+    font-weight: 500 !important;
+
+    line-height: 1.7 !important;
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.fi-infolist {
+
+    row-gap: 20px !important;
+}
+
+
+/* =========================================================
+   REMOVE DEFAULT FILAMENT SECTION STYLING
+========================================================= */
+
+.supplier-overview,
+.supplier-modern-card {
+
+    --tw-ring-shadow: 0 0 transparent !important;
+
+    --tw-shadow: 0 0 transparent !important;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 1024px) {
+
+    .supplier-overview .fi-section-content {
+
+        padding: 23px !important;
+    }
+
+    .supplier-modern-card .fi-section-content {
+
+        padding: 19px !important;
+    }
+}
+
+
+@media (max-width: 768px) {
+
+    .fi-in {
+
+        padding-inline: 14px !important;
+    }
+
+    .fi-header-heading {
+
+        font-size: 23px !important;
+    }
+
+    .supplier-overview {
+
+        border-radius: 14px !important;
+    }
+
+    .supplier-overview .fi-section-content {
+
+        padding: 20px !important;
+    }
+
+    .supplier-overview-name .fi-in-entry-content {
+
+        font-size: 19px !important;
+    }
+
+    .supplier-modern-card {
+
+        border-radius: 13px !important;
+    }
+
+    .supplier-modern-card .fi-section-header {
+
+        min-height: 55px !important;
+
+        padding-inline: 16px !important;
+    }
+
+    .supplier-modern-card .fi-section-content {
+
+        padding: 17px !important;
+    }
+
+    .supplier-financial-card .fi-in-entry {
+
+        padding-bottom: 13px !important;
+
+        margin-bottom: 13px !important;
+    }
+}
+
+/* =========================================================
+   DARK MODE SUPPORT
+========================================================= */
+
+.dark .fi-main {
+
+    background:
+        #0c171a !important;
+}
+
+.dark .supplier-profile-header,
+.dark .supplier-modern-section {
+
+    background:
+        #101e22 !important;
+
+    border-color:
+        #203337 !important;
+}
+
+.dark .supplier-modern-section .fi-section-header {
+
+    background:
+        #101e22 !important;
+
+    border-color:
+        #203337 !important;
+}
+
+.dark .supplier-profile-header .fi-in-entry-content,
+.dark .supplier-modern-section .fi-in-entry-content {
+
+    color: #d8e5e7 !important;
+}
+
+.dark .supplier-profile-header .fi-in-entry-label,
+.dark .supplier-modern-section .fi-in-entry-label {
+
+    color: #758a8f !important;
+}
+
+.dark .supplier-modern-section .fi-section-header-heading {
+
+    color: #d5e2e4 !important;
+}
+
+/* =========================================================
+   SUPPLIER PAYMENT STATS
+   CLEAN 4 CARD LAYOUT
+   NO OUTER WHITE CONTAINER
+========================================================= */
+
+
+/* ---------------------------------------------------------
+   OUTER WIDGET
+--------------------------------------------------------- */
+
+.supplier-payment-stats-widget,
+.supplier-payment-stats-widget.fi-wi,
+.supplier-payment-stats-widget.fi-wi-widget,
+.supplier-payment-stats-widget.fi-wi-stats-overview {
+
+    background: transparent !important;
+    background-color: transparent !important;
+
+    border: 0 !important;
+    border-width: 0 !important;
+
+    box-shadow: none !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    border-radius: 0 !important;
+}
+
+
+/* ---------------------------------------------------------
+   REMOVE FILAMENT PARENT CONTAINER
+--------------------------------------------------------- */
+
+.fi-wi:has(.supplier-payment-stat-card),
+.fi-wi-widget:has(.supplier-payment-stat-card),
+.fi-wi-stats-overview:has(.supplier-payment-stat-card),
+.fi-section:has(.supplier-payment-stat-card) {
+
+    background: transparent !important;
+    background-color: transparent !important;
+
+    border: 0 !important;
+    border-width: 0 !important;
+
+    box-shadow: none !important;
+
+    padding: 0 !important;
+}
+
+
+/* ---------------------------------------------------------
+   STATS GRID
+--------------------------------------------------------- */
+
+.supplier-payment-stats-widget .fi-wi-stats-overview-stats-ctn {
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr)) !important;
+
+    gap: 18px !important;
+
+    width: 100% !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    background: transparent !important;
+    background-color: transparent !important;
+
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+
+/* ---------------------------------------------------------
+   INDIVIDUAL PAYMENT CARD
+--------------------------------------------------------- */
+
+.supplier-payment-stats-widget .supplier-payment-stat-card {
+
+    position: relative !important;
+
+    min-height: 145px !important;
+
+    padding: 20px 20px 18px !important;
+
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+
+    border: 1px solid #e1e8e9 !important;
+
+    border-radius: 14px !important;
+
+    box-shadow:
+        0 2px 8px rgba(15, 45, 50, 0.045) !important;
+
+    overflow: hidden !important;
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        border-color .18s ease !important;
+}
+
+
+/* ---------------------------------------------------------
+   HOVER
+--------------------------------------------------------- */
+
+.supplier-payment-stats-widget .supplier-payment-stat-card:hover {
+
+    transform: translateY(-2px) !important;
+
+    border-color: #cbdcde !important;
+
+    box-shadow:
+        0 8px 22px rgba(15, 45, 50, 0.08) !important;
+}
+
+
+/* ---------------------------------------------------------
+   LEFT ACCENT LINE
+--------------------------------------------------------- */
+
+.supplier-payment-stat-card::before {
+
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 18px;
+    bottom: 18px;
+
+    width: 3px;
+
+    border-radius:
+        0 4px 4px 0;
+}
+
+
+/* Total Paid */
+
+.supplier-payment-total::before {
+    background: #008892;
+}
+
+
+/* This Month */
+
+.supplier-payment-month::before {
+    background: #008892;
+}
+
+
+/* Today */
+
+.supplier-payment-today::before {
+    background: #008892;
+}
+
+
+/* Transactions */
+
+.supplier-payment-transactions::before {
+    background: #4f7cff;
+}
+
+
+/* ---------------------------------------------------------
+   LABEL
+--------------------------------------------------------- */
+
+.supplier-payment-stats-widget .supplier-payment-stat-card .fi-wi-stats-overview-stat-label {
+
+    color: #718186 !important;
+
+    font-size: 12px !important;
+
+    font-weight: 600 !important;
+
+    line-height: 1.4 !important;
+}
+
+
+/* ---------------------------------------------------------
+   VALUE
+--------------------------------------------------------- */
+
+.supplier-payment-stats-widget .supplier-payment-stat-card .fi-wi-stats-overview-stat-value {
+
+    margin-top: 6px !important;
+
+    color: #152a30 !important;
+
+    font-size: 27px !important;
+
+    font-weight: 800 !important;
+
+    letter-spacing: -0.04em !important;
+
+    line-height: 1.15 !important;
+}
+
+
+/* ---------------------------------------------------------
+   DESCRIPTION
+--------------------------------------------------------- */
+
+.supplier-payment-stats-widget .supplier-payment-stat-card .fi-wi-stats-overview-stat-description {
+
+    margin-top: 7px !important;
+
+    color: #89979a !important;
+
+    font-size: 11px !important;
+
+    font-weight: 500 !important;
+
+    line-height: 1.45 !important;
+}
+
+
+/* ---------------------------------------------------------
+   MAIN ICON
+--------------------------------------------------------- */
+
+.supplier-payment-stats-widget .supplier-payment-stat-card .fi-wi-stats-overview-stat-icon {
+
+    width: 34px !important;
+    height: 34px !important;
+
+    padding: 8px !important;
+
+    border-radius: 9px !important;
+
+    background: #edf8f8 !important;
+
+    color: #008892 !important;
+}
+
+
+/* ---------------------------------------------------------
+   TOTAL PAID ICON
+--------------------------------------------------------- */
+
+.supplier-payment-total .fi-wi-stats-overview-stat-icon {
+
+    background: #edf8f2 !important;
+    color: #16a36a !important;
+}
+
+
+/* ---------------------------------------------------------
+   THIS MONTH ICON
+--------------------------------------------------------- */
+
+.supplier-payment-month .fi-wi-stats-overview-stat-icon {
+
+    background: #edf8f8 !important;
+    color: #008892 !important;
+}
+
+
+/* ---------------------------------------------------------
+   TODAY ICON
+--------------------------------------------------------- */
+
+.supplier-payment-today .fi-wi-stats-overview-stat-icon {
+
+    background: #fff7e9 !important;
+    color: #008892 !important;
+}
+
+
+/* ---------------------------------------------------------
+   TRANSACTIONS ICON
+--------------------------------------------------------- */
+
+.supplier-payment-transactions .fi-wi-stats-overview-stat-icon {
+
+    background: #eef2ff !important;
+    color: #4f7cff !important;
+}
+
+
+/* ---------------------------------------------------------
+   DESCRIPTION ICON
+--------------------------------------------------------- */
+
+.supplier-payment-stats-widget .fi-wi-stats-overview-stat-description-icon {
+
+    width: 13px !important;
+    height: 13px !important;
+}
+
+
+/* ---------------------------------------------------------
+   REMOVE RINGS / DEFAULT SHADOW
+--------------------------------------------------------- */
+
+.supplier-payment-stats-widget .supplier-payment-stat-card {
+
+    --tw-ring-offset-shadow: 0 0 transparent !important;
+
+    --tw-ring-shadow: 0 0 transparent !important;
+
+    --tw-shadow: none !important;
+
+    outline: none !important;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1050px) {
+
+    .supplier-payment-stats-widget .fi-wi-stats-overview-stats-ctn {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+
+        gap: 14px !important;
+    }
+}
+
+
+@media (max-width: 640px) {
+
+    .supplier-payment-stats-widget .fi-wi-stats-overview-stats-ctn {
+
+        grid-template-columns: 1fr !important;
+
+        gap: 12px !important;
+    }
+
+    .supplier-payment-stats-widget .supplier-payment-stat-card {
+
+        min-height: 125px !important;
+    }
+}
+
+/* =========================================================
+   MEDICARE SUPPLIERS — COMPLETE PAGE
+========================================================= */
+
+.supplier-page-header {
+    width: 100%;
+    min-height: 86px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 24px;
+
+    padding: 17px 20px;
+
+    margin-bottom: 18px;
+
+    background: #ffffff;
+
+    border: 1px solid #e3edef;
+
+    border-radius: 15px;
+
+    box-shadow: 0 4px 16px rgba(20, 65, 72, .045);
+
+    position: relative;
+    overflow: hidden;
+}
+
+.supplier-page-header::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 0;
+    bottom: 0;
+
+    width: 4px;
+
+    background: #008894;
+}
+
+.supplier-page-header-left {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.supplier-page-icon {
+    width: 45px;
+    height: 45px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #008894;
+    color: #fff;
+
+    border-radius: 12px;
+
+    box-shadow: 0 5px 13px rgba(0, 136, 148, .18);
+}
+
+.supplier-page-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.supplier-page-title-row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.supplier-page-title {
+    margin: 0;
+
+    color: #102f38;
+
+    font-size: 22px;
+    font-weight: 800;
+
+    letter-spacing: -.035em;
+}
+
+.supplier-page-badge {
+    padding: 4px 9px;
+
+    border-radius: 999px;
+
+    background: #e9f7f7;
+    border: 1px solid #d5eeee;
+
+    color: #007d86;
+
+    font-size: 8px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+
+.supplier-page-description {
+    margin: 4px 0 0;
+
+    color: #83979d;
+
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.supplier-page-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.supplier-total-mini {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 6px 10px;
+
+    background: #f7fbfb;
+
+    border: 1px solid #e4eeee;
+
+    border-radius: 10px;
+}
+
+.supplier-total-icon {
+    width: 28px;
+    height: 28px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 8px;
+
+    background: #e5f5f6;
+    color: #008894;
+}
+
+.supplier-total-icon svg {
+    width: 15px;
+    height: 15px;
+}
+
+.supplier-total-mini div:last-child {
+    display: flex;
+    flex-direction: column;
+}
+
+.supplier-total-mini strong {
+    color: #16363e;
+
+    font-size: 14px;
+    line-height: 1;
+}
+
+.supplier-total-mini span {
+    margin-top: 3px;
+
+    color: #91a1a6;
+
+    font-size: 8px;
+    font-weight: 600;
+
+    text-transform: uppercase;
+}
+
+.supplier-add-button {
+    min-height: 40px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    padding: 0 15px;
+
+    border-radius: 10px;
+
+    background: #008894;
+
+    color: #fff !important;
+
+    text-decoration: none !important;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    box-shadow: 0 5px 12px rgba(0, 136, 148, .15);
+
+    transition: .2s ease;
+}
+
+.supplier-add-button:hover {
+    background: #00757d;
+
+    transform: translateY(-1px);
+
+    box-shadow: 0 7px 16px rgba(0, 136, 148, .2);
+}
+
+.supplier-add-button svg {
+    width: 16px;
+    height: 16px;
+}
+
+
+/* =========================================================
+   STATS
+========================================================= */
+
+.supplier-stats-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 16px;
+
+    width: 100%;
+
+    margin-bottom: 18px;
+}
+
+.supplier-stat-card {
+    min-height: 154px;
+
+    padding: 16px 18px;
+
+    background: #fff;
+
+    border: 1px solid #e0eaec;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 3px 12px rgba(20, 65, 72, .035);
+
+    display: flex;
+    flex-direction: column;
+}
+
+.supplier-stat-top {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.supplier-stat-icon {
+    width: 29px;
+    height: 29px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 8px;
+}
+
+.supplier-stat-icon svg {
+    width: 15px;
+    height: 15px;
+}
+
+.supplier-stat-icon.total {
+    background: #e9f7f8;
+    color: #008894;
+}
+
+.supplier-stat-icon.active {
+    background: #eaf9f1;
+    color: #00a86b;
+}
+
+.supplier-stat-icon.payable {
+    background: #fff4e7;
+    color: #f28a00;
+}
+
+.supplier-stat-icon.inactive {
+    background: #fff0f0;
+    color: #ef4444;
+}
+
+.supplier-stat-label {
+    color: #64777d;
+
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.supplier-stat-value {
+    margin-top: 10px;
+
+    color: #111;
+
+    font-size: 27px;
+    line-height: 1;
+
+    font-weight: 800;
+
+    letter-spacing: -.025em;
+}
+
+.supplier-stat-bottom {
+    margin-top: auto;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 10px;
+}
+
+.supplier-stat-description {
+    max-width: 150px;
+
+    color: #008894;
+
+    font-size: 10px;
+    line-height: 1.45;
+}
+
+.supplier-stat-description.active-text {
+    color: #00a86b;
+}
+
+.supplier-stat-description.payable-text {
+    color: #e87900;
+}
+
+.supplier-stat-description.inactive-text {
+    color: #ef4444;
+}
+
+.supplier-stat-corner-icon {
+    width: 17px;
+    height: 17px;
+
+    color: #008894;
+}
+
+.supplier-stat-corner-icon.active-icon {
+    color: #00a86b;
+}
+
+.supplier-stat-corner-icon.payable-icon {
+    color: #f28a00;
+}
+
+.supplier-stat-corner-icon.inactive-icon {
+    color: #ef4444;
+}
+
+
+/* =========================================================
+   TABLE CONTAINER
+========================================================= */
+
+.supplier-table-wrapper {
+    width: 100%;
+
+    background: #fff;
+
+    border: 1px solid #e0eaec;
+
+    border-radius: 15px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 3px 14px rgba(20, 65, 72, .035);
+}
+
+.supplier-table-header {
+    min-height: 65px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 13px 20px;
+
+    border-bottom: 1px solid #edf2f3;
+}
+
+.supplier-table-title {
+    margin: 0;
+
+    color: #17353d;
+
+    font-size: 15px;
+    font-weight: 750;
+}
+
+.supplier-table-subtitle {
+    margin: 3px 0 0;
+
+    color: #92a1a6;
+
+    font-size: 9px;
+}
+
+.supplier-filament-table {
+    width: 100%;
+}
+
+
+/* =========================================================
+   REMOVE OLD FILAMENT PAGE HEADER
+========================================================= */
+
+.fi-page:has(.supplier-page-header) .fi-header,
+.fi-page:has(.supplier-page-header) .fi-breadcrumbs,
+.fi-page:has(.supplier-page-header) .fi-header-heading {
+    display: none !important;
+}
+
+
+/* =========================================================
+   REMOVE OLD HEADER WIDGET SPACE
+========================================================= */
+
+.fi-page:has(.supplier-page-header) .fi-header-widgets {
+    display: none !important;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .supplier-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+@media (max-width: 800px) {
+
+    .supplier-page-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .supplier-page-header-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .supplier-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .supplier-page-header {
+        padding: 15px;
+    }
+
+    .supplier-page-title {
+        font-size: 20px;
+    }
+
+    .supplier-page-badge {
+        display: none;
+    }
+
+}
+
+/* =========================================================
+   SUPPLIER PAYMENTS — COMPLETE MODERN PAGE
+========================================================= */
+
+.supplier-payment-page-header {
+    width: 100%;
+    min-height: 86px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 24px;
+
+    padding: 17px 20px;
+
+    margin-bottom: 18px;
+
+    background: #ffffff;
+
+    border: 1px solid #e3edef;
+
+    border-radius: 15px;
+
+    box-shadow: 0 4px 16px rgba(20, 65, 72, .045);
+
+    position: relative;
+    overflow: hidden;
+}
+
+.supplier-payment-page-header::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 0;
+    bottom: 0;
+
+    width: 4px;
+
+    background: #008894;
+}
+
+
+/* =========================================================
+   HEADER LEFT
+========================================================= */
+
+.supplier-payment-header-left {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+.supplier-payment-page-icon {
+    width: 45px;
+    height: 45px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #008894;
+    color: #fff;
+
+    border-radius: 12px;
+
+    box-shadow: 0 5px 13px rgba(0, 136, 148, .18);
+}
+
+.supplier-payment-page-icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.supplier-payment-title-row {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.supplier-payment-page-title {
+    margin: 0;
+
+    color: #102f38;
+
+    font-size: 22px;
+    font-weight: 800;
+
+    letter-spacing: -.035em;
+}
+
+.supplier-payment-page-badge {
+    padding: 4px 9px;
+
+    border-radius: 999px;
+
+    background: #e9f7f7;
+
+    border: 1px solid #d5eeee;
+
+    color: #007d86;
+
+    font-size: 8px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: .05em;
+}
+
+.supplier-payment-page-description {
+    margin: 4px 0 0;
+
+    color: #83979d;
+
+    font-size: 11px;
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   HEADER RIGHT
+========================================================= */
+
+.supplier-payment-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.supplier-payment-total-mini {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 6px 10px;
+
+    background: #f7fbfb;
+
+    border: 1px solid #e4eeee;
+
+    border-radius: 10px;
+}
+
+.supplier-payment-total-icon {
+    width: 28px;
+    height: 28px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 8px;
+
+    background: #e5f5f6;
+
+    color: #008894;
+}
+
+.supplier-payment-total-icon svg {
+    width: 15px;
+    height: 15px;
+}
+
+.supplier-payment-total-mini div:last-child {
+    display: flex;
+    flex-direction: column;
+}
+
+.supplier-payment-total-mini strong {
+    color: #16363e;
+
+    font-size: 14px;
+
+    line-height: 1;
+}
+
+.supplier-payment-total-mini span {
+    margin-top: 3px;
+
+    color: #91a1a6;
+
+    font-size: 8px;
+    font-weight: 600;
+
+    text-transform: uppercase;
+}
+
+.supplier-payment-add-button {
+    min-height: 40px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 7px;
+
+    padding: 0 15px;
+
+    border-radius: 10px;
+
+    background: #008894;
+
+    color: #fff !important;
+
+    text-decoration: none !important;
+
+    font-size: 11px;
+    font-weight: 700;
+
+    box-shadow: 0 5px 12px rgba(0, 136, 148, .15);
+
+    transition: .2s ease;
+}
+
+.supplier-payment-add-button:hover {
+    background: #00757d;
+
+    transform: translateY(-1px);
+
+    box-shadow: 0 7px 16px rgba(0, 136, 148, .2);
+}
+
+.supplier-payment-add-button svg {
+    width: 16px;
+    height: 16px;
+}
+
+
+/* =========================================================
+   STATS GRID
+========================================================= */
+
+.supplier-payment-stats-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 16px;
+
+    width: 100%;
+
+    margin-bottom: 18px;
+}
+
+.supplier-payment-stat-card {
+    min-height: 154px;
+
+    padding: 16px 18px;
+
+    background: #fff;
+
+    border: 1px solid #e0eaec;
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 3px 12px rgba(20, 65, 72, .035);
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+.supplier-payment-stat-top {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+}
+
+.supplier-payment-stat-icon {
+    width: 29px;
+    height: 29px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 8px;
+}
+
+.supplier-payment-stat-icon svg {
+    width: 15px;
+    height: 15px;
+}
+
+
+/* CARD ICONS */
+
+.supplier-payment-stat-icon.total {
+    background: #e9f7f8;
+
+    color: #008894;
+}
+
+.supplier-payment-stat-icon.paid {
+    background: #eaf9f1;
+
+    color: #00a86b;
+}
+
+.supplier-payment-stat-icon.month {
+    background: #fff4e7;
+
+    color: #f28a00;
+}
+
+.supplier-payment-stat-icon.year {
+    background: #f0edff;
+
+    color: #7357d9;
+}
+
+
+/* LABEL */
+
+.supplier-payment-stat-label {
+    color: #64777d;
+
+    font-size: 11px;
+
+    font-weight: 600;
+}
+
+
+/* VALUE */
+
+.supplier-payment-stat-value {
+    margin-top: 10px;
+
+    color: #111;
+
+    font-size: 27px;
+
+    line-height: 1;
+
+    font-weight: 800;
+
+    letter-spacing: -.025em;
+}
+
+
+/* BOTTOM */
+
+.supplier-payment-stat-bottom {
+    margin-top: auto;
+
+    display: flex;
+
+    align-items: flex-end;
+
+    justify-content: space-between;
+
+    gap: 10px;
+}
+
+.supplier-payment-stat-description {
+    max-width: 150px;
+
+    color: #008894;
+
+    font-size: 10px;
+
+    line-height: 1.45;
+}
+
+.supplier-payment-stat-description.paid-text {
+    color: #00a86b;
+}
+
+.supplier-payment-stat-description.month-text {
+    color: #e87900;
+}
+
+.supplier-payment-stat-description.year-text {
+    color: #7357d9;
+}
+
+
+/* CORNER ICON */
+
+.supplier-payment-stat-corner-icon {
+    width: 17px;
+    height: 17px;
+
+    color: #008894;
+}
+
+.supplier-payment-stat-corner-icon.paid-icon {
+    color: #00a86b;
+}
+
+.supplier-payment-stat-corner-icon.month-icon {
+    color: #f28a00;
+}
+
+.supplier-payment-stat-corner-icon.year-icon {
+    color: #7357d9;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.supplier-payment-table-wrapper {
+    width: 100%;
+
+    background: #fff;
+
+    border: 1px solid #e0eaec;
+
+    border-radius: 15px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 3px 14px rgba(20, 65, 72, .035);
+}
+
+.supplier-payment-table-header {
+    min-height: 65px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 13px 20px;
+
+    border-bottom: 1px solid #edf2f3;
+}
+
+.supplier-payment-table-title {
+    margin: 0;
+
+    color: #17353d;
+
+    font-size: 15px;
+
+    font-weight: 750;
+}
+
+.supplier-payment-table-subtitle {
+    margin: 3px 0 0;
+
+    color: #92a1a6;
+
+    font-size: 9px;
+}
+
+.supplier-payment-filament-table {
+    width: 100%;
+}
+
+
+/* =========================================================
+   REMOVE DEFAULT FILAMENT HEADER
+========================================================= */
+
+.fi-page:has(.supplier-payment-page-header) .fi-header,
+.fi-page:has(.supplier-payment-page-header) .fi-breadcrumbs,
+.fi-page:has(.supplier-payment-page-header) .fi-header-heading {
+    display: none !important;
+}
+
+
+/* =========================================================
+   REMOVE OLD WIDGET SPACE
+========================================================= */
+
+.fi-page:has(.supplier-payment-page-header) .fi-header-widgets {
+    display: none !important;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .supplier-payment-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+@media (max-width: 800px) {
+
+    .supplier-payment-page-header {
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+    .supplier-payment-header-right {
+        width: 100%;
+
+        justify-content: space-between;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .supplier-payment-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .supplier-payment-page-header {
+        padding: 15px;
+    }
+
+    .supplier-payment-page-title {
+        font-size: 20px;
+    }
+
+    .supplier-payment-page-badge {
+        display: none;
+    }
+
 }
