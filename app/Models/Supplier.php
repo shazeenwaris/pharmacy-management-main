@@ -5,8 +5,13 @@ namespace App\Models;
 use App\Models\SupplierPayment;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
+
 class Supplier extends Model
 {
+    use LogsActivity;
+
     protected $fillable = [
         'supplier_name', 'company_name', 'contact_person', 'phone', 'whatsapp', 'email',
         'address', 'city', 'country',
@@ -24,13 +29,16 @@ class Supplier extends Model
         return $this->hasMany(SupplierPayment::class);
     }
 
-    /**
-     * Current payable balance = Opening Balance - Total Payments Made.
-     * NOTE: Purchase invoices will be added to this calculation once the
-     * Purchases module is built (opening_balance + purchases - payments).
-     */
     public function getPayableBalanceAttribute(): float
     {
         return (float) $this->opening_balance - (float) $this->payments()->sum('amount');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['supplier_name', 'status', 'credit_limit'])
+            ->logOnlyDirty()
+            ->useLogName('Supplier');
     }
 }

@@ -14,6 +14,7 @@ use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class SupplierResource extends Resource
 {
@@ -22,6 +23,30 @@ class SupplierResource extends Resource
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-truck';
 
     protected static ?string $navigationLabel = 'Suppliers';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Purchases';
+
+    protected static ?int $navigationSort = 1;
+
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('manage suppliers') ?? false;
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('manage suppliers') ?? false;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return auth()->user()?->can('manage suppliers') ?? false;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return auth()->user()?->can('manage suppliers') ?? false;
+    }
 
     public static function form(Schema $schema): Schema
     {

@@ -2,13 +2,11 @@
 
 namespace App\Filament\Resources\Suppliers\Schemas;
 
+use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
 
-class SupplierForm
+class SupplierInfolist
 {
     public static function configure(Schema $schema): Schema
     {
@@ -17,75 +15,61 @@ class SupplierForm
                 Section::make('Basic Information')
                     ->columns(2)
                     ->schema([
-                        TextInput::make('supplier_name')
-                            ->label('Supplier Name')
-                            ->required()
-                            ->maxLength(255),
+                        TextEntry::make('supplier_name')
+                            ->label('Supplier Name'),
 
-                        TextInput::make('company_name')
-                            ->label('Company Name')
-                            ->maxLength(255),
+                        TextEntry::make('company_name')
+                            ->label('Company Name'),
 
-                        TextInput::make('contact_person')
-                            ->label('Contact Person')
-                            ->maxLength(255),
+                        TextEntry::make('contact_person')
+                            ->label('Contact Person'),
 
-                        TextInput::make('phone')
-                            ->tel(),
+                        TextEntry::make('phone'),
 
-                        TextInput::make('whatsapp')
-                            ->tel(),
+                        TextEntry::make('whatsapp'),
 
-                        TextInput::make('email')
-                            ->email(),
+                        TextEntry::make('email'),
                     ]),
 
                 Section::make('Address')
                     ->columns(3)
                     ->schema([
-                        Textarea::make('address')
-                            ->columnSpanFull()
-                            ->rows(2),
+                        TextEntry::make('address')
+                            ->columnSpanFull(),
 
-                        TextInput::make('city'),
+                        TextEntry::make('city'),
 
-                        TextInput::make('country'),
+                        TextEntry::make('country'),
                     ]),
 
                 Section::make('Financial Information')
                     ->columns(3)
                     ->schema([
-                        TextInput::make('tax_ntn_number')
+                        TextEntry::make('tax_ntn_number')
                             ->label('Tax / NTN Number'),
 
-                        TextInput::make('opening_balance')
-                            ->numeric()
-                            ->prefix('PKR')
-                            ->default(0),
+                        TextEntry::make('opening_balance')
+                            ->formatStateUsing(fn ($state) => format_currency($state)),
 
-                        TextInput::make('credit_limit')
-                            ->numeric()
-                            ->prefix('PKR')
-                            ->default(0),
+                        TextEntry::make('credit_limit')
+                            ->formatStateUsing(fn ($state) => format_currency($state)),
 
-                        TextInput::make('payment_terms')
-                            ->placeholder('Net 30, Cash on Delivery...')
+                        TextEntry::make('payment_terms')
                             ->columnSpanFull(),
                     ]),
 
                 Section::make('Status & Notes')
                     ->columns(2)
                     ->schema([
-                        Select::make('status')
-                            ->options([
-                                'active' => 'Active',
-                                'inactive' => 'Inactive',
-                            ])
-                            ->default('active')
-                            ->required(),
+                        TextEntry::make('status')
+                            ->badge()
+                            ->color(fn (string $state): string => match ($state) {
+                                'active' => 'success',
+                                'inactive' => 'gray',
+                                default => 'gray',
+                            }),
 
-                        Textarea::make('notes')
-                            ->rows(3)
+                        TextEntry::make('notes')
                             ->columnSpanFull(),
                     ]),
             ]);

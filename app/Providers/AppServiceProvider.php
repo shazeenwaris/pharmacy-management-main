@@ -2,7 +2,15 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use App\Models\PurchaseItem;
+use App\Observers\PurchaseItemObserver;
+use App\Models\PurchaseReturn;
+use App\Observers\PurchaseReturnObserver;
+use App\Models\SaleItem;
+use App\Observers\SaleItemObserver;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +27,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Gate::before(function ($user, $ability) {
+            return $user->hasRole('Admin') ? true : null;
+        });
+        PurchaseItem::observe(PurchaseItemObserver::class);
+        PurchaseReturn::observe(PurchaseReturnObserver::class);
+        SaleItem::observe(SaleItemObserver::class);
     }
 }

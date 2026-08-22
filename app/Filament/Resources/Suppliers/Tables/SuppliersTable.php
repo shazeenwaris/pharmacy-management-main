@@ -37,7 +37,7 @@ class SuppliersTable
 
                 TextColumn::make('payable_balance')
                     ->label('Payable Balance')
-                    ->money('PKR')
+                    ->formatStateUsing(fn ($state) => format_currency($state))
                     ->color(
                         fn (Supplier $record): string =>
                             $record->payable_balance > 0
@@ -46,7 +46,7 @@ class SuppliersTable
                     ),
 
                 TextColumn::make('credit_limit')
-                    ->money('PKR')
+                    ->formatStateUsing(fn ($state) => format_currency($state))
                     ->toggleable(),
 
                 BadgeColumn::make('status')

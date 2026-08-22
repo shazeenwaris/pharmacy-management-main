@@ -24,6 +24,8 @@
                 ['label' => 'Sales / POS',    'icon' => 'card',      'route' => '/admin/sales',           'active' => request()->is('admin/sales*')],
                 ['label' => 'Customers',      'icon' => 'users',     'route' => '/admin/customers',       'active' => request()->is('admin/customers*')],
                 ['label' => 'Suppliers',      'icon' => 'truck',     'route' => '/admin/suppliers',       'active' => request()->is('admin/suppliers*')],
+                 ['label' => 'Prescriptions', 'icon' => 'prescription', 'route' => '/admin/prescriptions', 'active' => request()->is('admin/prescriptions*')],
+
                 ['label' => 'Stock',          'icon' => 'box',       'route' => '/admin/stock',           'active' => request()->is('admin/stock*')],
                 ['label' => 'Reports',        'icon' => 'chart',     'route' => '/admin/reports',         'active' => request()->is('admin/reports*')],
                 ['label' => 'Alerts',         'icon' => 'bell',      'route' => '/admin/alerts',          'active' => request()->is('admin/alerts*'), 'badge' => 2],
@@ -43,153 +45,466 @@
                 'bell'   => 'M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0',
                 'clock'  => 'M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z',
                 'cog'    => 'M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.38.138.752.43.992l1.005.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.542-.56.94-1.11.94h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.38-.138-.752-.43-.992l-1.004-.827a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.28z',
+                'prescription' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
             ];
         @endphp
 
         @foreach ($items as $item)
 
-    {{-- ===== SUPPLIERS DROPDOWN ===== --}}
-    @if ($item['label'] === 'Suppliers')
+            {{-- ===== MEDICINES DROPDOWN ===== --}}
+            @if ($item['label'] === 'Medicines')
 
-        @php
-            $supplierActive = request()->is('admin/suppliers*')
-                || request()->is('admin/supplier-payments*');
-        @endphp
+                @php
+                    $medicineActive = request()->is('admin/medicines*')
+                        || request()->is('admin/categories*')
+                        || request()->is('admin/manufacturers*')
+                        || request()->is('admin/units*')
+                        || request()->is('admin/dosage-forms*')
+                        || request()->is('admin/medicine-batches*');
+                @endphp
 
-        <div x-data="{ open: {{ $supplierActive ? 'true' : 'false' }} }">
+                <div x-data="{ open: {{ $medicineActive ? 'true' : 'false' }} }">
 
-            {{-- Suppliers Main Item --}}
-            <button
-                type="button"
-                @click="open = !open"
-                class="pms-nav-item {{ $supplierActive ? 'pms-supplier-parent-active' : '' }}"
-                style="width: 100%; border: 0; background: transparent; cursor: pointer;"
-            >
+                    <button
+                        type="button"
+                        @click="open = !open"
+                        class="pms-nav-item {{ $medicineActive ? 'pms-supplier-parent-active' : '' }}"
+                        style="width: 100%; border: 0; background: transparent; cursor: pointer;"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pms-nav-icon">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $icons['beaker'] }}" />
+                        </svg>
 
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    class="pms-nav-icon"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="{{ $icons['truck'] }}"
-                    />
-                </svg>
+                        <span class="pms-nav-label">Medicines</span>
 
-                <span class="pms-nav-label">
-                    Suppliers
-                </span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="pms-nav-chevron" :style="open ? 'transform: rotate(90deg)' : ''" style="transition: transform 0.2s ease;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
 
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2.5"
-                    class="pms-nav-chevron"
-                    :style="open ? 'transform: rotate(90deg)' : ''"
-                    style="transition: transform 0.2s ease;"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M9 5l7 7-7 7"
-                    />
-                </svg>
+                    <div x-show="open" x-collapse class="pms-submenu">
 
-            </button>
+                        <a href="/admin/medicines" class="pms-submenu-item {{ request()->is('admin/medicines*') ? 'pms-submenu-item-active' : '' }}">
+                            <span class="pms-submenu-dot"></span>
+                            <span>All Medicines</span>
+                        </a>
 
-            {{-- Supplier Submenu --}}
-            <div
-                x-show="open"
-                x-collapse
-                class="pms-submenu"
-            >
+                        <a href="/admin/categories" class="pms-submenu-item {{ request()->is('admin/categories*') ? 'pms-submenu-item-active' : '' }}">
+                            <span class="pms-submenu-dot"></span>
+                            <span>Categories</span>
+                        </a>
 
-                {{-- All Suppliers --}}
-                <a
-                    href="/admin/suppliers"
-                    class="pms-submenu-item {{ request()->is('admin/suppliers*') && !request()->is('admin/supplier-payments*') ? 'pms-submenu-item-active' : '' }}"
-                >
-                    <span class="pms-submenu-dot"></span>
-                    <span>All Suppliers</span>
-                </a>
+                        <a href="/admin/manufacturers" class="pms-submenu-item {{ request()->is('admin/manufacturers*') ? 'pms-submenu-item-active' : '' }}">
+                            <span class="pms-submenu-dot"></span>
+                            <span>Manufacturers</span>
+                        </a>
 
-                {{-- Supplier Payments --}}
-                <a
-                    href="/admin/supplier-payments"
-                    class="pms-submenu-item {{ request()->is('admin/supplier-payments*') ? 'pms-submenu-item-active' : '' }}"
-                >
-                    <span class="pms-submenu-dot"></span>
-                    <span>Supplier Payments</span>
-                </a>
+                        <a href="/admin/units" class="pms-submenu-item {{ request()->is('admin/units*') ? 'pms-submenu-item-active' : '' }}">
+                            <span class="pms-submenu-dot"></span>
+                            <span>Units</span>
+                        </a>
 
-            </div>
+                        <a href="/admin/dosage-forms" class="pms-submenu-item {{ request()->is('admin/dosage-forms*') ? 'pms-submenu-item-active' : '' }}">
+                            <span class="pms-submenu-dot"></span>
+                            <span>Dosage Forms</span>
+                        </a>
+
+                        <a href="/admin/medicine-batches" class="pms-submenu-item {{ request()->is('admin/medicine-batches*') ? 'pms-submenu-item-active' : '' }}">
+                            <span class="pms-submenu-dot"></span>
+                            <span>Batches & Expiry</span>
+                        </a>
+
+                    </div>
+                </div>
+
+            {{-- ===== PURCHASES DROPDOWN ===== --}}
+            @elseif ($item['label'] === 'Purchases')
+
+                @php
+                    $purchaseActive = request()->is('admin/purchases*')
+                        || request()->is('admin/purchase-returns*');
+                @endphp
+
+                <div x-data="{ open: {{ $purchaseActive ? 'true' : 'false' }} }">
+
+                    <button
+                        type="button"
+                        @click="open = !open"
+                        class="pms-nav-item {{ $purchaseActive ? 'pms-supplier-parent-active' : '' }}"
+                        style="width: 100%; border: 0; background: transparent; cursor: pointer;"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pms-nav-icon">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $icons['cart'] }}" />
+                        </svg>
+
+                        <span class="pms-nav-label">Purchases</span>
+
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="pms-nav-chevron" :style="open ? 'transform: rotate(90deg)' : ''" style="transition: transform 0.2s ease;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+
+                    <div x-show="open" x-collapse class="pms-submenu">
+
+                        <a href="/admin/purchases" class="pms-submenu-item {{ request()->is('admin/purchases*') && !request()->is('admin/purchase-returns*') ? 'pms-submenu-item-active' : '' }}">
+                            <span class="pms-submenu-dot"></span>
+                            <span>All Purchases</span>
+                        </a>
+
+                        <a href="/admin/purchases/create" class="pms-submenu-item">
+                            <span class="pms-submenu-dot"></span>
+                            <span>New Purchase</span>
+                        </a>
+
+                        <a href="/admin/purchase-returns" class="pms-submenu-item {{ request()->is('admin/purchase-returns*') ? 'pms-submenu-item-active' : '' }}">
+                            <span class="pms-submenu-dot"></span>
+                            <span>Purchase Returns</span>
+                        </a>
+
+                    </div>
+                </div>
+
+            {{-- ===== SALES / POS DROPDOWN ===== --}}
+            @elseif ($item['label'] === 'Sales / POS')
+
+                @php
+                    $salesActive = request()->is('admin/sales')
+                        || request()->is('admin/sales-history*')
+                        || request()->is('admin/sale-returns*');
+                @endphp
+
+                <div x-data="{ open: {{ $salesActive ? 'true' : 'false' }} }">
+
+                    <button
+                        type="button"
+                        @click="open = !open"
+                        class="pms-nav-item {{ $salesActive ? 'pms-supplier-parent-active' : '' }}"
+                        style="width: 100%; border: 0; background: transparent; cursor: pointer;"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pms-nav-icon">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $icons['card'] }}" />
+                        </svg>
+
+                        <span class="pms-nav-label">Sales / POS</span>
+
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="pms-nav-chevron" :style="open ? 'transform: rotate(90deg)' : ''" style="transition: transform 0.2s ease;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+
+                    <div x-show="open" x-collapse class="pms-submenu">
+
+                        <a href="/admin/sales" class="pms-submenu-item {{ request()->is('admin/sales') ? 'pms-submenu-item-active' : '' }}">
+                            <span class="pms-submenu-dot"></span>
+                            <span>New Sale</span>
+                        </a>
+
+                        <a href="/admin/sales-history" class="pms-submenu-item {{ request()->is('admin/sales-history*') ? 'pms-submenu-item-active' : '' }}">
+                            <span class="pms-submenu-dot"></span>
+                            <span>Sales History</span>
+                        </a>
+
+                        <a href="/admin/sale-returns" class="pms-submenu-item {{ request()->is('admin/sale-returns*') ? 'pms-submenu-item-active' : '' }}">
+                            <span class="pms-submenu-dot"></span>
+                            <span>Sales Returns</span>
+                        </a>
+
+                    </div>
+                </div>
+
+                {{-- ===== CUSTOMERS DROPDOWN ===== --}}
+@elseif ($item['label'] === 'Customers')
+
+    @php
+        $customerActive = request()->is('admin/customers*')
+            || request()->is('admin/customer-payments*');
+    @endphp
+
+    <div x-data="{ open: {{ $customerActive ? 'true' : 'false' }} }">
+
+        <button
+            type="button"
+            @click="open = !open"
+            class="pms-nav-item {{ $customerActive ? 'pms-supplier-parent-active' : '' }}"
+            style="width: 100%; border: 0; background: transparent; cursor: pointer;"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pms-nav-icon">
+                <path stroke-linecap="round" stroke-linejoin="round" d="{{ $icons['users'] }}" />
+            </svg>
+
+            <span class="pms-nav-label">Customers</span>
+
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="pms-nav-chevron" :style="open ? 'transform: rotate(90deg)' : ''" style="transition: transform 0.2s ease;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+        </button>
+
+        <div x-show="open" x-collapse class="pms-submenu">
+
+            <a href="/admin/customers" class="pms-submenu-item {{ request()->is('admin/customers*') && !request()->is('admin/customer-payments*') ? 'pms-submenu-item-active' : '' }}">
+                <span class="pms-submenu-dot"></span>
+                <span>All Customers</span>
+            </a>
+
+            <a href="/admin/customer-payments" class="pms-submenu-item {{ request()->is('admin/customer-payments*') ? 'pms-submenu-item-active' : '' }}">
+                <span class="pms-submenu-dot"></span>
+                <span>Customer Payments</span>
+            </a>
 
         </div>
+    </div>
+            {{-- ===== SUPPLIERS DROPDOWN ===== --}}
+            @elseif ($item['label'] === 'Suppliers')
 
-    @else
+                @php
+                    $supplierActive = request()->is('admin/suppliers*')
+                        || request()->is('admin/supplier-payments*');
+                @endphp
 
-        {{-- ===== NORMAL SIDEBAR ITEMS ===== --}}
-        <a
-            href="{{ $item['route'] }}"
-            class="pms-nav-item {{ $item['active'] ? 'pms-nav-item-active' : '' }}"
+                <div x-data="{ open: {{ $supplierActive ? 'true' : 'false' }} }">
+
+                    <button
+                        type="button"
+                        @click="open = !open"
+                        class="pms-nav-item {{ $supplierActive ? 'pms-supplier-parent-active' : '' }}"
+                        style="width: 100%; border: 0; background: transparent; cursor: pointer;"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pms-nav-icon">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $icons['truck'] }}" />
+                        </svg>
+
+                        <span class="pms-nav-label">Suppliers</span>
+
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="pms-nav-chevron" :style="open ? 'transform: rotate(90deg)' : ''" style="transition: transform 0.2s ease;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+
+                    <div x-show="open" x-collapse class="pms-submenu">
+
+                        <a href="/admin/suppliers" class="pms-submenu-item {{ request()->is('admin/suppliers*') && !request()->is('admin/supplier-payments*') ? 'pms-submenu-item-active' : '' }}">
+                            <span class="pms-submenu-dot"></span>
+                            <span>All Suppliers</span>
+                        </a>
+
+                        <a href="/admin/supplier-payments" class="pms-submenu-item {{ request()->is('admin/supplier-payments*') ? 'pms-submenu-item-active' : '' }}">
+                            <span class="pms-submenu-dot"></span>
+                            <span>Supplier Payments</span>
+                        </a>
+
+                    </div>
+                </div>
+
+                {{-- ===== PRESCRIPTIONS DROPDOWN ===== --}}
+@elseif ($item['label'] === 'Prescriptions')
+
+    @php
+        $prescriptionActive = request()->is('admin/prescriptions*');
+    @endphp
+
+    <div x-data="{ open: {{ $prescriptionActive ? 'true' : 'false' }} }">
+
+        <button
+            type="button"
+            @click="open = !open"
+            class="pms-nav-item {{ $prescriptionActive ? 'pms-supplier-parent-active' : '' }}"
+            style="width: 100%; border: 0; background: transparent; cursor: pointer;"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pms-nav-icon">
+                <path stroke-linecap="round" stroke-linejoin="round" d="{{ $icons['prescription'] }}" />
+            </svg>
+
+            <span class="pms-nav-label">Prescriptions</span>
+
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="pms-nav-chevron" :style="open ? 'transform: rotate(90deg)' : ''" style="transition: transform 0.2s ease;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+        </button>
+
+        <div x-show="open" x-collapse class="pms-submenu">
+
+            <a href="/admin/prescriptions" class="pms-submenu-item {{ request()->is('admin/prescriptions') ? 'pms-submenu-item-active' : '' }}">
+                <span class="pms-submenu-dot"></span>
+                <span>All Prescriptions</span>
+            </a>
+
+            <a href="/admin/prescriptions/create" class="pms-submenu-item">
+                <span class="pms-submenu-dot"></span>
+                <span>New Prescription</span>
+            </a>
+
+            <a href="/admin/prescriptions?status=active" class="pms-submenu-item">
+                <span class="pms-submenu-dot"></span>
+                <span>Pending / Active</span>
+            </a>
+
+            <a href="/admin/prescriptions?status=dispensed" class="pms-submenu-item">
+                <span class="pms-submenu-dot"></span>
+                <span>Dispensed</span>
+            </a>
+
+        </div>
+    </div>
+
+
+    {{-- ===== STOCK DROPDOWN ===== --}}
+@elseif ($item['label'] === 'Stock')
+
+    @php
+        $stockActive = request()->is('admin/stock*');
+    @endphp
+
+    <div x-data="{ open: {{ $stockActive ? 'true' : 'false' }} }">
+
+        <button
+            type="button"
+            @click="open = !open"
+            class="pms-nav-item {{ $stockActive ? 'pms-supplier-parent-active' : '' }}"
+            style="width: 100%; border: 0; background: transparent; cursor: pointer;"
         >
 
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                class="pms-nav-icon"
-            >
+            {{-- Stock Icon --}}
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2"
+                 class="pms-nav-icon">
+
                 <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                    d="{{ $icons[$item['icon']] }}"
+                    d="{{ $icons['stock'] ?? '' }}"
                 />
+
             </svg>
 
-            <span class="pms-nav-label">
-                {{ $item['label'] }}
-            </span>
+            <span class="pms-nav-label">Stock</span>
 
-            @if (isset($item['badge']))
+            {{-- Chevron --}}
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor"
+                 stroke-width="2.5"
+                 class="pms-nav-chevron"
+                 :style="open ? 'transform: rotate(90deg)' : ''"
+                 style="transition: transform 0.2s ease;">
 
-                <span class="pms-nav-badge">
-                    {{ $item['badge'] }}
-                </span>
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M9 5l7 7-7 7"
+                />
+
+            </svg>
+
+        </button>
+
+        {{-- Stock Submenu --}}
+        <div x-show="open" x-collapse class="pms-submenu">
+
+            {{-- Inventory Overview --}}
+            <a href="/admin/stock"
+               class="pms-submenu-item {{ request()->is('admin/stock') ? 'pms-submenu-item-active' : '' }}">
+
+                <span class="pms-submenu-dot"></span>
+
+                <span>Inventory Overview</span>
+
+            </a>
+
+        </div>
+
+    </div>
+            {{-- ===== SETTINGS DROPDOWN ===== --}}
+            @elseif ($item['label'] === 'Settings')
+
+                @php
+                    $settingsActive = request()->is('admin/settings*')
+                        || request()->is('admin/users*')
+                        || request()->is('admin/roles*')
+                        || request()->is('admin/audit-logs*')
+                        || request()->is('admin/backup*');
+                @endphp
+
+                <div x-data="{ open: {{ $settingsActive ? 'true' : 'false' }} }">
+
+                    <button
+                        type="button"
+                        @click="open = !open"
+                        class="pms-nav-item {{ $settingsActive ? 'pms-supplier-parent-active' : '' }}"
+                        style="width: 100%; border: 0; background: transparent; cursor: pointer;"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pms-nav-icon">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $icons['cog'] }}" />
+                        </svg>
+
+                        <span class="pms-nav-label">Settings</span>
+
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="pms-nav-chevron" :style="open ? 'transform: rotate(90deg)' : ''" style="transition: transform 0.2s ease;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+
+                    <div x-show="open" x-collapse class="pms-submenu">
+
+                        <a href="/admin/settings" class="pms-submenu-item {{ request()->is('admin/settings*') ? 'pms-submenu-item-active' : '' }}">
+                            <span class="pms-submenu-dot"></span>
+                            <span>General Settings</span>
+                        </a>
+
+                        <a href="/admin/users" class="pms-submenu-item {{ request()->is('admin/users*') ? 'pms-submenu-item-active' : '' }}">
+                            <span class="pms-submenu-dot"></span>
+                            <span>Users</span>
+                        </a>
+
+                        <a href="/admin/roles" class="pms-submenu-item {{ request()->is('admin/roles*') ? 'pms-submenu-item-active' : '' }}">
+                            <span class="pms-submenu-dot"></span>
+                            <span>Roles &amp; Permissions</span>
+                        </a>
+
+                        <a href="/admin/audit-logs" class="pms-submenu-item {{ request()->is('admin/audit-logs*') ? 'pms-submenu-item-active' : '' }}">
+                            <span class="pms-submenu-dot"></span>
+                            <span>Audit Logs</span>
+                        </a>
+
+                        <a href="/admin/backup" class="pms-submenu-item {{ request()->is('admin/backup*') ? 'pms-submenu-item-active' : '' }}">
+                            <span class="pms-submenu-dot"></span>
+                            <span>Backup &amp; Restore</span>
+                        </a>
+
+                    </div>
+                </div>
 
             @else
 
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2.5"
-                    class="pms-nav-chevron"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M9 5l7 7-7 7"
-                    />
-                </svg>
+                {{-- ===== NORMAL SIDEBAR ITEMS ===== --}}
+                <a href="{{ $item['route'] }}" class="pms-nav-item {{ $item['active'] ? 'pms-nav-item-active' : '' }}">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pms-nav-icon">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="{{ $icons[$item['icon']] }}" />
+                    </svg>
+
+                    <span class="pms-nav-label">
+                        {{ $item['label'] }}
+                    </span>
+
+                    @if (isset($item['badge']))
+                        <span class="pms-nav-badge">
+                            {{ $item['badge'] }}
+                        </span>
+                    @else
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="pms-nav-chevron">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                    @endif
+
+                </a>
 
             @endif
 
-        </a>
-
-    @endif
-
-@endforeach
+        @endforeach
     </nav>
 
 </div>
