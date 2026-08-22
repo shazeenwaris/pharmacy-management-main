@@ -2,8 +2,8 @@
 
 namespace App\Filament\Resources\SupplierPayments\Tables;
 
-use App\Models\SupplierPayment;
 use Filament\Actions\BulkActionGroup;
+
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -17,6 +17,21 @@ class SupplierPaymentsTable
     public static function configure(Table $table): Table
     {
         return $table
+
+            /*
+            |--------------------------------------------------------------------------
+            | TABLE HEADER ACTION
+            |--------------------------------------------------------------------------
+            */
+
+           
+
+            /*
+            |--------------------------------------------------------------------------
+            | COLUMNS
+            |--------------------------------------------------------------------------
+            */
+
             ->columns([
 
                 TextColumn::make('supplier.supplier_name')
@@ -32,7 +47,7 @@ class SupplierPaymentsTable
 
                 TextColumn::make('amount')
                     ->label('Amount')
-                    ->money('PKR')
+                    ->money('USD')
                     ->sortable()
                     ->weight('semibold'),
 
@@ -81,6 +96,12 @@ class SupplierPaymentsTable
 
             ])
 
+            /*
+            |--------------------------------------------------------------------------
+            | FILTERS
+            |--------------------------------------------------------------------------
+            */
+
             ->filters([
 
                 SelectFilter::make('supplier_id')
@@ -102,17 +123,35 @@ class SupplierPaymentsTable
 
             ])
 
+            /*
+            |--------------------------------------------------------------------------
+            | RECORD ACTIONS
+            |--------------------------------------------------------------------------
+            */
+
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
 
+            /*
+            |--------------------------------------------------------------------------
+            | BULK ACTIONS
+            |--------------------------------------------------------------------------
+            */
+
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
             ])
+
+            /*
+            |--------------------------------------------------------------------------
+            | DEFAULT SORT
+            |--------------------------------------------------------------------------
+            */
 
             ->defaultSort('payment_date', 'desc');
     }

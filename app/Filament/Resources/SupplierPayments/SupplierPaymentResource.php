@@ -20,7 +20,7 @@ class SupplierPaymentResource extends Resource
     protected static ?string $model = SupplierPayment::class;
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-banknotes';
-
+protected static bool $shouldRegisterNavigation = false;
     protected static ?string $navigationLabel = 'Supplier Payments';
 
     protected static ?string $modelLabel = 'Supplier Payment';
