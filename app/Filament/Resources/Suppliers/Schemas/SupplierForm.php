@@ -2,13 +2,7 @@
 
 namespace App\Filament\Resources\Suppliers\Schemas;
 
-<<<<<<< HEAD
 use Filament\Infolists\Components\TextEntry;
-=======
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
->>>>>>> d06efcbf243a71ca1589c114591841d520a8f34f
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
@@ -16,231 +10,161 @@ class SupplierInfolist
 {
     public static function configure(Schema $schema): Schema
     {
-<<<<<<< HEAD
-        return $schema
-            ->components([
-                Section::make('Basic Information')
-                    ->columns(2)
-                    ->schema([
-                        TextEntry::make('supplier_name')
-                            ->label('Supplier Name'),
-
-                        TextEntry::make('company_name')
-                            ->label('Company Name'),
-
-                        TextEntry::make('contact_person')
-                            ->label('Contact Person'),
-
-                        TextEntry::make('phone'),
-
-                        TextEntry::make('whatsapp'),
-
-                        TextEntry::make('email'),
-                    ]),
-
-                Section::make('Address')
-                    ->columns(3)
-                    ->schema([
-                        TextEntry::make('address')
-                            ->columnSpanFull(),
-
-                        TextEntry::make('city'),
-
-                        TextEntry::make('country'),
-                    ]),
-
-                Section::make('Financial Information')
-                    ->columns(3)
-                    ->schema([
-                        TextEntry::make('tax_ntn_number')
-                            ->label('Tax / NTN Number'),
-
-                        TextEntry::make('opening_balance')
-                            ->formatStateUsing(fn ($state) => format_currency($state)),
-
-                        TextEntry::make('credit_limit')
-                            ->formatStateUsing(fn ($state) => format_currency($state)),
-
-                        TextEntry::make('payment_terms')
-                            ->columnSpanFull(),
-                    ]),
-
-                Section::make('Status & Notes')
-                    ->columns(2)
-                    ->schema([
-                        TextEntry::make('status')
-                            ->badge()
-                            ->color(fn (string $state): string => match ($state) {
-                                'active' => 'success',
-                                'inactive' => 'gray',
-                                default => 'gray',
-                            }),
-
-                        TextEntry::make('notes')
-                            ->columnSpanFull(),
-                    ]),
-            ]);
-=======
         return $schema->components([
 
-            // ================================
-            // SUPPLIER PROFILE
-            // ================================
+            // =====================================================
+            // SUPPLIER OVERVIEW
+            // =====================================================
 
-            Section::make('Supplier Profile')
-                ->icon('heroicon-o-building-office-2')
-                ->columns(3)
+            Section::make()
                 ->schema([
 
-                    TextInput::make('supplier_name')
+                    TextEntry::make('supplier_name')
                         ->label('Supplier Name')
-                        ->placeholder('Ahmed Traders')
-                        ->prefixIcon('heroicon-o-user')
-                        ->required()
-                        ->maxLength(255),
+                        ->weight('bold')
+                        ->icon('heroicon-m-user'),
 
-                    TextInput::make('company_name')
+                    TextEntry::make('company_name')
                         ->label('Company')
-                        ->placeholder('ABC Pharmaceutical')
-                        ->prefixIcon('heroicon-o-building-office')
-                        ->maxLength(255),
+                        ->icon('heroicon-m-building-office-2'),
 
-                    TextInput::make('contact_person')
-                        ->label('Contact Person')
-                        ->placeholder('Muhammad Ahmed')
-                        ->prefixIcon('heroicon-o-user-circle')
-                        ->maxLength(255),
-
-                    TextInput::make('phone')
-                        ->label('Phone')
-                        ->placeholder('+92 300 1234567')
-                        ->prefixIcon('heroicon-o-phone')
-                        ->tel()
-                        ->maxLength(30),
-
-                    TextInput::make('whatsapp')
-                        ->label('WhatsApp')
-                        ->placeholder('+92 300 1234567')
-                        ->prefixIcon('heroicon-o-chat-bubble-left-right')
-                        ->tel()
-                        ->maxLength(30),
-
-                    TextInput::make('email')
-                        ->label('Email')
-                        ->placeholder('supplier@example.com')
-                        ->prefixIcon('heroicon-o-envelope')
-                        ->email()
-                        ->maxLength(255),
-
-                ])
-                ->columnSpanFull(),
-
-
-            // ================================
-            // BUSINESS INFORMATION
-            // ================================
-
-            Section::make('Business Information')
-                ->icon('heroicon-o-map-pin')
-                ->columns(3)
-                ->schema([
-
-                    TextInput::make('city')
-                        ->label('City')
-                        ->placeholder('Lahore')
-                        ->prefixIcon('heroicon-o-building-office-2')
-                        ->maxLength(100),
-
-                    TextInput::make('country')
-                        ->label('Country')
-                        ->placeholder('Pakistan')
-                        ->prefixIcon('heroicon-o-globe-alt')
-                        ->default('Pakistan')
-                        ->maxLength(100),
-
-                    TextInput::make('tax_ntn_number')
-                        ->label('Tax / NTN')
-                        ->placeholder('1234567-8')
-                        ->prefixIcon('heroicon-o-document-text')
-                        ->maxLength(100),
-
-                    Textarea::make('address')
-                        ->label('Business Address')
-                        ->placeholder('Office / Street / Area')
-                        ->rows(2)
-                        ->columnSpan(2)
-                        ->maxLength(1000),
-
-                    TextInput::make('payment_terms')
-                        ->label('Payment Terms')
-                        ->placeholder('Net 30 Days')
-                        ->prefixIcon('heroicon-o-calendar-days')
-                        ->maxLength(255),
-
-                ])
-                ->columnSpanFull(),
-
-
-            // ================================
-            // FINANCIAL
-            // ================================
-
-            Section::make('Financial Settings')
-                ->icon('heroicon-o-banknotes')
-                ->columns(3)
-                ->schema([
-
-                    TextInput::make('opening_balance')
-                        ->label('Opening Balance')
-                        ->numeric()
-                        ->prefix('$')
-                        ->default(0)
-                        ->minValue(0)
-                        ->step(0.01)
-                        ->prefixIcon('heroicon-o-wallet'),
-
-                    TextInput::make('credit_limit')
-                        ->label('Credit Limit')
-                        ->numeric()
-                        ->prefix('$')
-                        ->default(0)
-                        ->minValue(0)
-                        ->step(0.01)
-                        ->prefixIcon('heroicon-o-credit-card'),
-
-                    Select::make('status')
+                    TextEntry::make('status')
                         ->label('Status')
-                        ->options([
-                            'active' => 'Active',
-                            'inactive' => 'Inactive',
-                        ])
-                        ->default('active')
-                        ->required()
-                        ->native(false)
-                        ->prefixIcon('heroicon-o-check-circle'),
+                        ->badge()
+                        ->formatStateUsing(
+                            fn ($state) => $state
+                                ? ucfirst($state)
+                                : 'Unknown'
+                        )
+                        ->color(
+                            fn ($state): string => match ($state) {
+                                'active' => 'success',
+                                'inactive' => 'danger',
+                                default => 'gray',
+                            }
+                        ),
+
+                    TextEntry::make('phone')
+                        ->label('Phone')
+                        ->icon('heroicon-m-phone'),
+
+                    TextEntry::make('email')
+                        ->label('Email')
+                        ->icon('heroicon-m-envelope'),
+
+                    TextEntry::make('whatsapp')
+                        ->label('WhatsApp')
+                        ->icon('heroicon-m-chat-bubble-left-right'),
+
+                    TextEntry::make('payment_terms')
+                        ->label('Payment Terms')
+                        ->icon('heroicon-m-calendar-days'),
 
                 ])
-                ->columnSpanFull(),
+                ->columns(4)
+                ->columnSpanFull()
+                ->extraAttributes([
+                    'class' => 'supplier-overview',
+                ]),
 
 
-            // ================================
-            // NOTES
-            // ================================
+            // =====================================================
+            // CONTACT INFORMATION
+            // =====================================================
 
-            Section::make('Notes')
-                ->icon('heroicon-o-document-text')
+            Section::make('Contact Information')
+                ->description('Supplier contact and business location')
+                ->icon('heroicon-m-identification')
                 ->schema([
 
-                    Textarea::make('notes')
-                        ->label('Internal Notes')
-                        ->placeholder('Add any additional information...')
-                        ->rows(2)
-                        ->maxLength(2000),
+                    TextEntry::make('contact_person')
+                        ->label('Contact Person')
+                        ->icon('heroicon-m-user'),
+
+                    TextEntry::make('phone')
+                        ->label('Phone')
+                        ->icon('heroicon-m-phone'),
+
+                    TextEntry::make('email')
+                        ->label('Email')
+                        ->icon('heroicon-m-envelope'),
+
+                    TextEntry::make('whatsapp')
+                        ->label('WhatsApp')
+                        ->icon('heroicon-m-chat-bubble-left-right'),
+
+                    TextEntry::make('address')
+                        ->label('Business Address')
+                        ->icon('heroicon-m-map-pin')
+                        ->columnSpan(2),
+
+                    TextEntry::make('city')
+                        ->label('City')
+                        ->icon('heroicon-m-building-office'),
+
+                    TextEntry::make('country')
+                        ->label('Country')
+                        ->icon('heroicon-m-globe-alt'),
 
                 ])
-                ->columnSpanFull(),
+                ->columns(4)
+                ->columnSpan(2)
+                ->extraAttributes([
+                    'class' => 'supplier-modern-card supplier-contact-card',
+                ]),
+
+
+            // =====================================================
+            // FINANCIAL INFORMATION
+            // =====================================================
+
+            Section::make('Financial Overview')
+                ->description('Supplier payment and credit information')
+                ->icon('heroicon-m-banknotes')
+                ->schema([
+
+                    TextEntry::make('opening_balance')
+                        ->label('Opening Balance')
+                        ->money('PKR')
+                        ->icon('heroicon-m-arrow-trending-up'),
+
+                    TextEntry::make('credit_limit')
+                        ->label('Credit Limit')
+                        ->money('PKR')
+                        ->icon('heroicon-m-credit-card'),
+
+                    TextEntry::make('tax_ntn_number')
+                        ->label('Tax / NTN Number')
+                        ->icon('heroicon-m-document-check'),
+
+                ])
+                ->columns(1)
+                ->columnSpan(2)
+                ->extraAttributes([
+                    'class' => 'supplier-modern-card supplier-financial-card',
+                ]),
+
+
+            // =====================================================
+            // SUPPLIER NOTES
+            // =====================================================
+
+            Section::make('Supplier Notes')
+                ->description('Additional information about this supplier')
+                ->icon('heroicon-m-document-text')
+                ->schema([
+
+                    TextEntry::make('notes')
+                        ->label('')
+                        ->placeholder('No additional notes have been added.')
+                        ->columnSpanFull(),
+
+                ])
+                ->columnSpanFull()
+                ->extraAttributes([
+                    'class' => 'supplier-modern-card supplier-notes-card',
+                ]),
 
         ]);
->>>>>>> d06efcbf243a71ca1589c114591841d520a8f34f
     }
 }

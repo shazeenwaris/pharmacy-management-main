@@ -43,15 +43,10 @@ class SuppliersTable
                     ->iconColor('gray'),
 
                 TextColumn::make('payable_balance')
-<<<<<<< HEAD
                     ->label('Payable Balance')
                     ->formatStateUsing(fn ($state) => format_currency($state))
-=======
-                    ->label('Payable')
-                    ->money('USD')
                     ->sortable()
                     ->weight('bold')
->>>>>>> d06efcbf243a71ca1589c114591841d520a8f34f
                     ->color(
                         fn ($record): string =>
                             $record->payable_balance > 0
@@ -60,12 +55,8 @@ class SuppliersTable
                     ),
 
                 TextColumn::make('credit_limit')
-<<<<<<< HEAD
-                    ->formatStateUsing(fn ($state) => format_currency($state))
-=======
                     ->label('Credit Limit')
-                    ->money('USD')
->>>>>>> d06efcbf243a71ca1589c114591841d520a8f34f
+                    ->formatStateUsing(fn ($state) => format_currency($state))
                     ->toggleable(),
 
                 TextColumn::make('status')

@@ -124,14 +124,14 @@ class SupplierInfolist
                 ->schema([
 
                     TextEntry::make('opening_balance')
-                        ->label('Opening Balance')
-                        ->money('PKR')
-                        ->icon('heroicon-m-arrow-trending-up'),
+    ->label('Opening Balance')
+    ->formatStateUsing(fn ($state) => format_currency($state))
+    ->icon('heroicon-m-arrow-trending-up'),
 
-                    TextEntry::make('credit_limit')
-                        ->label('Credit Limit')
-                        ->money('PKR')
-                        ->icon('heroicon-m-credit-card'),
+TextEntry::make('credit_limit')
+    ->label('Credit Limit')
+    ->formatStateUsing(fn ($state) => format_currency($state))
+    ->icon('heroicon-m-credit-card'),
 
                     TextEntry::make('tax_ntn_number')
                         ->label('Tax / NTN Number')

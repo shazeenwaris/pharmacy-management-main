@@ -5,11 +5,8 @@ namespace App\Models;
 use App\Models\SupplierPayment;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-<<<<<<< HEAD
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
-=======
->>>>>>> d06efcbf243a71ca1589c114591841d520a8f34f
 
 class Supplier extends Model
 {
@@ -43,13 +40,10 @@ class Supplier extends Model
         return $this->hasMany(SupplierPayment::class);
     }
 
-<<<<<<< HEAD
-=======
     /**
      * Current payable balance =
      * Opening Balance - Total Payments Made.
      */
->>>>>>> d06efcbf243a71ca1589c114591841d520a8f34f
     public function getPayableBalanceAttribute(): float
     {
         return (float) $this->opening_balance
