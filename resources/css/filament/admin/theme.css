@@ -18,12 +18,13 @@
     --color-pms-accent: #26A69A;
 
     /* 2. Background Colors */
+
     --color-pms-bg-page: #F8FAFA;
     --color-pms-bg-surface: #FFFFFF;
-    --color-pms-bg-sidebar: #F0FAFA;
-    --color-pms-bg-sidebar-active: #D4F3F4;
-    --color-pms-bg-sidebar-hover: #E0F2F1;
 
+    --color-pms-bg-sidebar: #DDEFEF;
+    --color-pms-bg-sidebar-active: #BFE3E5;
+    --color-pms-bg-sidebar-hover: #D2EBEC;
     /* 3. Text Colors */
     --color-pms-text-primary: #123047;
     --color-pms-text-secondary: #405A68;
@@ -378,7 +379,11 @@
    -------------------------------------------------------------------------- */
 
 .pms-sidebar {
-    @apply flex flex-col h-full bg-pms-bg-sidebar border-r border-pms-border;
+    @apply flex flex-col bg-pms-bg-sidebar border-r border-pms-border;
+
+    width: 100%;
+    height: 100%;
+    min-height: 0;
 }
 
 /* Brand / Logo */
@@ -400,7 +405,11 @@
 
 /* Navigation */
 .pms-sidebar-nav {
-    @apply flex-1 overflow-y-auto px-3 space-y-1;
+    @apply flex-1 px-3 space-y-1;
+
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .pms-nav-item {
@@ -530,6 +539,8 @@
     background: #00838F;
     box-shadow: 0 0 6px rgba(0, 131, 143, 0.35);
 }
+
+
 
 /* =========================================================
    MEDICARE SUPPLIERS PAGE
@@ -3615,4 +3626,335 @@
         display: none;
     }
 
+
 }
+
+
+
+/* =========================================================
+   FORCE FILAMENT NOTIFICATION ABOVE PMS NAVBAR
+========================================================= */
+
+.pms-topbar {
+    z-index: 10 !important;
+}
+
+.fi-notifications {
+    position: fixed !important;
+    z-index: 999999 !important;
+}
+
+.fi-notification {
+    z-index: 999999 !important;
+}
+
+/* ============================================================
+   MEDICARE — CLEAN FILAMENT LAYOUT
+   ============================================================ */
+
+/* TOPBAR */
+.fi-topbar {
+    height: 72px !important;
+    min-height: 72px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    position: relative !important;
+    z-index: 100 !important;
+
+    border-bottom: 1px solid var(--color-pms-border) !important;
+}
+
+/* ============================================================
+   MEDICARE — FIXED SIDEBAR
+   Sidebar will NEVER move with page content
+   ============================================================ */
+
+:root {
+    --pms-sidebar-width: 255px;
+    --pms-topbar-height: 77px;
+}
+
+/* ============================================================
+   1. SIDEBAR
+   ============================================================ */
+
+.fi-sidebar {
+    position: fixed !important;
+
+    /* EXACTLY under 72px topbar */
+    top: 72px !important;
+    right: auto !important;
+    bottom: 0 !important;
+    left: 0 !important;
+
+    width: 255px !important;
+    min-width: 255px !important;
+    max-width: 255px !important;
+
+    height: calc(100dvh - 72px) !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    z-index: 90 !important;
+
+    overflow: hidden !important;
+
+    background: var(--color-pms-bg-sidebar) !important;
+
+    border: 0 !important;
+    border-right: 1px solid var(--color-pms-border) !important;
+}
+
+/* ============================================================
+   2. CUSTOM PMS SIDEBAR
+   ============================================================ */
+
+.fi-sidebar .pms-sidebar {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    overflow: hidden !important;
+
+    background: var(--color-pms-bg-sidebar) !important;
+}
+
+
+/* ============================================================
+   3. SIDEBAR BRAND
+   ============================================================ */
+
+.fi-sidebar .pms-sidebar-brand {
+    flex: 0 0 72px !important;
+
+    width: 100% !important;
+    height: 72px !important;
+    min-height: 72px !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    margin: 0 !important;
+    padding: 0 16px !important;
+}
+
+
+/* ============================================================
+   4. SIDEBAR NAVIGATION
+   ONLY NAVIGATION SCROLLS
+   ============================================================ */
+
+.fi-sidebar .pms-sidebar-nav {
+    flex: 1 1 auto !important;
+
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+
+    margin: 0 !important;
+
+    padding: 8px 12px 16px !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+
+
+/* ============================================================
+   5. SUBMENUS
+   ============================================================ */
+
+.fi-sidebar .pms-submenu {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+
+    overflow: visible !important;
+}
+
+
+/* ============================================================
+   6. FOOTER
+   ============================================================ */
+
+.fi-sidebar .pms-sidebar-footer-card {
+    flex: 0 0 auto !important;
+}
+
+
+/* ============================================================
+   7. MAIN CONTENT
+   Keep main content beside fixed sidebar
+   ============================================================ */
+
+.fi-main {
+    margin-left: var(--pms-sidebar-width) !important;
+
+    min-width: 0 !important;
+
+    width: calc(100% - var(--pms-sidebar-width)) !important;
+
+    overflow-x: hidden !important;
+
+    background: var(--color-pms-bg-page) !important;
+}
+
+
+/* ============================================================
+   8. MAIN CONTENT CONTAINER
+   ============================================================ */
+
+.fi-main-ctn {
+    min-width: 0 !important;
+    max-width: 100% !important;
+
+    overflow-x: auto !important;
+}
+
+
+/* ============================================================
+   9. TABLES
+   Large tables can scroll horizontally,
+   but sidebar stays completely fixed
+   ============================================================ */
+
+.fi-main table {
+    max-width: none;
+}
+
+
+/* ============================================================
+   10. SIDEBAR SCROLLBAR
+   ============================================================ */
+
+.fi-sidebar .pms-sidebar-nav::-webkit-scrollbar {
+    width: 5px;
+}
+
+.fi-sidebar .pms-sidebar-nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.fi-sidebar .pms-sidebar-nav::-webkit-scrollbar-thumb {
+    background: #b8c9ce;
+    border-radius: 999px;
+}
+
+.fi-sidebar .pms-sidebar-nav {
+    scrollbar-width: thin;
+    scrollbar-color: #b8c9ce transparent;
+}
+
+
+/* ============================================================
+   11. MOBILE / SMALL SCREEN
+   ============================================================ */
+
+@media (max-width: 1024px) {
+
+    .fi-sidebar {
+        position: relative !important;
+
+        top: auto !important;
+        left: auto !important;
+        bottom: auto !important;
+
+        width: 260px !important;
+        max-width: 260px !important;
+
+        height: 100dvh !important;
+    }
+
+    .fi-main {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+}
+
+/* =========================================================
+   HIDE FILAMENT DEFAULT PAGE HEADER GLOBALLY
+   Keep custom application headers
+========================================================= */
+
+/* .fi-header {
+    display: none !important;
+}
+
+.fi-page-header {
+    display: none !important;
+} */
+
+/* .fi-page-header-heading {
+    display: none !important;
+}
+
+.fi-page-header-description {
+    display: none !important;
+} */
+
+/* .pms-nav-chevron,
+.pms-submenu-chevron {
+    width: 16px;
+    height: 16px;
+    margin-left: auto;
+    transition: transform 0.2s ease;
+}
+
+.pms-submenu-group {
+    margin-bottom: 2px;
+}
+
+.pms-submenu-parent {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px 9px 42px;
+    border: none;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    text-align: left;
+    font-size: 13px;
+}
+
+.pms-submenu-dot {
+    width: 5px;
+    height: 5px;
+    min-width: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: .55;
+}
+
+.pms-nested-submenu {
+    padding-left: 28px;
+}
+
+.pms-submenu-item {
+    display: block;
+    padding: 8px 14px 8px 38px;
+    text-decoration: none;
+    color: inherit;
+    font-size: 12.5px;
+    border-radius: 7px;
+}
+
+.pms-submenu-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.rotate-180 {
+    transform: rotate(180deg);
+} */
