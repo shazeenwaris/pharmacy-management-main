@@ -56,38 +56,58 @@ class CustomerResource extends Resource
         return $schema
             ->components([
                 Section::make('Customer Profile')
+                    ->description('Basic contact information for this customer')
+                    ->icon(Heroicon::OutlinedUser)
+                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('name')
+                            ->label('Name')
                             ->required()
                             ->maxLength(255),
                         TextInput::make('phone')
+                            ->label('Phone')
                             ->required()
                             ->tel(),
                         TextInput::make('email')
+                            ->label('Email')
                             ->email(),
-                        DatePicker::make('date_of_birth'),
+                        DatePicker::make('date_of_birth')
+                            ->label('Date of Birth'),
                         TextInput::make('address')
+                            ->label('Address')
                             ->columnSpanFull(),
                     ])
-                    ->columns(3),
+                    ->columns(4),
 
                 Section::make('Credit Settings')
+                    ->description('Opening balance and credit limit for this customer')
+                    ->icon(Heroicon::OutlinedCalculator)
+                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('opening_balance')
+                            ->label('Opening Balance')
                             ->numeric()
                             ->prefix(fn () => currency_symbol())
                             ->default(0),
                         TextInput::make('credit_limit')
+                            ->label('Credit Limit')
                             ->numeric()
                             ->prefix(fn () => currency_symbol())
                             ->default(0),
                         Toggle::make('status')
+                            ->label('Active')
                             ->default(true),
                     ])
                     ->columns(3),
 
-                Textarea::make('notes')
-                    ->columnSpanFull(),
+                Section::make('Notes')
+                    ->columnSpanFull()
+                    ->schema([
+                        Textarea::make('notes')
+                            ->label('')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -132,4 +152,20 @@ class CustomerResource extends Resource
             'edit' => EditCustomer::route('/{record}/edit'),
         ];
     }
+   public static function getGloballySearchableAttributes(): array
+{
+    return ['name', 'phone', 'email'];
+}
+
+public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string
+{
+    return $record->name;
+}
+
+public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+{
+    return [
+        'Phone' => $record->phone,
+    ];
+}
 }

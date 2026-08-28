@@ -35,78 +35,75 @@ class PosScreen extends Component
             ->get();
     }
 
-    // public function addToCart($medicineId)
-    // {
-    //     $batch = MedicineBatch::where('medicine_id', $medicineId)
-    //         ->where('status', true)
-    //         ->where('quantity', '>', 0)
-    //         ->where('expiry_date', '>', now())
-    //         ->orderBy('expiry_date', 'asc')
-    //         ->first();
-
-    //     if (! $batch) {
-    //         $this->dispatch('notify', message: 'No available stock for this medicine.');
-    //         return;
-    //     }
-
-    //     $medicine = Medicine::find($medicineId);
-
-    //     if (isset($this->cart[$batch->id])) {
-    //         $this->cart[$batch->id]['quantity']++;
-    //     } else {
-    //         $this->cart[$batch->id] = [
-    //             'medicine_id' => $medicine->id,
-    //             'medicine_name' => $medicine->name,
-    //             'batch_id' => $batch->id,
-    //             'batch_number' => $batch->batch_number,
-    //             'expiry_date' => $batch->expiry_date->format('d M Y'),
-    //             'available_qty' => $batch->quantity,
-    //             'quantity' => 1,
-    //             'unit_price' => (float) $medicine->sale_price,
-    //             'discount' => 0,
-    //         ];
-    //     }
-
-    //     $this->search = '';
-    // }
     public function addToCart($medicineId)
-{
-    $medicine = Medicine::find($medicineId);
+    {
+        $medicine = Medicine::find($medicineId);
 
-    if ($medicine->prescription_required) {
-        $this->dispatch('notify', message: '⚠ Prescription Required for ' . $medicine->name);
+        if ($medicine->prescription_required) {
+            $this->dispatch('notify', message: '⚠ Prescription Required for ' . $medicine->name);
+        }
+
+        $batch = MedicineBatch::where('medicine_id', $medicineId)
+            ->where('status', true)
+            ->where('quantity', '>', 0)
+            ->where('expiry_date', '>', now())
+            ->orderBy('expiry_date', 'asc')
+            ->first();
+
+        if (! $batch) {
+            $this->dispatch('notify', message: 'No available stock for this medicine.');
+            return;
+        }
+
+        if (isset($this->cart[$batch->id])) {
+            $this->cart[$batch->id]['quantity']++;
+        } else {
+            $this->cart[$batch->id] = [
+                'medicine_id' => $medicine->id,
+                'medicine_name' => $medicine->name,
+                'batch_id' => $batch->id,
+                'batch_number' => $batch->batch_number,
+                'expiry_date' => $batch->expiry_date->format('d M Y'),
+                'available_qty' => $batch->quantity,
+                'quantity' => 1,
+                'unit_price' => (float) $medicine->sale_price,
+                'discount' => 0,
+            ];
+        }
+
+        $this->search = '';
     }
 
-    $batch = MedicineBatch::where('medicine_id', $medicineId)
-        ->where('status', true)
-        ->where('quantity', '>', 0)
-        ->where('expiry_date', '>', now())
-        ->orderBy('expiry_date', 'asc')
-        ->first();
+    /**
+     * Called when the cashier presses Enter in the search box — this is
+     * how barcode scanners behave (they type digits then send an Enter
+     * keystroke). PDF section 9 flow:
+     *   Scan Barcode -> Find Medicine -> Find Available Batch (FEFO)
+     *   -> Add to Cart -> Generate Invoice
+     * No manual click should be needed for a genuine barcode scan.
+     */
+    public function scanBarcode()
+    {
+        if (trim($this->search) === '') {
+            return;
+        }
 
-    if (! $batch) {
-        $this->dispatch('notify', message: 'No available stock for this medicine.');
-        return;
+        $medicine = Medicine::where('status', true)
+            ->where('barcode', $this->search)
+            ->first();
+
+        if (! $medicine) {
+            $this->dispatch('notify', message: '⚠ No medicine found for barcode: ' . $this->search);
+            $this->search = '';
+            return;
+        }
+
+        $this->addToCart($medicine->id);
+
+        // Tell the browser to refocus the search input so the cashier
+        // can immediately scan the next item without touching the mouse.
+        $this->dispatch('focus-search');
     }
-
-    if (isset($this->cart[$batch->id])) {
-        $this->cart[$batch->id]['quantity']++;
-    } else {
-        $this->cart[$batch->id] = [
-            'medicine_id' => $medicine->id,
-            'medicine_name' => $medicine->name,
-            'batch_id' => $batch->id,
-            'batch_number' => $batch->batch_number,
-            'expiry_date' => $batch->expiry_date->format('d M Y'),
-            'available_qty' => $batch->quantity,
-            'quantity' => 1,
-            'unit_price' => (float) $medicine->sale_price,
-            'discount' => 0,
-        ];
-    }
-
-    $this->search = '';
-}
 
     public function removeFromCart($batchId)
     {
@@ -140,7 +137,6 @@ class PosScreen extends Component
         if (empty($this->cart)) {
             $this->dispatch('notify', message: 'Cart is empty.');
             return;
-            
         }
 
         $saleId = null;
@@ -178,7 +174,7 @@ class PosScreen extends Component
             $saleId = $sale->id;
         });
 
-      $this->redirect(route('filament.admin.pages.sales.invoice.{record}', ['record' => $saleId]));
+        $this->redirect(route('filament.admin.pages.sales.invoice.{record}', ['record' => $saleId]));
     }
 
     public function render()

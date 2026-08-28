@@ -11,6 +11,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Auth;
 
 class StockAdjustmentForm
@@ -19,6 +20,9 @@ class StockAdjustmentForm
     {
         return $schema->components([
             Section::make('Stock Adjustment')
+                ->description('Correct system stock to match actual physical count')
+                ->icon(Heroicon::OutlinedAdjustmentsHorizontal)
+                ->columnSpanFull()
                 ->columns(2)
                 ->components([
                     Select::make('medicine_id')
@@ -89,6 +93,7 @@ class StockAdjustmentForm
                         ->required(),
 
                     Textarea::make('notes')
+                        ->rows(3)
                         ->columnSpanFull(),
 
                     Hidden::make('user_id')

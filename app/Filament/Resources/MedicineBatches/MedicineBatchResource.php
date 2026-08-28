@@ -26,6 +26,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use UnitEnum;
 
 class MedicineBatchResource extends Resource
 {
@@ -33,7 +34,7 @@ class MedicineBatchResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Medicines';
+    protected static string|UnitEnum|null $navigationGroup = 'Medicines';
 
     protected static ?int $navigationSort = 6;
 
@@ -64,6 +65,10 @@ class MedicineBatchResource extends Resource
         return $schema
             ->components([
                 Section::make('Batch Details')
+                    ->description('Core identity of this batch and current quantity')
+                    ->icon(Heroicon::OutlinedCalendarDays)
+                    ->columnSpanFull()
+                    ->columns(3)
                     ->schema([
                         Select::make('medicine_id')
                             ->label('Medicine')
@@ -71,45 +76,66 @@ class MedicineBatchResource extends Resource
                             ->searchable()
                             ->preload()
                             ->required(),
+
                         TextInput::make('batch_number')
                             ->required()
                             ->maxLength(255),
-                        DatePicker::make('manufacturing_date'),
-                        DatePicker::make('expiry_date')
-                            ->required(),
+
                         TextInput::make('quantity')
                             ->numeric()
                             ->default(0)
                             ->required(),
-                    ])
-                    ->columns(3),
 
-               Section::make('Pricing')
-    ->schema([
-        TextInput::make('purchase_price')
-            ->numeric()
-            ->prefix(fn () => currency_symbol()),
-        TextInput::make('sale_price')
-            ->numeric()
-            ->prefix(fn () => currency_symbol()),
-    ])
-    ->columns(2),
+                        DatePicker::make('manufacturing_date'),
+
+                        DatePicker::make('expiry_date')
+                            ->required(),
+                    ]),
+
+                Section::make('Pricing')
+                    ->description('Purchase and sale price for this batch')
+                    ->icon(Heroicon::OutlinedBanknotes)
+                    ->columnSpanFull()
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('purchase_price')
+                            ->numeric()
+                            ->prefix(fn () => currency_symbol()),
+
+                        TextInput::make('sale_price')
+                            ->numeric()
+                            ->prefix(fn () => currency_symbol()),
+                    ]),
 
                 Section::make('Supplier / Purchase Reference')
+                    ->description('Where this batch was sourced from')
+                    ->icon(Heroicon::OutlinedTruck)
+                    ->columnSpanFull()
+                    ->columns(2)
                     ->schema([
                         Select::make('supplier_id')
-    ->label('Supplier')
-    ->relationship('supplier', 'supplier_name')
-    ->searchable()
-    ->preload(),
-                        TextInput::make('purchase_reference'),
-                    ])
-                    ->columns(2),
+                            ->label('Supplier')
+                            ->relationship('supplier', 'supplier_name')
+                            ->searchable()
+                            ->preload(),
 
-                Toggle::make('status')
-                    ->default(true),
-                Textarea::make('notes')
-                    ->columnSpanFull(),
+                        TextInput::make('purchase_reference'),
+                    ]),
+
+                Section::make('Status & Notes')
+                    ->icon(Heroicon::OutlinedCheckCircle)
+                    ->columnSpanFull()
+                    ->schema([
+                        Toggle::make('status')
+                            ->label('Active')
+                            ->default(true)
+                            ->onColor('success')
+                            ->offColor('danger'),
+
+                        Textarea::make('notes')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -120,9 +146,13 @@ class MedicineBatchResource extends Resource
                 TextColumn::make('medicine.name')
                     ->label('Medicine')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->weight('medium'),
+
                 TextColumn::make('batch_number')
+                    ->label('Batch #')
                     ->searchable(),
+
                 TextColumn::make('expiry_date')
                     ->date()
                     ->sortable()
@@ -131,10 +161,19 @@ class MedicineBatchResource extends Resource
                         'expiring_soon' => 'warning',
                         default => 'success',
                     }),
+
                 TextColumn::make('quantity')
                     ->sortable(),
+
                 TextColumn::make('sale_price')
-    ->formatStateUsing(fn ($state) => format_currency($state)),
+                    ->label('Sale Price')
+                    ->formatStateUsing(fn ($state) => format_currency($state))
+                    ->sortable(),
+
+                TextColumn::make('supplier.supplier_name')
+                    ->label('Supplier')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('expiry_status')
                     ->label('Status')
                     ->badge()
@@ -152,7 +191,9 @@ class MedicineBatchResource extends Resource
             ->filters([
                 SelectFilter::make('medicine_id')
                     ->label('Medicine')
-                    ->relationship('medicine', 'name'),
+                    ->relationship('medicine', 'name')
+                    ->searchable()
+                    ->preload(),
 
                 Filter::make('expiring_soon')
                     ->label('Expiring Soon (30 days)')

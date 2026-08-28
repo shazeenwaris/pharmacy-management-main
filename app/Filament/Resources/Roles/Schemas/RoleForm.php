@@ -6,6 +6,7 @@ use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Spatie\Permission\Models\Permission;
 
 class RoleForm
@@ -15,6 +16,9 @@ class RoleForm
         return $schema
             ->components([
                 Section::make('Role Details')
+                    ->description('Basic identity of this role')
+                    ->icon(Heroicon::OutlinedShieldCheck)
+                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('name')
                             ->label('Role Name')
@@ -25,6 +29,9 @@ class RoleForm
                     ]),
 
                 Section::make('Permissions')
+                    ->description('Select what this role is allowed to do across the system')
+                    ->icon(Heroicon::OutlinedKey)
+                    ->columnSpanFull()
                     ->schema([
                         CheckboxList::make('permissions')
                             ->label('')
@@ -32,7 +39,7 @@ class RoleForm
                             ->options(fn () => Permission::query()->pluck('name', 'id'))
                             ->searchable()
                             ->bulkToggleable()
-                            ->columns(2)
+                            ->columns(3)
                             ->gridDirection('row'),
                     ]),
             ]);

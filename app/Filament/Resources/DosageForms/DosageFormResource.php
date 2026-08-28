@@ -13,6 +13,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
@@ -20,6 +21,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use UnitEnum;
 
 class DosageFormResource extends Resource
 {
@@ -27,7 +29,9 @@ class DosageFormResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBeaker;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Medicines';
+    protected static string|UnitEnum|null $navigationGroup = 'Medicines';
+
+    protected static ?string $navigationLabel = 'Dosage Forms';
 
     protected static ?int $navigationSort = 5;
 
@@ -55,13 +59,26 @@ class DosageFormResource extends Resource
     {
         return $schema
             ->components([
-                TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Textarea::make('description')
-                    ->columnSpanFull(),
-                Toggle::make('status')
-                    ->default(true),
+                Section::make('Dosage Form Details')
+                    ->description('e.g. Tablet, Syrup, Injection, Cream, Drops')
+                    ->icon(Heroicon::OutlinedBeaker)
+                    ->columnSpanFull()
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+
+                        Toggle::make('status')
+                            ->label('Active')
+                            ->default(true)
+                            ->onColor('success')
+                            ->offColor('danger'),
+
+                        Textarea::make('description')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -71,15 +88,25 @@ class DosageFormResource extends Resource
             ->columns([
                 TextColumn::make('name')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->weight('medium'),
+
                 TextColumn::make('medicines_count')
                     ->counts('medicines')
-                    ->label('Medicines'),
+                    ->label('Medicines')
+                    ->badge()
+                    ->color('info'),
+
                 IconColumn::make('status')
+                    ->label('Active')
                     ->boolean(),
             ])
             ->filters([
-                TernaryFilter::make('status'),
+                TernaryFilter::make('status')
+                    ->label('Status')
+                    ->placeholder('All dosage forms')
+                    ->trueLabel('Active only')
+                    ->falseLabel('Inactive only'),
             ])
             ->recordActions([
                 EditAction::make(),
@@ -89,7 +116,8 @@ class DosageFormResource extends Resource
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('name');
     }
 
     public static function getPages(): array

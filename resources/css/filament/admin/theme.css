@@ -1,7 +1,7 @@
-@import '../../../../vendor/filament/filament/resources/css/theme.css';
+ @import '../../../../vendor/filament/filament/resources/css/theme.css';
 
 @source '../../../../app/Filament/**/*';
-@source '../../../../resources/views/filament/**/*';
+@source '../../../../resources/views/filament/**/*'; 
 
 /* ==========================================================================
    MediCare Pharmacy System — Filament Admin Theme
@@ -119,7 +119,9 @@
 .fi-topbar {
     @apply bg-white border-b border-pms-border;
 }
-
+.fi-body {
+    padding-top: 0 !important;
+}
 /* --------------------------------------------------------------------------
    2. TEXT UTILITIES
    -------------------------------------------------------------------------- */
@@ -1106,7 +1108,7 @@
 }
 
 
-/* LEFT */
+
 
 .pms-topbar-left {
     display: flex;
@@ -1137,16 +1139,15 @@
 }
 
 
-/* RIGHT */
 
-.pms-topbar-right {
+
+/* .pms-topbar-right {
     display: flex;
     align-items: center;
     gap: 8px;
-}
+} */
 
 
-/* ACTION BUTTON */
 
 .pms-topbar-action {
     width: 40px;
@@ -1193,7 +1194,7 @@
 }
 
 
-/* NOTIFICATION */
+
 
 .pms-notification-btn {
     position: relative;
@@ -1217,7 +1218,7 @@
 }
 
 
-/* DIVIDER */
+
 
 .pms-topbar-divider {
     width: 1px;
@@ -1229,7 +1230,7 @@
 }
 
 
-/* USER */
+
 
 .pms-user {
     display: flex;
@@ -1257,7 +1258,6 @@
 }
 
 
-/* AVATAR */
 
 .pms-user-avatar {
     width: 38px;
@@ -1284,7 +1284,6 @@
 }
 
 
-/* USER INFO */
 
 .pms-user-info {
     display: flex;
@@ -1312,7 +1311,7 @@
 }
 
 
-/* CHEVRON */
+
 
 .pms-user-chevron {
     width: 15px;
@@ -1333,7 +1332,7 @@
 }
 
 
-/* MOBILE */
+
 
 .pms-mobile-menu {
     display: none;
@@ -1363,9 +1362,7 @@
 }
 
 
-/* =========================================================
-   RESPONSIVE
-========================================================= */
+
 
 @media (max-width: 768px) {
 
@@ -1435,12 +1432,12 @@
 }
 
 /* Remove space reserved for topbar */
-.fi-main {
+/* .fi-main {
     padding-top: 72px !important;
-}
+} */
 
 /* Keep custom navbar visible */
-.pms-topbar {
+/* .pms-topbar {
     height: 72px;
     width: 100%;
 
@@ -1460,11 +1457,11 @@
     left: 0;
 
     z-index: 9999;
-}
+} */
 
-.pms-sidebar {
+/* .pms-sidebar {
     @apply flex flex-col h-full bg-pms-bg-sidebar border-r border-pms-border;
-}
+} */
 
 /* =========================================================
    SUPPLIER FORM — COMPACT PREMIUM
@@ -3615,4 +3612,77 @@
         display: none;
     }
 
+}
+
+
+
+.pms-hide-header-action {
+    display: none !important;
+}
+
+
+
+/* =========================================================
+   FORCE-FIX TOPBAR LAYOUT (must stay at very end of file)
+   ========================================================= */
+
+.pms-topbar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: nowrap !important;
+    height: 72px !important;
+}
+
+.pms-topbar-left {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    flex-shrink: 0 !important;
+}
+
+.pms-topbar-search {
+    display: flex !important;
+    align-items: center !important;
+    flex: 1 1 auto !important;
+    max-width: 420px !important;
+}
+
+.pms-topbar-right {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-shrink: 0 !important;
+    position: relative !important;
+    top: auto !important;
+    right: auto !important;
+}
+
+.pms-user {
+    position: relative !important;
+}
+
+
+
+
+.fi-page-main {
+    padding-top: 0 !important;
+}
+
+.fi-header {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0 !important;
+    margin: 0 !important;
+}
+
+.fi-page-header-main-ctn {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.fi-page-content {
+    padding-top: 0.25rem !important;
+}
+html, body {
+    background-color: #eefafb !important;
 }

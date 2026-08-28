@@ -5,9 +5,9 @@ namespace App\Filament\Resources\AuditLogs;
 use App\Filament\Resources\AuditLogs\Pages\ListAuditLogs;
 use App\Filament\Resources\AuditLogs\Pages\ViewAuditLog;
 use BackedEnum;
+use Filament\Actions\ViewAction;
 use Filament\Infolists\Components\KeyValueEntry;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -16,6 +16,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Spatie\Activitylog\Models\Activity;
+use UnitEnum;
 
 class AuditLogResource extends Resource
 {
@@ -23,7 +24,11 @@ class AuditLogResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
 
+    protected static string|UnitEnum|null $navigationGroup = 'Settings';
+
     protected static ?string $navigationLabel = 'Audit Logs';
+
+    protected static ?int $navigationSort = 4;
 
     protected static ?string $recordTitleAttribute = 'description';
 
@@ -52,14 +57,19 @@ class AuditLogResource extends Resource
         return $schema
             ->components([
                 Section::make('Activity Details')
+                    ->description('Who did what, and when')
+                    ->icon(Heroicon::OutlinedInformationCircle)
+                    ->columnSpanFull()
                     ->columns(2)
                     ->schema([
                         TextEntry::make('causer.name')
                             ->label('User')
                             ->default('System'),
+
                         TextEntry::make('log_name')
                             ->label('Module')
                             ->badge(),
+
                         TextEntry::make('event')
                             ->label('Action')
                             ->badge()
@@ -69,21 +79,27 @@ class AuditLogResource extends Resource
                                 'deleted' => 'danger',
                                 default => 'gray',
                             }),
+
                         TextEntry::make('subject_type')
                             ->label('Model'),
+
                         TextEntry::make('created_at')
                             ->label('Date/Time')
                             ->dateTime('d M Y, h:i A'),
                     ]),
 
                 Section::make('Changes')
+                    ->description('Field values before and after this change')
+                    ->icon(Heroicon::OutlinedArrowsRightLeft)
+                    ->columnSpanFull()
+                    ->columns(2)
                     ->schema([
                         KeyValueEntry::make('properties.old')
                             ->label('Previous Value'),
+
                         KeyValueEntry::make('properties.attributes')
                             ->label('New Value'),
-                    ])
-                    ->columns(2),
+                    ]),
             ]);
     }
 
@@ -95,9 +111,11 @@ class AuditLogResource extends Resource
                     ->label('User')
                     ->default('System')
                     ->searchable(),
+
                 TextColumn::make('log_name')
                     ->label('Module')
                     ->badge(),
+
                 TextColumn::make('event')
                     ->label('Action')
                     ->badge()
@@ -107,8 +125,10 @@ class AuditLogResource extends Resource
                         'deleted' => 'danger',
                         default => 'gray',
                     }),
+
                 TextColumn::make('description')
                     ->searchable(),
+
                 TextColumn::make('created_at')
                     ->label('Date/Time')
                     ->dateTime('d M Y, h:i A')
@@ -124,6 +144,7 @@ class AuditLogResource extends Resource
                         'Supplier' => 'Supplier',
                         'User' => 'User',
                     ]),
+
                 SelectFilter::make('event')
                     ->options([
                         'created' => 'Created',
@@ -132,7 +153,7 @@ class AuditLogResource extends Resource
                     ]),
             ])
             ->recordUrl(fn ($record) => static::getUrl('view', ['record' => $record]))
-                        ->recordActions([
+            ->recordActions([
                 ViewAction::make(),
             ])
             ->defaultSort('created_at', 'desc');

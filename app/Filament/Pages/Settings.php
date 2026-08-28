@@ -3,17 +3,19 @@
 namespace App\Filament\Pages;
 
 use App\Models\PharmacySetting;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
+use BackedEnum;
 use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use BackedEnum;
+use Filament\Support\Icons\Heroicon;
+use Illuminate\Support\Facades\Cache;
 use UnitEnum;
 
 class Settings extends Page implements HasForms
@@ -47,22 +49,15 @@ class Settings extends Page implements HasForms
         return $schema
             ->components([
                 Section::make('Pharmacy Info')
+                    ->description('Basic identity of your pharmacy shown on receipts and reports')
+                    ->icon(Heroicon::OutlinedBuildingStorefront)
+                    ->columnSpanFull()
                     ->columns(2)
                     ->schema([
                         TextInput::make('pharmacy_name')
                             ->label('Pharmacy Name')
                             ->required()
                             ->maxLength(255),
-
-                        FileUpload::make('logo')
-                            ->label('Logo')
-                            ->image()
-                            ->directory('pharmacy-logo')
-                            ->columnSpan(1),
-
-                        Textarea::make('address')
-                            ->label('Address')
-                            ->columnSpanFull(),
 
                         TextInput::make('phone')
                             ->label('Phone')
@@ -71,9 +66,23 @@ class Settings extends Page implements HasForms
                         TextInput::make('email')
                             ->label('Email')
                             ->email(),
+
+                       FileUpload::make('logo')
+    ->label('Logo')
+    ->image()
+    ->disk('public')
+    ->directory('pharmacy-logo')
+    ->columnSpan(1),
+                        Textarea::make('address')
+                            ->label('Address')
+                            ->rows(3)
+                            ->columnSpanFull(),
                     ]),
 
                 Section::make('Invoice Settings')
+                    ->description('Controls how invoice numbers and footers are generated')
+                    ->icon(Heroicon::OutlinedDocumentText)
+                    ->columnSpanFull()
                     ->columns(2)
                     ->schema([
                         TextInput::make('invoice_prefix')
@@ -87,10 +96,14 @@ class Settings extends Page implements HasForms
 
                         Textarea::make('invoice_footer_note')
                             ->label('Invoice Footer Note')
+                            ->rows(3)
                             ->columnSpanFull(),
                     ]),
 
                 Section::make('Tax & Currency')
+                    ->description('Default tax rate and currency used across the system')
+                    ->icon(Heroicon::OutlinedBanknotes)
+                    ->columnSpanFull()
                     ->columns(3)
                     ->schema([
                         TextInput::make('default_tax_percentage')
@@ -109,6 +122,9 @@ class Settings extends Page implements HasForms
                     ]),
 
                 Section::make('Stock & Expiry Alerts')
+                    ->description('Thresholds that trigger low-stock and expiry notifications')
+                    ->icon(Heroicon::OutlinedBellAlert)
+                    ->columnSpanFull()
                     ->columns(2)
                     ->schema([
                         TextInput::make('low_stock_threshold')
@@ -125,6 +141,9 @@ class Settings extends Page implements HasForms
                     ]),
 
                 Section::make('Payment Methods')
+                    ->description('Payment options available at checkout')
+                    ->icon(Heroicon::OutlinedCreditCard)
+                    ->columnSpanFull()
                     ->schema([
                         CheckboxList::make('payment_methods')
                             ->label('Enabled Payment Methods')
@@ -141,15 +160,15 @@ class Settings extends Page implements HasForms
     }
 
     public function save(): void
-{
-    $settings = PharmacySetting::current();
-    $settings->update($this->form->getState());
+    {
+        $settings = PharmacySetting::current();
+        $settings->update($this->form->getState());
 
-    \Illuminate\Support\Facades\Cache::forget('pharmacy_currency_symbol');
+        Cache::forget('pharmacy_currency_symbol');
 
-    Notification::make()
-        ->title('Settings saved successfully')
-        ->success()
-        ->send();
-}
+        Notification::make()
+            ->title('Settings saved successfully')
+            ->success()
+            ->send();
+    }
 }

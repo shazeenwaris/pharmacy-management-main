@@ -1,4 +1,5 @@
 <?php
+// app/Filament/Resources/Categories/CategoryResource.php
 
 namespace App\Filament\Resources\Categories;
 
@@ -13,6 +14,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
@@ -20,6 +22,8 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use UnitEnum;
+
 
 class CategoryResource extends Resource
 {
@@ -27,7 +31,9 @@ class CategoryResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Medicines';
+    protected static string|UnitEnum|null $navigationGroup = 'Medicines';
+
+    protected static ?string $navigationLabel = 'Categories';
 
     protected static ?int $navigationSort = 2;
 
@@ -51,17 +57,31 @@ class CategoryResource extends Resource
         return auth()->user()?->can('manage categories') ?? false;
     }
 
-    public static function form(Schema $schema): Schema
+       public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Textarea::make('description')
-                    ->columnSpanFull(),
-                Toggle::make('status')
-                    ->default(true),
+                Section::make('Category Details')
+                    ->description('Add or update a medicine category')
+                    ->columnSpanFull()
+                    ->columns(2)
+                    ->components([
+                        TextInput::make('name')
+                            ->required()
+                            ->maxLength(255)
+                            ->columnSpan(1),
+
+                        Toggle::make('status')
+                            ->label('Active')
+                            ->default(true)
+                            ->onColor('success')
+                            ->offColor('danger')
+                            ->columnSpan(1),
+
+                        Textarea::make('description')
+                            ->rows(4)
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -71,19 +91,37 @@ class CategoryResource extends Resource
             ->columns([
                 TextColumn::make('name')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->weight('medium'),
+
+                TextColumn::make('description')
+                    ->limit(50)
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('medicines_count')
                     ->counts('medicines')
-                    ->label('Medicines'),
+                    ->label('Medicines')
+                    ->badge()
+                    ->color('info')
+                    ->sortable(),
+
                 IconColumn::make('status')
-                    ->boolean(),
+                    ->label('Active')
+                    ->boolean()
+                    ->sortable(),
+
                 TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label('Created')
+                    ->dateTime('d M Y, h:i A')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TernaryFilter::make('status'),
+                TernaryFilter::make('status')
+                    ->label('Status')
+                    ->placeholder('All categories')
+                    ->trueLabel('Active only')
+                    ->falseLabel('Inactive only'),
             ])
             ->recordActions([
                 EditAction::make(),
@@ -93,13 +131,15 @@ class CategoryResource extends Resource
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('name');
     }
 
-    public static function getPages(): array
-    {
-        return [
-            'index' => ManageCategories::route('/'),
-        ];
-    }
+    
+public static function getPages(): array
+{
+    return [
+        'index' => ManageCategories::route('/'),
+    ];
+}
 }

@@ -26,9 +26,45 @@ class InventoryOverview extends Page implements HasTable
 
     protected static ?int $navigationSort = 0;
 
-    protected static ?string $slug = 'stock/overview';
+   protected static ?string $slug = 'inventory-overview';
 
     protected string $view = 'filament.pages.inventory-overview';
+
+    protected function getViewData(): array
+    {
+        $totalMedicines = Medicine::count();
+
+        $totalStock = (int) Medicine::query()
+            ->withSum('batches as stock_quantity', 'quantity')
+            ->get()
+            ->sum('stock_quantity');
+
+        $lowStock = Medicine::query()
+            ->withSum('batches as stock_quantity', 'quantity')
+            ->get()
+            ->filter(function ($medicine) {
+                $stock = $medicine->stock_quantity ?? 0;
+
+                return $stock > 0
+                    && $stock <= $medicine->minimum_stock_level;
+            })
+            ->count();
+
+        $outOfStock = Medicine::query()
+            ->withSum('batches as stock_quantity', 'quantity')
+            ->get()
+            ->filter(function ($medicine) {
+                return ($medicine->stock_quantity ?? 0) <= 0;
+            })
+            ->count();
+
+        return [
+            'totalMedicines' => $totalMedicines,
+            'totalStock' => $totalStock,
+            'lowStock' => $lowStock,
+            'outOfStock' => $outOfStock,
+        ];
+    }
 
     public function table(Table $table): Table
     {

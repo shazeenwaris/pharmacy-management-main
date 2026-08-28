@@ -20,3 +20,37 @@ Route::get('/admin/backup-download/{path}', function (string $path) {
 
     return response()->download($realPath);
 })->name('backup.download')->middleware(['web', 'auth']);
+
+// ===== Global live search route =====
+Route::middleware(['web', 'auth'])->get('/admin/global-search', function (\Illuminate\Http\Request $request) {
+    $q = trim($request->get('q', ''));
+
+    if (strlen($q) < 2) {
+        return response()->json([]);
+    }
+
+    $medicines = \App\Models\Medicine::where('name', 'like', "%{$q}%")
+        ->orWhere('sku', 'like', "%{$q}%")
+        ->orWhere('generic_name', 'like', "%{$q}%")
+        ->limit(5)
+        ->get(['id', 'name', 'sku'])
+        ->map(fn ($m) => [
+            'label' => $m->name,
+            'sub'   => $m->sku,
+            'url'   => route('filament.admin.resources.medicines.edit', $m->id),
+            'type'  => 'Medicine',
+        ]);
+
+    $customers = \App\Models\Customer::where('name', 'like', "%{$q}%")
+        ->orWhere('phone', 'like', "%{$q}%")
+        ->limit(5)
+        ->get(['id', 'name', 'phone'])
+        ->map(fn ($c) => [
+            'label' => $c->name,
+            'sub'   => $c->phone,
+            'url'   => route('filament.admin.resources.customers.edit', $c->id),
+            'type'  => 'Customer',
+        ]);
+
+    return response()->json($medicines->concat($customers)->values());
+})->name('admin.global-search');

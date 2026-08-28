@@ -3,7 +3,8 @@
 namespace App\Filament\Resources\Medicines\Pages;
 
 use App\Filament\Resources\Medicines\MedicineResource;
-use Filament\Actions\CreateAction;
+use App\Filament\Resources\Medicines\Widgets\MedicineBanner;
+use App\Filament\Resources\Medicines\Widgets\MedicineStats;
 use Filament\Resources\Pages\ListRecords;
 
 class ListMedicines extends ListRecords
@@ -12,8 +13,19 @@ class ListMedicines extends ListRecords
 
     protected function getHeaderActions(): array
     {
+        return [];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
         return [
-            CreateAction::make(),
+            MedicineBanner::class,
+            MedicineStats::class,
         ];
+    }
+
+    public function getHeaderWidgetsColumns(): int|array
+    {
+        return 1;
     }
 }

@@ -58,22 +58,31 @@ class PrescriptionResource extends Resource
         return $schema
             ->components([
                 Section::make('Patient & Doctor Info')
+                    ->description('Who the prescription belongs to and when it was written')
+                    ->icon(Heroicon::OutlinedUser)
+                    ->columnSpanFull()
+                    ->columns(3)
                     ->schema([
                         TextInput::make('prescription_number')
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->default(fn () => 'RX-' . now()->format('Ymd') . '-' . rand(1000, 9999)),
+
                         Select::make('customer_id')
                             ->label('Customer (optional)')
                             ->relationship('customer', 'name')
                             ->searchable()
                             ->preload(),
+
                         TextInput::make('patient_name')
                             ->required(),
+
                         TextInput::make('doctor_name'),
+
                         DatePicker::make('prescription_date')
                             ->required()
                             ->default(now()),
+
                         Select::make('status')
                             ->options([
                                 'active' => 'Active',
@@ -82,10 +91,12 @@ class PrescriptionResource extends Resource
                             ])
                             ->default('active')
                             ->required(),
-                    ])
-                    ->columns(3),
+                    ]),
 
                 Section::make('Prescription Image')
+                    ->description('Attach a photo or scan of the original prescription')
+                    ->icon(Heroicon::OutlinedPhoto)
+                    ->columnSpanFull()
                     ->schema([
                         FileUpload::make('image_path')
                             ->image()
@@ -94,6 +105,9 @@ class PrescriptionResource extends Resource
                     ]),
 
                 Section::make('Medicines')
+                    ->description('Add each medicine, dosage, and quantity prescribed')
+                    ->icon(Heroicon::OutlinedBeaker)
+                    ->columnSpanFull()
                     ->schema([
                         Repeater::make('items')
                             ->relationship('items')
@@ -104,18 +118,27 @@ class PrescriptionResource extends Resource
                                     ->searchable()
                                     ->preload()
                                     ->required(),
+
                                 TextInput::make('dosage')
                                     ->placeholder('e.g. 1 tablet twice a day'),
+
                                 TextInput::make('quantity')
                                     ->numeric()
                                     ->required(),
                             ])
                             ->columns(3)
-                            ->columnSpanFull(),
+                            ->columnSpanFull()
+                            ->addActionLabel('Add Medicine'),
                     ]),
 
-                Textarea::make('notes')
-                    ->columnSpanFull(),
+                Section::make('Notes')
+                    ->icon(Heroicon::OutlinedPencilSquare)
+                    ->columnSpanFull()
+                    ->schema([
+                        Textarea::make('notes')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -124,15 +147,32 @@ class PrescriptionResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('prescription_number')
+                    ->label('RX Number')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->weight('medium'),
+
                 TextColumn::make('patient_name')
                     ->searchable(),
+
                 TextColumn::make('doctor_name')
+                    ->label('Doctor')
                     ->searchable(),
+
+                TextColumn::make('customer.name')
+                    ->label('Customer')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('items_count')
+                    ->counts('items')
+                    ->label('Medicines')
+                    ->badge()
+                    ->color('info'),
+
                 TextColumn::make('prescription_date')
                     ->date()
                     ->sortable(),
+
                 TextColumn::make('status')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {

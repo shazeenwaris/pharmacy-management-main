@@ -62,12 +62,16 @@ class MedicineResource extends Resource
         return $schema
             ->components([
                 Section::make('Basic Information')
+                    ->description('Core identification details for this medicine')
+                    ->icon(Heroicon::OutlinedIdentification)
+                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('name')
                             ->label('Medicine Name')
                             ->required()
                             ->maxLength(255),
                         TextInput::make('generic_name')
+                            ->label('Generic Name')
                             ->required()
                             ->maxLength(255),
                         TextInput::make('medicine_type')
@@ -75,72 +79,92 @@ class MedicineResource extends Resource
                             ->placeholder('e.g. Tablet, Syrup, Injection')
                             ->maxLength(255),
                         TextInput::make('brand_name')
+                            ->label('Brand Name')
                             ->maxLength(255),
                         TextInput::make('sku')
                             ->label('Medicine Code / SKU')
                             ->required()
                             ->unique(ignoreRecord: true),
                         TextInput::make('barcode')
+                            ->label('Barcode')
                             ->unique(ignoreRecord: true),
                         TextInput::make('strength')
+                            ->label('Strength')
                             ->required()
                             ->placeholder('e.g. 500mg'),
                         TextInput::make('pack_size')
                             ->label('Pack Size')
                             ->placeholder('e.g. 10 tablets/strip'),
                     ])
-                    ->columns(3),
+                    ->columns(4),
 
                 Section::make('Classification')
+                    ->description('Category, manufacturer and supplier links')
+                    ->icon(Heroicon::OutlinedTag)
+                    ->columnSpanFull()
                     ->schema([
                         Select::make('category_id')
+                            ->label('Category')
                             ->relationship('category', 'name')
                             ->searchable()
                             ->preload()
                             ->required(),
                         Select::make('manufacturer_id')
+                            ->label('Manufacturer')
                             ->relationship('manufacturer', 'name')
                             ->searchable()
                             ->preload()
                             ->required(),
                         Select::make('supplier_id')
+                            ->label('Supplier')
                             ->relationship('supplier', 'supplier_name')
                             ->searchable()
                             ->preload(),
                         Select::make('dosage_form_id')
+                            ->label('Dosage Form')
                             ->relationship('dosageForm', 'name')
                             ->searchable()
                             ->preload()
                             ->required(),
                         Select::make('unit_id')
+                            ->label('Unit')
                             ->relationship('unit', 'name')
                             ->searchable()
                             ->preload()
                             ->required(),
                     ])
-                    ->columns(2),
+                    ->columns(3),
 
                 Section::make('Pricing')
+                    ->description('Purchase and sale pricing for this medicine')
+                    ->icon(Heroicon::OutlinedCalculator)
+                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('purchase_price')
+                            ->label('Purchase Price')
                             ->numeric()
                             ->prefix(fn () => currency_symbol())
                             ->required(),
                         TextInput::make('sale_price')
+                            ->label('Sale Price')
                             ->numeric()
                             ->prefix(fn () => currency_symbol())
                             ->required(),
                         TextInput::make('wholesale_price')
+                            ->label('Wholesale Price')
                             ->numeric()
                             ->prefix(fn () => currency_symbol()),
                         TextInput::make('minimum_sale_price')
+                            ->label('Minimum Sale Price')
                             ->numeric()
                             ->prefix(fn () => currency_symbol()),
                         TextInput::make('tax_percent')
+                            ->label('Tax Percent')
                             ->numeric()
                             ->suffix('%')
                             ->default(0),
                         TextInput::make('discount_percent')
+                            ->label('Discount Percent')
                             ->numeric()
                             ->suffix('%')
                             ->default(0),
@@ -148,29 +172,45 @@ class MedicineResource extends Resource
                     ->columns(3),
 
                 Section::make('Stock Settings')
+                    ->description('Reorder thresholds and opening stock')
+                    ->icon(Heroicon::OutlinedArchiveBox)
+                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('minimum_stock_level')
+                            ->label('Minimum Stock Level')
                             ->numeric()
                             ->default(0),
                         TextInput::make('maximum_stock_level')
+                            ->label('Maximum Stock Level')
                             ->numeric(),
                         TextInput::make('reorder_level')
+                            ->label('Reorder Level')
                             ->numeric()
                             ->default(0),
                         TextInput::make('opening_stock')
+                            ->label('Opening Stock')
                             ->numeric()
                             ->default(0),
                     ])
                     ->columns(4),
 
                 Section::make('Other')
+                    ->description('Prescription requirement, status and additional notes')
+                    ->icon(Heroicon::OutlinedDocumentText)
+                    ->columnSpanFull()
                     ->schema([
-                        Toggle::make('prescription_required'),
+                        Toggle::make('prescription_required')
+                            ->label('Prescription Required'),
                         Toggle::make('status')
+                            ->label('Active')
                             ->default(true),
                         Textarea::make('description')
+                            ->label('Description')
+                            ->rows(3)
                             ->columnSpanFull(),
                         Textarea::make('notes')
+                            ->label('Notes')
+                            ->rows(3)
                             ->columnSpanFull(),
                     ])
                     ->columns(2),
@@ -232,4 +272,28 @@ class MedicineResource extends Resource
             'edit' => EditMedicine::route('/{record}/edit'),
         ];
     }
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'sku', 'generic_name', 'brand_name'];
+    }
+
+    public static function getGlobalSearchResultTitle(Model $record): string
+    {
+        return $record->name;
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        return [
+            'SKU' => $record->sku,
+        ];
+    }
+
+    public static function getWidgets(): array
+{
+    return [
+        \App\Filament\Resources\Medicines\Widgets\MedicineBanner::class,
+        \App\Filament\Resources\Medicines\Widgets\MedicineStats::class,
+    ];
+}
 }

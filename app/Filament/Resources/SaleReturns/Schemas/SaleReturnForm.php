@@ -12,6 +12,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 
 class SaleReturnForm
 {
@@ -20,7 +21,10 @@ class SaleReturnForm
         return $schema
             ->components([
                 Section::make('Return Details')
-                    ->columns(2)
+                    ->description('Select the original invoice and medicine being returned')
+                    ->icon(Heroicon::OutlinedDocumentText)
+                    ->columnSpanFull()
+                    ->columns(3)
                     ->schema([
                         Select::make('sale_id')
                             ->label('Original Invoice')
@@ -56,7 +60,20 @@ class SaleReturnForm
                                 }
                             }),
 
+                        DatePicker::make('return_date')
+                            ->label('Return Date')
+                            ->default(now())
+                            ->required(),
+                    ]),
+
+                Section::make('Quantity & Refund')
+                    ->description('How much is being returned and the refund amount')
+                    ->icon(Heroicon::OutlinedCalculator)
+                    ->columnSpanFull()
+                    ->columns(3)
+                    ->schema([
                         TextInput::make('quantity')
+                            ->label('Quantity')
                             ->numeric()
                             ->minValue(1)
                             ->required()
@@ -69,12 +86,14 @@ class SaleReturnForm
                             }),
 
                         TextInput::make('refund_amount')
-    ->numeric()
-    ->prefix(fn () => currency_symbol())
-    ->required()
-    ->readOnly(),
+                            ->label('Refund Amount')
+                            ->numeric()
+                            ->prefix(fn () => currency_symbol())
+                            ->required()
+                            ->readOnly(),
 
                         Select::make('reason')
+                            ->label('Reason')
                             ->options([
                                 'defective' => 'Defective / Damaged',
                                 'wrong_item' => 'Wrong Item Sold',
@@ -82,11 +101,8 @@ class SaleReturnForm
                                 'expired' => 'Expired',
                                 'other' => 'Other',
                             ])
-                            ->required(),
-
-                        DatePicker::make('return_date')
-                            ->default(now())
-                            ->required(),
+                            ->required()
+                            ->native(false),
 
                         Hidden::make('medicine_id'),
                         Hidden::make('medicine_batch_id'),

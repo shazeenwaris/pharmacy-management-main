@@ -17,6 +17,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -60,83 +61,140 @@ class PurchaseResource extends Resource
     {
         return $schema
             ->components([
-                Section::make('Purchase Details')
+            Section::make('Purchase Details')
+    ->description('Basic information about this purchase invoice')
+    ->icon(Heroicon::OutlinedDocumentText)
+    ->columnSpanFull()
+    ->schema([
+        Select::make('supplier_id')
+            ->label('Supplier')
+            ->relationship('supplier', 'supplier_name')
+            ->searchable()
+            ->preload()
+            ->required(),
+        TextInput::make('invoice_number')
+            ->label('Invoice Number')
+            ->required()
+            ->unique(ignoreRecord: true),
+        DatePicker::make('purchase_date')
+            ->label('Purchase Date')
+            ->required()
+            ->default(now()),
+        Select::make('status')
+            ->options([
+                'completed' => 'Completed',
+                'pending' => 'Pending',
+            ])
+            ->default('completed')
+            ->required()
+            ->native(false),
+    ])
+    ->columns(4),
+
+Section::make('Items')
+    ->description('Medicines included in this purchase')
+    ->icon(Heroicon::OutlinedBeaker)
+    ->columnSpanFull()
+    ->schema([
+        Repeater::make('items')
+            ->relationship('items')
+            ->label('')
+            ->addActionLabel('Add Item')
+            ->itemLabel(fn (array $state): ?string => $state['batch_number'] ?? null)
+            ->collapsible()
+            ->schema([
+                Grid::make(4)
                     ->schema([
-                        Select::make('supplier_id')
-                            ->relationship('supplier', 'supplier_name')
+                        Select::make('medicine_id')
+                            ->label('Medicine')
+                            ->relationship('medicine', 'name')
                             ->searchable()
                             ->preload()
-                            ->required(),
-                        TextInput::make('invoice_number')
                             ->required()
-                            ->unique(ignoreRecord: true),
-                        DatePicker::make('purchase_date')
-                            ->required()
-                            ->default(now()),
-                        Select::make('status')
-                            ->options([
-                                'completed' => 'Completed',
-                                'pending' => 'Pending',
-                            ])
-                            ->default('completed')
+                            ->columnSpan(2),
+                        TextInput::make('batch_number')
+                            ->label('Batch Number')
                             ->required(),
-                    ])
-                    ->columns(4),
-
-                Section::make('Items')
-                    ->schema([
-                        Repeater::make('items')
-                            ->relationship('items')
-                            ->schema([
-                                Select::make('medicine_id')
-                                    ->label('Medicine')
-                                    ->relationship('medicine', 'name')
-                                    ->searchable()
-                                    ->preload()
-                                    ->required(),
-                                TextInput::make('batch_number')
-                                    ->required(),
-                                DatePicker::make('manufacturing_date'),
-                                DatePicker::make('expiry_date')
-                                    ->required(),
-                                TextInput::make('quantity')
-                                    ->numeric()
-                                    ->required(),
-                                TextInput::make('purchase_price')
-                                    ->numeric()
-                                    ->prefix(fn () => currency_symbol())
-                                    ->required(),
-                                TextInput::make('sale_price')
-                                    ->numeric()
-                                    ->prefix(fn () => currency_symbol())
-                                    ->required(),
-                                TextInput::make('discount_percent')
-                                    ->numeric()
-                                    ->suffix('%')
-                                    ->default(0),
-                                TextInput::make('tax_percent')
-                                    ->numeric()
-                                    ->suffix('%')
-                                    ->default(0),
-                                TextInput::make('total_amount')
-                                    ->numeric()
-                                    ->prefix(fn () => currency_symbol())
-                                    ->required(),
-                            ])
-                            ->columns(4)
-                            ->columnSpanFull(),
+                        TextInput::make('quantity')
+                            ->label('Quantity')
+                            ->numeric()
+                            ->required(),
                     ]),
+                Grid::make(4)
+                    ->schema([
+                        DatePicker::make('manufacturing_date')
+                            ->label('Manufacturing Date'),
+                        DatePicker::make('expiry_date')
+                            ->label('Expiry Date')
+                            ->required(),
+                        TextInput::make('purchase_price')
+                            ->label('Purchase Price')
+                            ->numeric()
+                            ->prefix(fn () => currency_symbol())
+                            ->required(),
+                        TextInput::make('sale_price')
+                            ->label('Sale Price')
+                            ->numeric()
+                            ->prefix(fn () => currency_symbol())
+                            ->required(),
+                    ]),
+                Grid::make(3)
+                    ->schema([
+                        TextInput::make('discount_percent')
+                            ->label('Discount Percent')
+                            ->numeric()
+                            ->suffix('%')
+                            ->default(0),
+                        TextInput::make('tax_percent')
+                            ->label('Tax Percent')
+                            ->numeric()
+                            ->suffix('%')
+                            ->default(0),
+                        TextInput::make('total_amount')
+                            ->label('Total Amount')
+                            ->numeric()
+                            ->prefix(fn () => currency_symbol())
+                            ->required(),
+                    ]),
+            ])
+            ->columnSpanFull(),
+    ]),
 
                 Section::make('Totals')
+                    ->description('Overall amounts for this purchase invoice')
+                    ->icon(Heroicon::OutlinedCalculator)
                     ->schema([
-                        TextInput::make('subtotal')->numeric()->prefix(fn () => currency_symbol())->default(0),
-                        TextInput::make('discount_amount')->numeric()->prefix(fn () => currency_symbol())->default(0),
-                        TextInput::make('tax_amount')->numeric()->prefix(fn () => currency_symbol())->default(0),
-                        TextInput::make('total_amount')->numeric()->prefix(fn () => currency_symbol())->default(0)->required(),
+                        TextInput::make('subtotal')
+                            ->label('Subtotal')
+                            ->numeric()
+                            ->prefix(fn () => currency_symbol())
+                            ->default(0),
+                        TextInput::make('discount_amount')
+                            ->label('Discount Amount')
+                            ->numeric()
+                            ->prefix(fn () => currency_symbol())
+                            ->default(0),
+                        TextInput::make('tax_amount')
+                            ->label('Tax Amount')
+                            ->numeric()
+                            ->prefix(fn () => currency_symbol())
+                            ->default(0),
+                        TextInput::make('total_amount')
+                            ->label('Total Amount')
+                            ->numeric()
+                            ->prefix(fn () => currency_symbol())
+                            ->default(0)
+                            ->required(),
                     ])
                     ->columns(4),
 
-                Textarea::make('notes')->columnSpanFull(),
+                Section::make('Notes')
+                    ->schema([
+                        Textarea::make('notes')
+                            ->label('')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 

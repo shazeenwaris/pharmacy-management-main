@@ -55,20 +55,27 @@ class CustomerPaymentResource extends Resource
         return $schema
             ->components([
                 Section::make('Payment Details')
+                    ->description('Record a payment received from this customer')
+                    ->icon(Heroicon::OutlinedBanknotes)
+                    ->columnSpanFull()
                     ->schema([
                         Select::make('customer_id')
+                            ->label('Customer')
                             ->relationship('customer', 'name')
                             ->searchable()
                             ->preload()
                             ->required(),
                         DatePicker::make('payment_date')
+                            ->label('Payment Date')
                             ->required()
                             ->default(now()),
                         TextInput::make('amount')
+                            ->label('Amount')
                             ->numeric()
                             ->prefix(fn () => currency_symbol())
                             ->required(),
                         Select::make('method')
+                            ->label('Payment Method')
                             ->options([
                                 'cash' => 'Cash',
                                 'card' => 'Card',
@@ -76,13 +83,21 @@ class CustomerPaymentResource extends Resource
                                 'other' => 'Other',
                             ])
                             ->default('cash')
-                            ->required(),
-                        TextInput::make('reference'),
+                            ->required()
+                            ->native(false),
+                        TextInput::make('reference')
+                            ->label('Reference Number'),
                     ])
-                    ->columns(2),
+                    ->columns(3),
 
-                Textarea::make('notes')
-                    ->columnSpanFull(),
+                Section::make('Notes')
+                    ->columnSpanFull()
+                    ->schema([
+                        Textarea::make('notes')
+                            ->label('')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 

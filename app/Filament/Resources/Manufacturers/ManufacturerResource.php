@@ -20,7 +20,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Model;
+use UnitEnum;
 
 class ManufacturerResource extends Resource
 {
@@ -28,35 +28,21 @@ class ManufacturerResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice2;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Medicines';
+    protected static string|UnitEnum|null $navigationGroup = 'Medicines';
+
+    protected static ?string $navigationLabel = 'Manufacturers';
 
     protected static ?int $navigationSort = 3;
-
-    public static function canViewAny(): bool
-    {
-        return auth()->user()?->can('manage manufacturers') ?? false;
-    }
-
-    public static function canCreate(): bool
-    {
-        return auth()->user()?->can('manage manufacturers') ?? false;
-    }
-
-    public static function canEdit(Model $record): bool
-    {
-        return auth()->user()?->can('manage manufacturers') ?? false;
-    }
-
-    public static function canDelete(Model $record): bool
-    {
-        return auth()->user()?->can('manage manufacturers') ?? false;
-    }
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
                 Section::make('Manufacturer Details')
+                    ->description('Basic identity and contact info')
+                    ->icon(Heroicon::OutlinedBuildingOffice2)
+                    ->columnSpanFull()
+                    ->columns(2)
                     ->schema([
                         TextInput::make('name')
                             ->required()
@@ -74,20 +60,30 @@ class ManufacturerResource extends Resource
                             ->url(),
                         TextInput::make('tax_ntn_number')
                             ->label('Tax / NTN Number'),
-                    ])
-                    ->columns(2),
+                    ]),
 
                 Section::make('Address')
+                    ->description('Manufacturer location details')
+                    ->icon(Heroicon::OutlinedMapPin)
+                    ->columnSpanFull()
+                    ->columns(2)
                     ->schema([
                         TextInput::make('address')
                             ->columnSpanFull(),
                         TextInput::make('city'),
                         TextInput::make('country'),
-                    ])
-                    ->columns(2),
+                    ]),
 
-                Toggle::make('status')
-                    ->default(true),
+                Section::make('Status')
+                    ->icon(Heroicon::OutlinedCheckCircle)
+                    ->columnSpanFull()
+                    ->schema([
+                        Toggle::make('status')
+                            ->label('Active')
+                            ->default(true)
+                            ->onColor('success')
+                            ->offColor('danger'),
+                    ]),
             ]);
     }
 
@@ -97,14 +93,21 @@ class ManufacturerResource extends Resource
             ->columns([
                 TextColumn::make('name')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->weight('medium'),
                 TextColumn::make('city')
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('phone'),
+                TextColumn::make('email')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('medicines_count')
                     ->counts('medicines')
-                    ->label('Medicines'),
+                    ->label('Medicines')
+                    ->badge()
+                    ->color('info'),
                 IconColumn::make('status')
+                    ->label('Active')
                     ->boolean(),
             ])
             ->recordActions([
@@ -115,7 +118,8 @@ class ManufacturerResource extends Resource
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('name');
     }
 
     public static function getPages(): array

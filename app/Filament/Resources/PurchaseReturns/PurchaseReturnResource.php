@@ -60,6 +60,9 @@ class PurchaseReturnResource extends Resource
         return $schema
             ->components([
                 Section::make('Return Details')
+                    ->description('Select the original purchase and medicine being returned')
+                    ->icon(Heroicon::OutlinedDocumentText)
+                    ->columnSpanFull()
                     ->schema([
                         Select::make('purchase_id')
                             ->label('Purchase Invoice')
@@ -68,6 +71,7 @@ class PurchaseReturnResource extends Resource
                             ->preload()
                             ->required(),
                         Select::make('medicine_id')
+                            ->label('Medicine')
                             ->relationship('medicine', 'name')
                             ->searchable()
                             ->preload()
@@ -78,32 +82,44 @@ class PurchaseReturnResource extends Resource
                             ->searchable()
                             ->preload(),
                         TextInput::make('batch_number')
+                            ->label('Batch Number')
                             ->required(),
                     ])
-                    ->columns(2),
+                    ->columns(4),
 
                 Section::make('Quantity & Refund')
+                    ->description('How much is being returned and the refund amount')
+                    ->icon(Heroicon::OutlinedCalculator)
+                    ->columnSpanFull()
                     ->schema([
                         TextInput::make('quantity')
+                            ->label('Quantity')
                             ->numeric()
                             ->required(),
                         TextInput::make('purchase_price')
+                            ->label('Purchase Price')
                             ->numeric()
                             ->prefix(fn () => currency_symbol())
                             ->required(),
                         TextInput::make('refund_amount')
+                            ->label('Refund Amount')
                             ->numeric()
                             ->prefix(fn () => currency_symbol())
                             ->default(0),
                         DatePicker::make('return_date')
+                            ->label('Return Date')
                             ->required()
                             ->default(now()),
                     ])
-                    ->columns(2),
+                    ->columns(4),
 
                 Section::make('Reason')
+                    ->description('Why this item is being returned')
+                    ->icon(Heroicon::OutlinedExclamationTriangle)
+                    ->columnSpanFull()
                     ->schema([
                         Select::make('reason')
+                            ->label('Reason')
                             ->options([
                                 'damaged' => 'Damaged',
                                 'expired' => 'Expired',
@@ -111,8 +127,11 @@ class PurchaseReturnResource extends Resource
                                 'excess_stock' => 'Excess Stock',
                                 'other' => 'Other',
                             ])
-                            ->required(),
+                            ->required()
+                            ->native(false),
                         Textarea::make('notes')
+                            ->label('Notes')
+                            ->rows(3)
                             ->columnSpanFull(),
                     ])
                     ->columns(2),

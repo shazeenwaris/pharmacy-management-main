@@ -3,16 +3,17 @@
 namespace App\Filament\Resources\AuditLogs\Pages;
 
 use App\Filament\Resources\AuditLogs\AuditLogResource;
+use App\Filament\Widgets\ActivityOverview;
 use Filament\Resources\Pages\ListRecords;
 
 class ListAuditLogs extends ListRecords
 {
     protected static string $resource = AuditLogResource::class;
 
-    protected function getHeaderActions(): array
+    protected function getHeaderWidgets(): array
     {
         return [
-            // Create button hata diya — audit logs khud system banata hai
+            ActivityOverview::class,
         ];
     }
 }

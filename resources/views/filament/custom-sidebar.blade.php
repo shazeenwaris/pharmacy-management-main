@@ -1,37 +1,245 @@
-<!-- <div class="pms-sidebar"> -->
-<div class="pms-sidebar" style="width:280px; min-width:280px;">
-    {{-- ===== LOGO / BRAND ===== --}}
-    <div class="pms-sidebar-brand">
-        <div class="pms-sidebar-brand-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-5 h-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+
+@persist('pms-sidebar')
+<script>
+    (function () {
+        var collapsed = localStorage.getItem('pms_sidebar_collapsed') === 'true';
+        document.documentElement.setAttribute('data-pms-sidebar', collapsed ? 'collapsed' : 'expanded');
+        document.documentElement.style.setProperty('--pms-sidebar-width', collapsed ? '84px' : '280px');
+    })();
+
+    document.addEventListener('alpine:init', () => {
+        if (!Alpine.store('sidebarState')) {
+            Alpine.store('sidebarState', {
+                collapsed: localStorage.getItem('pms_sidebar_collapsed') === 'true',
+
+                setState(value) {
+                    this.collapsed = value;
+                    localStorage.setItem('pms_sidebar_collapsed', value);
+                    document.documentElement.setAttribute('data-pms-sidebar', value ? 'collapsed' : 'expanded');
+                    document.documentElement.style.setProperty('--pms-sidebar-width', value ? '84px' : '280px');
+                },
+
+                toggle() {
+                    this.setState(!this.collapsed);
+                },
+
+                expand() {
+                    this.setState(false);
+                },
+            });
+        }
+    });
+</script>
+
+ <style>
+   :root { --pms-sidebar-width: 280px; }
+
+.fi-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    height: 100vh !important;
+    width: var(--pms-sidebar-width) !important;
+    min-width: var(--pms-sidebar-width) !important;
+    overflow: visible !important;
+    z-index: 40 !important;
+    transition: width 0.2s ease, min-width 0.2s ease !important;
+}
+
+.fi-main {
+    margin-inline-start: var(--pms-sidebar-width) !important;
+    width: calc(100% - var(--pms-sidebar-width)) !important;
+    max-width: calc(100% - var(--pms-sidebar-width)) !important;
+    box-sizing: border-box !important;
+    transition: margin-inline-start 0.2s ease, width 0.2s ease !important;
+}
+
+.pms-sidebar {
+    width: var(--pms-sidebar-width) !important;
+    min-width: var(--pms-sidebar-width) !important;
+    overflow: hidden;
+    transition: width 0.2s ease, min-width 0.2s ease;
+}
+
+@media (max-width: 1024px) {
+    .fi-main {
+        margin-inline-start: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+}
+
+
+
+
+
+
+
+
+
+    .pms-sidebar {
+        width: var(--pms-sidebar-width) !important;
+        min-width: var(--pms-sidebar-width) !important;
+        overflow: hidden;
+        transition: width 0.2s ease, min-width 0.2s ease;
+    }
+
+   html[data-pms-sidebar="collapsed"] .pms-sidebar-brand-title,
+html[data-pms-sidebar="collapsed"] .pms-sidebar-brand-subtitle,
+html[data-pms-sidebar="collapsed"] .pms-nav-label,
+html[data-pms-sidebar="collapsed"] .pms-nav-chevron,
+html[data-pms-sidebar="collapsed"] .pms-nav-badge,
+html[data-pms-sidebar="collapsed"] .pms-submenu,
+html[data-pms-sidebar="collapsed"] .pms-search-box {
+    display: none !important;
+}
+
+    html[data-pms-sidebar="collapsed"] .pms-sidebar-brand {
+        flex-direction: column;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 1rem 0;
+    }
+
+    html[data-pms-sidebar="collapsed"] .pms-nav-item {
+        justify-content: center;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .pms-nav-item,
+    .pms-nav-label,
+    .pms-sidebar-brand-title,
+    .pms-sidebar-brand-subtitle {
+        white-space: nowrap;
+    }
+
+
+
+
+
+
+
+.fi-sidebar,
+.fi-sidebar *,
+.fi-sidebar-nav,
+.fi-sidebar-nav * {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+.fi-sidebar::-webkit-scrollbar,
+.fi-sidebar *::-webkit-scrollbar,
+.fi-sidebar-nav::-webkit-scrollbar,
+.fi-sidebar-nav *::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+}
+
+
+
+
+
+</style> 
+
+
+<div class="pms-sidebar">
+    @php
+        $pharmacySettings = \App\Models\PharmacySetting::current();
+    @endphp
+
+    <div class="pms-sidebar-brand" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+            @if ($pharmacySettings->logo)
+                <img src="{{ \Illuminate\Support\Facades\Storage::url($pharmacySettings->logo) }}" alt="Logo" style="width: 3.5rem; height: 3.5rem; border-radius: 0.65rem; object-fit: cover; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.12);">
+            @else
+                <div class="pms-sidebar-brand-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+                </div>
+            @endif
+            <div>
+                <p class="pms-sidebar-brand-title">{{ $pharmacySettings->pharmacy_name ?? 'Pharmacy' }}</p>
+                <p class="pms-sidebar-brand-subtitle">Pharmacy System</p>
+            </div>
+        </div>
+
+        <button
+            type="button"
+            @click="$store.sidebarState.toggle()"
+            style="background: transparent; border: none; cursor: pointer; padding: 0.35rem; color: #718792; flex-shrink: 0;"
+            title="Collapse sidebar"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 1.25rem; height: 1.25rem;">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
             </svg>
-        </div>
-        <div>
-            <p class="pms-sidebar-brand-title">MediCare</p>
-            <p class="pms-sidebar-brand-subtitle">Pharmacy System</p>
-        </div>
+        </button>
     </div>
 
     {{-- ===== NAVIGATION ===== --}}
-    <nav class="pms-sidebar-nav">
+    <nav class="pms-sidebar-nav" x-ref="navList">
+
+        {{-- Menu Search (client-side filter) --}}
+        <div class="px-3 pb-3" x-data="{ query: '' }">
+            <div class="relative">
+                <svg class="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
+                </svg>
+                <input
+                    type="text"
+                    x-model="query"
+                    @input="
+                        $refs.navList.querySelectorAll('[data-nav-item]').forEach(el => {
+                            const label = (el.dataset.navLabel || '').toLowerCase();
+                            const match = label.includes(query.toLowerCase());
+                            el.style.display = match || query === '' ? '' : 'none';
+
+                            const group = el.closest('[data-nav-group]');
+                            if (group) {
+                                const anyVisible = [...group.querySelectorAll('[data-nav-item]')].some(i => i.style.display !== 'none');
+                                group.style.display = anyVisible || query === '' ? '' : 'none';
+                                if (query !== '' && anyVisible) {
+                                    $store.sidebarState.expand();
+                                }
+                            }
+                        });
+
+                        $refs.navList.querySelectorAll('.pms-nav-section-label').forEach(label => {
+                            let sibling = label.nextElementSibling;
+                            let anyVisible = false;
+                            while (sibling && !sibling.classList.contains('pms-nav-section-label')) {
+                                if (sibling.style.display !== 'none') { anyVisible = true; }
+                                sibling = sibling.nextElementSibling;
+                            }
+                            label.style.display = anyVisible || query === '' ? '' : 'none';
+                        });
+                    "
+                    placeholder="Search menu..."
+                    class="w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-9 pr-3 text-sm text-gray-700 placeholder-gray-400 focus:border-[#00838F] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#00838F] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+                >
+            </div>
+        </div>
 
         @php
-            $items = [
-                ['label' => 'Dashboard',      'icon' => 'home',      'route' => '/admin',                'active' => request()->is('admin')],
-                ['label' => 'Medicines',      'icon' => 'beaker',    'route' => '/admin/medicines',       'active' => request()->is('admin/medicines*')],
-                ['label' => 'Purchases',      'icon' => 'cart',      'route' => '/admin/purchases',       'active' => request()->is('admin/purchases*')],
-                ['label' => 'Sales / POS',    'icon' => 'card',      'route' => '/admin/sales',           'active' => request()->is('admin/sales*')],
-                ['label' => 'Customers',      'icon' => 'users',     'route' => '/admin/customers',       'active' => request()->is('admin/customers*')],
-                ['label' => 'Suppliers',      'icon' => 'truck',     'route' => '/admin/suppliers',       'active' => request()->is('admin/suppliers*')],
-                 ['label' => 'Prescriptions', 'icon' => 'prescription', 'route' => '/admin/prescriptions', 'active' => request()->is('admin/prescriptions*')],
+            $unreadNotifications = \App\Models\AppNotification::unread()->count();
 
-                ['label' => 'Stock',          'icon' => 'box',       'route' => '/admin/stock',           'active' => request()->is('admin/stock*')],
-                ['label' => 'Reports',        'icon' => 'chart',     'route' => '/admin/reports',         'active' => request()->is('admin/reports*')],
-                ['label' => 'Alerts',         'icon' => 'bell',      'route' => '/admin/alerts',          'active' => request()->is('admin/alerts*'), 'badge' => 2],
-                ['label' => 'Expiry Tracker', 'icon' => 'clock',     'route' => '/admin/expiry-tracker',  'active' => request()->is('admin/expiry-tracker*')],
-                ['label' => 'Settings',       'icon' => 'cog',       'route' => '/admin/settings',        'active' => request()->is('admin/settings*')],
-            ];
+
+            $items = [
+    ['label' => 'Dashboard',      'icon' => 'home',      'route' => '/admin',                'active' => request()->is('admin'), 'section' => 'Main Menu'],
+    ['label' => 'Medicines',      'icon' => 'beaker',    'route' => '/admin/medicines',       'active' => request()->is('admin/medicines*'), 'section' => 'Inventory'],
+    ['label' => 'Purchases',      'icon' => 'cart',      'route' => '/admin/purchases',       'active' => request()->is('admin/purchases*'), 'section' => 'Inventory'],
+    ['label' => 'Stock',          'icon' => 'box',       'route' => '/admin/stock',           'active' => request()->is('admin/stock*'), 'section' => 'Inventory'],
+    ['label' => 'Sales / POS',    'icon' => 'card',      'route' => '/admin/sales',           'active' => request()->is('admin/sales*'), 'section' => 'Sales'],
+    ['label' => 'Prescriptions',  'icon' => 'prescription', 'route' => '/admin/prescriptions', 'active' => request()->is('admin/prescriptions*'), 'section' => 'Sales'],
+    ['label' => 'Customers',      'icon' => 'users',     'route' => '/admin/customers',       'active' => request()->is('admin/customers*'), 'section' => 'People'],
+    ['label' => 'Suppliers',      'icon' => 'truck',     'route' => '/admin/suppliers',       'active' => request()->is('admin/suppliers*'), 'section' => 'People'],
+    ['label' => 'Reports',        'icon' => 'chart',     'route' => '/admin/reports',         'active' => request()->is('admin/reports*'), 'section' => 'Insights'],
+    ['label' => 'Alerts',         'icon' => 'bell',      'route' => '/admin/app-notifications', 'active' => request()->is('admin/app-notifications*'), 'badge' => $unreadNotifications > 0 ? $unreadNotifications : null, 'section' => 'Insights'],
+    ['label' => 'Expiry Tracker', 'icon' => 'clock',     'route' => '/admin/expiry-tracker',  'active' => request()->is('admin/expiry-tracker*'), 'section' => 'Insights'],
+    ['label' => 'Settings',       'icon' => 'cog',       'route' => '/admin/settings',        'active' => request()->is('admin/settings*'), 'section' => 'System'],
+];
 
             $icons = [
                 'home'   => 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
@@ -47,35 +255,121 @@
                 'cog'    => 'M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.38.138.752.43.992l1.005.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.542-.56.94-1.11.94h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.38-.138-.752-.43-.992l-1.004-.827a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.28z',
                 'prescription' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
             ];
+
+            $groups = [
+                'Medicines' => [
+                    'icon' => 'beaker',
+                    'active' => request()->is('admin/medicines*') || request()->is('admin/categories*') || request()->is('admin/manufacturers*') || request()->is('admin/units*') || request()->is('admin/dosage-forms*') || request()->is('admin/medicine-batches*'),
+                    'links' => [
+                        ['url' => '/admin/medicines', 'label' => 'All Medicines', 'active' => request()->is('admin/medicines*')],
+                        ['url' => '/admin/categories', 'label' => 'Categories', 'active' => request()->is('admin/categories*')],
+                        ['url' => '/admin/manufacturers', 'label' => 'Manufacturers', 'active' => request()->is('admin/manufacturers*')],
+                        ['url' => '/admin/units', 'label' => 'Units', 'active' => request()->is('admin/units*')],
+                        ['url' => '/admin/dosage-forms', 'label' => 'Dosage Forms', 'active' => request()->is('admin/dosage-forms*')],
+                        ['url' => '/admin/medicine-batches', 'label' => 'Batches & Expiry', 'active' => request()->is('admin/medicine-batches*')],
+                    ],
+                ],
+                'Purchases' => [
+                    'icon' => 'cart',
+                    'active' => request()->is('admin/purchases*') || request()->is('admin/purchase-returns*'),
+                    'links' => [
+                        ['url' => '/admin/purchases', 'label' => 'All Purchases', 'active' => request()->is('admin/purchases*') && !request()->is('admin/purchase-returns*')],
+                        ['url' => '/admin/purchases/create', 'label' => 'New Purchase', 'active' => false],
+                        ['url' => '/admin/purchase-returns', 'label' => 'Purchase Returns', 'active' => request()->is('admin/purchase-returns*')],
+                    ],
+                ],
+                'Sales / POS' => [
+                    'icon' => 'card',
+                    'active' => request()->is('admin/sales') || request()->is('admin/sales-history*') || request()->is('admin/sale-returns*'),
+                    'links' => [
+                        ['url' => '/admin/sales', 'label' => 'New Sale', 'active' => request()->is('admin/sales')],
+                        ['url' => '/admin/sales-history', 'label' => 'Sales History', 'active' => request()->is('admin/sales-history*')],
+                        ['url' => '/admin/sale-returns', 'label' => 'Sales Returns', 'active' => request()->is('admin/sale-returns*')],
+                    ],
+                ],
+                'Customers' => [
+                    'icon' => 'users',
+                    'active' => request()->is('admin/customers*') || request()->is('admin/customer-payments*'),
+                    'links' => [
+                        ['url' => '/admin/customers', 'label' => 'All Customers', 'active' => request()->is('admin/customers*') && !request()->is('admin/customer-payments*')],
+                        ['url' => '/admin/customer-payments', 'label' => 'Customer Payments', 'active' => request()->is('admin/customer-payments*')],
+                    ],
+                ],
+                'Suppliers' => [
+                    'icon' => 'truck',
+                    'active' => request()->is('admin/suppliers*') || request()->is('admin/supplier-payments*'),
+                    'links' => [
+                        ['url' => '/admin/suppliers', 'label' => 'All Suppliers', 'active' => request()->is('admin/suppliers*') && !request()->is('admin/supplier-payments*')],
+                        ['url' => '/admin/supplier-payments', 'label' => 'Supplier Payments', 'active' => request()->is('admin/supplier-payments*')],
+                    ],
+                ],
+                'Prescriptions' => [
+                    'icon' => 'prescription',
+                    'active' => request()->is('admin/prescriptions*'),
+                    'links' => [
+                        ['url' => '/admin/prescriptions', 'label' => 'All Prescriptions', 'active' => request()->is('admin/prescriptions')],
+                        ['url' => '/admin/prescriptions/create', 'label' => 'New Prescription', 'active' => false],
+                        ['url' => '/admin/prescriptions?status=active', 'label' => 'Pending / Active', 'active' => false],
+                        ['url' => '/admin/prescriptions?status=dispensed', 'label' => 'Dispensed', 'active' => false],
+                    ],
+                ],
+                'Stock' => [
+                    'icon' => 'box',
+                    'active' => request()->is('admin/stock*') || request()->is('admin/inventory-overview*'),
+                    'links' => [
+                        ['url' => '/admin/inventory-overview', 'label' => 'Inventory Overview', 'active' => request()->is('admin/inventory-overview*')],
+                        ['url' => '/admin/stock', 'label' => 'Stock Adjustments', 'active' => request()->is('admin/stock')],
+                    ],
+                ],
+                'Settings' => [
+                    'icon' => 'cog',
+                    'active' => request()->is('admin/settings*') || request()->is('admin/users*') || request()->is('admin/roles*') || request()->is('admin/audit-logs*') || request()->is('admin/backup*'),
+                    'links' => [
+                        ['url' => '/admin/settings', 'label' => 'General Settings', 'active' => request()->is('admin/settings*')],
+                        ['url' => '/admin/users', 'label' => 'Users', 'active' => request()->is('admin/users*')],
+                        ['url' => '/admin/roles', 'label' => 'Roles & Permissions', 'active' => request()->is('admin/roles*')],
+                        ['url' => '/admin/audit-logs', 'label' => 'Audit Logs', 'active' => request()->is('admin/audit-logs*')],
+                        ['url' => '/admin/backup', 'label' => 'Backup & Restore', 'active' => request()->is('admin/backup*')],
+                    ],
+                ],
+            ];
         @endphp
 
-        @foreach ($items as $item)
+        @php $lastSection = null; @endphp
 
-            {{-- ===== MEDICINES DROPDOWN ===== --}}
-            @if ($item['label'] === 'Medicines')
+@foreach ($items as $item)
 
-                @php
-                    $medicineActive = request()->is('admin/medicines*')
-                        || request()->is('admin/categories*')
-                        || request()->is('admin/manufacturers*')
-                        || request()->is('admin/units*')
-                        || request()->is('admin/dosage-forms*')
-                        || request()->is('admin/medicine-batches*');
-                @endphp
+    @if ($item['section'] !== $lastSection)
+        @php $lastSection = $item['section']; @endphp
+        <p class="pms-nav-section-label">{{ strtoupper($item['section']) }}</p>
+    @endif
 
-                <div x-data="{ open: {{ $medicineActive ? 'true' : 'false' }} }">
+    @if (array_key_exists($item['label'], $groups))
+
+                @php $group = $groups[$item['label']]; @endphp
+
+                <div x-data="{ open: {{ $group['active'] ? 'true' : 'false' }} }" data-nav-group>
 
                     <button
                         type="button"
-                        @click="open = !open"
-                        class="pms-nav-item {{ $medicineActive ? 'pms-supplier-parent-active' : '' }}"
+                        data-nav-item
+                        data-nav-label="{{ $item['label'] }}"
+                        @click="
+                            if ($store.sidebarState.collapsed) {
+                                $store.sidebarState.expand();
+                                open = true;
+                            } else {
+                                open = !open;
+                            }
+                        "
+                        class="pms-nav-item {{ $group['active'] ? 'pms-supplier-parent-active' : '' }}"
                         style="width: 100%; border: 0; background: transparent; cursor: pointer;"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pms-nav-icon">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $icons['beaker'] }}" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $icons[$group['icon']] }}" />
                         </svg>
 
-                        <span class="pms-nav-label">Medicines</span>
+                        <span class="pms-nav-label">{{ $item['label'] }}</span>
 
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="pms-nav-chevron" :style="open ? 'transform: rotate(90deg)' : ''" style="transition: transform 0.2s ease;">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
@@ -83,405 +377,21 @@
                     </button>
 
                     <div x-show="open" x-collapse class="pms-submenu">
-
-                        <a href="/admin/medicines" class="pms-submenu-item {{ request()->is('admin/medicines*') ? 'pms-submenu-item-active' : '' }}">
-                            <span class="pms-submenu-dot"></span>
-                            <span>All Medicines</span>
-                        </a>
-
-                        <a href="/admin/categories" class="pms-submenu-item {{ request()->is('admin/categories*') ? 'pms-submenu-item-active' : '' }}">
-                            <span class="pms-submenu-dot"></span>
-                            <span>Categories</span>
-                        </a>
-
-                        <a href="/admin/manufacturers" class="pms-submenu-item {{ request()->is('admin/manufacturers*') ? 'pms-submenu-item-active' : '' }}">
-                            <span class="pms-submenu-dot"></span>
-                            <span>Manufacturers</span>
-                        </a>
-
-                        <a href="/admin/units" class="pms-submenu-item {{ request()->is('admin/units*') ? 'pms-submenu-item-active' : '' }}">
-                            <span class="pms-submenu-dot"></span>
-                            <span>Units</span>
-                        </a>
-
-                        <a href="/admin/dosage-forms" class="pms-submenu-item {{ request()->is('admin/dosage-forms*') ? 'pms-submenu-item-active' : '' }}">
-                            <span class="pms-submenu-dot"></span>
-                            <span>Dosage Forms</span>
-                        </a>
-
-                        <a href="/admin/medicine-batches" class="pms-submenu-item {{ request()->is('admin/medicine-batches*') ? 'pms-submenu-item-active' : '' }}">
-                            <span class="pms-submenu-dot"></span>
-                            <span>Batches & Expiry</span>
-                        </a>
-
-                    </div>
-                </div>
-
-            {{-- ===== PURCHASES DROPDOWN ===== --}}
-            @elseif ($item['label'] === 'Purchases')
-
-                @php
-                    $purchaseActive = request()->is('admin/purchases*')
-                        || request()->is('admin/purchase-returns*');
-                @endphp
-
-                <div x-data="{ open: {{ $purchaseActive ? 'true' : 'false' }} }">
-
-                    <button
-                        type="button"
-                        @click="open = !open"
-                        class="pms-nav-item {{ $purchaseActive ? 'pms-supplier-parent-active' : '' }}"
-                        style="width: 100%; border: 0; background: transparent; cursor: pointer;"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pms-nav-icon">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $icons['cart'] }}" />
-                        </svg>
-
-                        <span class="pms-nav-label">Purchases</span>
-
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="pms-nav-chevron" :style="open ? 'transform: rotate(90deg)' : ''" style="transition: transform 0.2s ease;">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </button>
-
-                    <div x-show="open" x-collapse class="pms-submenu">
-
-                        <a href="/admin/purchases" class="pms-submenu-item {{ request()->is('admin/purchases*') && !request()->is('admin/purchase-returns*') ? 'pms-submenu-item-active' : '' }}">
-                            <span class="pms-submenu-dot"></span>
-                            <span>All Purchases</span>
-                        </a>
-
-                        <a href="/admin/purchases/create" class="pms-submenu-item">
-                            <span class="pms-submenu-dot"></span>
-                            <span>New Purchase</span>
-                        </a>
-
-                        <a href="/admin/purchase-returns" class="pms-submenu-item {{ request()->is('admin/purchase-returns*') ? 'pms-submenu-item-active' : '' }}">
-                            <span class="pms-submenu-dot"></span>
-                            <span>Purchase Returns</span>
-                        </a>
-
-                    </div>
-                </div>
-
-            {{-- ===== SALES / POS DROPDOWN ===== --}}
-            @elseif ($item['label'] === 'Sales / POS')
-
-                @php
-                    $salesActive = request()->is('admin/sales')
-                        || request()->is('admin/sales-history*')
-                        || request()->is('admin/sale-returns*');
-                @endphp
-
-                <div x-data="{ open: {{ $salesActive ? 'true' : 'false' }} }">
-
-                    <button
-                        type="button"
-                        @click="open = !open"
-                        class="pms-nav-item {{ $salesActive ? 'pms-supplier-parent-active' : '' }}"
-                        style="width: 100%; border: 0; background: transparent; cursor: pointer;"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pms-nav-icon">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $icons['card'] }}" />
-                        </svg>
-
-                        <span class="pms-nav-label">Sales / POS</span>
-
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="pms-nav-chevron" :style="open ? 'transform: rotate(90deg)' : ''" style="transition: transform 0.2s ease;">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </button>
-
-                    <div x-show="open" x-collapse class="pms-submenu">
-
-                        <a href="/admin/sales" class="pms-submenu-item {{ request()->is('admin/sales') ? 'pms-submenu-item-active' : '' }}">
-                            <span class="pms-submenu-dot"></span>
-                            <span>New Sale</span>
-                        </a>
-
-                        <a href="/admin/sales-history" class="pms-submenu-item {{ request()->is('admin/sales-history*') ? 'pms-submenu-item-active' : '' }}">
-                            <span class="pms-submenu-dot"></span>
-                            <span>Sales History</span>
-                        </a>
-
-                        <a href="/admin/sale-returns" class="pms-submenu-item {{ request()->is('admin/sale-returns*') ? 'pms-submenu-item-active' : '' }}">
-                            <span class="pms-submenu-dot"></span>
-                            <span>Sales Returns</span>
-                        </a>
-
-                    </div>
-                </div>
-
-                {{-- ===== CUSTOMERS DROPDOWN ===== --}}
-@elseif ($item['label'] === 'Customers')
-
-    @php
-        $customerActive = request()->is('admin/customers*')
-            || request()->is('admin/customer-payments*');
-    @endphp
-
-    <div x-data="{ open: {{ $customerActive ? 'true' : 'false' }} }">
-
-        <button
-            type="button"
-            @click="open = !open"
-            class="pms-nav-item {{ $customerActive ? 'pms-supplier-parent-active' : '' }}"
-            style="width: 100%; border: 0; background: transparent; cursor: pointer;"
-        >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pms-nav-icon">
-                <path stroke-linecap="round" stroke-linejoin="round" d="{{ $icons['users'] }}" />
-            </svg>
-
-            <span class="pms-nav-label">Customers</span>
-
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="pms-nav-chevron" :style="open ? 'transform: rotate(90deg)' : ''" style="transition: transform 0.2s ease;">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
-        </button>
-
-        <div x-show="open" x-collapse class="pms-submenu">
-
-            <a href="/admin/customers" class="pms-submenu-item {{ request()->is('admin/customers*') && !request()->is('admin/customer-payments*') ? 'pms-submenu-item-active' : '' }}">
-                <span class="pms-submenu-dot"></span>
-                <span>All Customers</span>
-            </a>
-
-            <a href="/admin/customer-payments" class="pms-submenu-item {{ request()->is('admin/customer-payments*') ? 'pms-submenu-item-active' : '' }}">
-                <span class="pms-submenu-dot"></span>
-                <span>Customer Payments</span>
-            </a>
-
-        </div>
-    </div>
-            {{-- ===== SUPPLIERS DROPDOWN ===== --}}
-            @elseif ($item['label'] === 'Suppliers')
-
-                @php
-                    $supplierActive = request()->is('admin/suppliers*')
-                        || request()->is('admin/supplier-payments*');
-                @endphp
-
-                <div x-data="{ open: {{ $supplierActive ? 'true' : 'false' }} }">
-
-                    <button
-                        type="button"
-                        @click="open = !open"
-                        class="pms-nav-item {{ $supplierActive ? 'pms-supplier-parent-active' : '' }}"
-                        style="width: 100%; border: 0; background: transparent; cursor: pointer;"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pms-nav-icon">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $icons['truck'] }}" />
-                        </svg>
-
-                        <span class="pms-nav-label">Suppliers</span>
-
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="pms-nav-chevron" :style="open ? 'transform: rotate(90deg)' : ''" style="transition: transform 0.2s ease;">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </button>
-
-                    <div x-show="open" x-collapse class="pms-submenu">
-
-                        <a href="/admin/suppliers" class="pms-submenu-item {{ request()->is('admin/suppliers*') && !request()->is('admin/supplier-payments*') ? 'pms-submenu-item-active' : '' }}">
-                            <span class="pms-submenu-dot"></span>
-                            <span>All Suppliers</span>
-                        </a>
-
-                        <a href="/admin/supplier-payments" class="pms-submenu-item {{ request()->is('admin/supplier-payments*') ? 'pms-submenu-item-active' : '' }}">
-                            <span class="pms-submenu-dot"></span>
-                            <span>Supplier Payments</span>
-                        </a>
-
-                    </div>
-                </div>
-
-                {{-- ===== PRESCRIPTIONS DROPDOWN ===== --}}
-@elseif ($item['label'] === 'Prescriptions')
-
-    @php
-        $prescriptionActive = request()->is('admin/prescriptions*');
-    @endphp
-
-    <div x-data="{ open: {{ $prescriptionActive ? 'true' : 'false' }} }">
-
-        <button
-            type="button"
-            @click="open = !open"
-            class="pms-nav-item {{ $prescriptionActive ? 'pms-supplier-parent-active' : '' }}"
-            style="width: 100%; border: 0; background: transparent; cursor: pointer;"
-        >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pms-nav-icon">
-                <path stroke-linecap="round" stroke-linejoin="round" d="{{ $icons['prescription'] }}" />
-            </svg>
-
-            <span class="pms-nav-label">Prescriptions</span>
-
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="pms-nav-chevron" :style="open ? 'transform: rotate(90deg)' : ''" style="transition: transform 0.2s ease;">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-            </svg>
-        </button>
-
-        <div x-show="open" x-collapse class="pms-submenu">
-
-            <a href="/admin/prescriptions" class="pms-submenu-item {{ request()->is('admin/prescriptions') ? 'pms-submenu-item-active' : '' }}">
-                <span class="pms-submenu-dot"></span>
-                <span>All Prescriptions</span>
-            </a>
-
-            <a href="/admin/prescriptions/create" class="pms-submenu-item">
-                <span class="pms-submenu-dot"></span>
-                <span>New Prescription</span>
-            </a>
-
-            <a href="/admin/prescriptions?status=active" class="pms-submenu-item">
-                <span class="pms-submenu-dot"></span>
-                <span>Pending / Active</span>
-            </a>
-
-            <a href="/admin/prescriptions?status=dispensed" class="pms-submenu-item">
-                <span class="pms-submenu-dot"></span>
-                <span>Dispensed</span>
-            </a>
-
-        </div>
-    </div>
-
-
-    {{-- ===== STOCK DROPDOWN ===== --}}
-@elseif ($item['label'] === 'Stock')
-
-    @php
-        $stockActive = request()->is('admin/stock*');
-    @endphp
-
-    <div x-data="{ open: {{ $stockActive ? 'true' : 'false' }} }">
-
-        <button
-            type="button"
-            @click="open = !open"
-            class="pms-nav-item {{ $stockActive ? 'pms-supplier-parent-active' : '' }}"
-            style="width: 100%; border: 0; background: transparent; cursor: pointer;"
-        >
-
-            {{-- Stock Icon --}}
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 viewBox="0 0 24 24"
-                 fill="none"
-                 stroke="currentColor"
-                 stroke-width="2"
-                 class="pms-nav-icon">
-
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="{{ $icons['stock'] ?? '' }}"
-                />
-
-            </svg>
-
-            <span class="pms-nav-label">Stock</span>
-
-            {{-- Chevron --}}
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 viewBox="0 0 24 24"
-                 fill="none"
-                 stroke="currentColor"
-                 stroke-width="2.5"
-                 class="pms-nav-chevron"
-                 :style="open ? 'transform: rotate(90deg)' : ''"
-                 style="transition: transform 0.2s ease;">
-
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M9 5l7 7-7 7"
-                />
-
-            </svg>
-
-        </button>
-
-        {{-- Stock Submenu --}}
-        <div x-show="open" x-collapse class="pms-submenu">
-
-            {{-- Inventory Overview --}}
-            <a href="/admin/stock"
-               class="pms-submenu-item {{ request()->is('admin/stock') ? 'pms-submenu-item-active' : '' }}">
-
-                <span class="pms-submenu-dot"></span>
-
-                <span>Inventory Overview</span>
-
-            </a>
-
-        </div>
-
-    </div>
-            {{-- ===== SETTINGS DROPDOWN ===== --}}
-            @elseif ($item['label'] === 'Settings')
-
-                @php
-                    $settingsActive = request()->is('admin/settings*')
-                        || request()->is('admin/users*')
-                        || request()->is('admin/roles*')
-                        || request()->is('admin/audit-logs*')
-                        || request()->is('admin/backup*');
-                @endphp
-
-                <div x-data="{ open: {{ $settingsActive ? 'true' : 'false' }} }">
-
-                    <button
-                        type="button"
-                        @click="open = !open"
-                        class="pms-nav-item {{ $settingsActive ? 'pms-supplier-parent-active' : '' }}"
-                        style="width: 100%; border: 0; background: transparent; cursor: pointer;"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pms-nav-icon">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="{{ $icons['cog'] }}" />
-                        </svg>
-
-                        <span class="pms-nav-label">Settings</span>
-
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="pms-nav-chevron" :style="open ? 'transform: rotate(90deg)' : ''" style="transition: transform 0.2s ease;">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                        </svg>
-                    </button>
-
-                    <div x-show="open" x-collapse class="pms-submenu">
-
-                        <a href="/admin/settings" class="pms-submenu-item {{ request()->is('admin/settings*') ? 'pms-submenu-item-active' : '' }}">
-                            <span class="pms-submenu-dot"></span>
-                            <span>General Settings</span>
-                        </a>
-
-                        <a href="/admin/users" class="pms-submenu-item {{ request()->is('admin/users*') ? 'pms-submenu-item-active' : '' }}">
-                            <span class="pms-submenu-dot"></span>
-                            <span>Users</span>
-                        </a>
-
-                        <a href="/admin/roles" class="pms-submenu-item {{ request()->is('admin/roles*') ? 'pms-submenu-item-active' : '' }}">
-                            <span class="pms-submenu-dot"></span>
-                            <span>Roles &amp; Permissions</span>
-                        </a>
-
-                        <a href="/admin/audit-logs" class="pms-submenu-item {{ request()->is('admin/audit-logs*') ? 'pms-submenu-item-active' : '' }}">
-                            <span class="pms-submenu-dot"></span>
-                            <span>Audit Logs</span>
-                        </a>
-
-                        <a href="/admin/backup" class="pms-submenu-item {{ request()->is('admin/backup*') ? 'pms-submenu-item-active' : '' }}">
-                            <span class="pms-submenu-dot"></span>
-                            <span>Backup &amp; Restore</span>
-                        </a>
-
+                        @foreach ($group['links'] as $link)
+                                    <a href="{{ $link['url'] }}" wire:navigate class="pms-submenu-item {{ $link['active'] ? 'pms-submenu-item-active' : '' }}">
+                            <!-- <a href="{{ $link['url'] }}" class="pms-submenu-item {{ $link['active'] ? 'pms-submenu-item-active' : '' }}"> -->
+                                <span class="pms-submenu-dot"></span>
+                                <span>{{ $link['label'] }}</span>
+                            </a>
+                        @endforeach
                     </div>
                 </div>
 
             @else
 
-                {{-- ===== NORMAL SIDEBAR ITEMS ===== --}}
-                <a href="{{ $item['route'] }}" class="pms-nav-item {{ $item['active'] ? 'pms-nav-item-active' : '' }}">
-
+                {{-- ===== NORMAL SIDEBAR ITEMS (Dashboard, Reports, Alerts, Expiry Tracker) ===== --}}
+                <!-- <a href="{{ $item['route'] }}" class="pms-nav-item {{ $item['active'] ? 'pms-nav-item-active' : '' }}"> -->
+                    <a href="{{ $item['route'] }}" wire:navigate data-nav-item data-nav-label="{{ $item['label'] }}" class="pms-nav-item {{ $item['active'] ? 'pms-nav-item-active' : '' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pms-nav-icon">
                         <path stroke-linecap="round" stroke-linejoin="round" d="{{ $icons[$item['icon']] }}" />
                     </svg>
@@ -508,3 +418,453 @@
     </nav>
 
 </div>
+
+{{-- ===== SIDEBAR BRAND FOOTER ===== --}}
+<div class="pms-sidebar-footer">
+    <div class="pms-footer-card">
+
+        <div class="pms-footer-logo">
+            @if ($pharmacySettings->logo)
+                <img
+                    src="{{ \Illuminate\Support\Facades\Storage::url($pharmacySettings->logo) }}"
+                    alt="{{ $pharmacySettings->pharmacy_name ?? 'Pharmacy' }}"
+                >
+            @else
+                <div class="pms-footer-logo-placeholder">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2">
+                        <path stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M12 4v16M4 12h16"/>
+                    </svg>
+                </div>
+            @endif
+        </div>
+
+        <div class="pms-footer-info">
+            <div class="pms-footer-title">
+                {{ $pharmacySettings->pharmacy_name ?? 'MediCare Pharmacy' }}
+            </div>
+
+            <div class="pms-footer-subtitle">
+                Pharmacy System
+            </div>
+
+            <div class="pms-footer-tagline">
+                Healthcare Today,<br>
+                Better Tomorrow.
+            </div>
+        </div>
+
+    </div>
+</div>
+<style>
+    /* =========================================================
+   PROFESSIONAL STICKY FOOTER
+   ========================================================= */
+
+.pms-sidebar {
+    position: relative !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    overflow: hidden !important;
+}
+
+
+/* Navigation scrolls behind/above footer */
+.pms-sidebar-nav {
+    height: 100% !important;
+
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+
+    padding-bottom: 92px !important;
+
+    scrollbar-width: none !important;
+}
+
+.pms-sidebar-nav::-webkit-scrollbar {
+    display: none !important;
+}
+
+
+/* =========================================================
+   FOOTER — ALWAYS STAYS AT BOTTOM
+   ========================================================= */
+
+.pms-sidebar-footer {
+    position: absolute !important;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    width: 100%;
+
+    z-index: 999;
+
+    padding: 9px 10px 11px;
+
+    box-sizing: border-box;
+
+    /* Glass bottom layer */
+    background:
+        linear-gradient(
+            180deg,
+            rgba(239, 250, 251, 0.18),
+            rgba(239, 250, 251, 0.82) 45%,
+            rgba(239, 250, 251, 0.96)
+        );
+
+    border-top:
+        1px solid rgba(255, 255, 255, 0.72);
+
+    backdrop-filter:
+        blur(20px)
+        saturate(140%);
+
+    -webkit-backdrop-filter:
+        blur(20px)
+        saturate(140%);
+
+    box-shadow:
+        0 -10px 30px rgba(0, 105, 115, 0.055);
+}
+
+
+/* =========================================================
+   FOOTER CARD
+   ========================================================= */
+
+.pms-footer-card {
+    position: relative;
+
+    width: 100%;
+
+    height: 70px;
+    min-height: 70px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 9px 10px;
+
+    box-sizing: border-box;
+
+    overflow: hidden;
+
+    border-radius: 14px;
+
+    border:
+        1px solid rgba(255, 255, 255, 0.92);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.84),
+            rgba(229, 248, 250, 0.62)
+        );
+
+    backdrop-filter:
+        blur(24px)
+        saturate(150%);
+
+    -webkit-backdrop-filter:
+        blur(24px)
+        saturate(150%);
+
+    box-shadow:
+        0 10px 28px rgba(0, 100, 110, 0.08),
+        0 2px 7px rgba(0, 100, 110, 0.035),
+        inset 0 1px 0 rgba(255, 255, 255, 0.98);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+/* =========================================================
+   SUBTLE GLASS SHINE
+   ========================================================= */
+
+.pms-footer-card::before {
+    content: "";
+
+    position: absolute;
+
+    top: 0;
+    left: 12px;
+    right: 12px;
+
+    height: 1px;
+
+    background:
+        rgba(255, 255, 255, 1);
+
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   FOOTER HOVER
+   ========================================================= */
+
+.pms-footer-card:hover {
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 14px 32px rgba(0, 100, 110, 0.11),
+        0 3px 8px rgba(0, 100, 110, 0.045),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+
+/* =========================================================
+   LOGO
+   ========================================================= */
+
+.pms-footer-logo {
+    position: relative;
+    z-index: 2;
+
+    width: 42px;
+    height: 42px;
+
+    min-width: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    border-radius: 11px;
+
+    background:
+        rgba(255, 255, 255, 0.78);
+
+    border:
+        1px solid rgba(255, 255, 255, 0.95);
+
+    box-shadow:
+        0 5px 14px rgba(0, 131, 143, 0.09),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.pms-footer-logo img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+}
+
+
+/* =========================================================
+   FOOTER INFO
+   ========================================================= */
+
+.pms-footer-info {
+    position: relative;
+    z-index: 2;
+
+    flex: 1;
+
+    min-width: 0;
+
+    overflow: hidden;
+}
+
+.pms-footer-title {
+    color: #006b73;
+
+    font-size: 0.72rem;
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pms-footer-subtitle {
+    margin-top: 3px;
+
+    color: #78909c;
+
+    font-size: 0.56rem;
+    font-weight: 500;
+
+    white-space: nowrap;
+}
+
+.pms-footer-tagline {
+    margin-top: 4px;
+
+    color: #90a4ae;
+
+    font-size: 0.49rem;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   COLLAPSED SIDEBAR
+   ========================================================= */
+
+html[data-pms-sidebar="collapsed"] .pms-sidebar-footer {
+    padding: 7px 6px 9px;
+}
+
+html[data-pms-sidebar="collapsed"] .pms-sidebar-nav {
+    padding-bottom: 70px !important;
+}
+
+html[data-pms-sidebar="collapsed"] .pms-footer-card {
+    width: 52px;
+
+    height: 52px;
+    min-height: 52px;
+
+    padding: 5px;
+
+    justify-content: center;
+
+    border-radius: 13px;
+}
+
+html[data-pms-sidebar="collapsed"] .pms-footer-logo {
+    width: 40px;
+    height: 40px;
+
+    min-width: 40px;
+}
+    </style>
+ 
+
+
+
+
+ <style>
+/* =========================================================
+   TOPBAR — WELCOME GREETING + SEARCH BAR
+   ========================================================= */
+
+.pms-welcome-avatar {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #00838f, #006064);
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 750;
+    box-shadow: 0 5px 12px rgba(5, 143, 148, 0.18);
+    flex-shrink: 0;
+}
+
+.pms-topbar-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    max-width: 420px;
+    margin: 0 24px;
+    padding: 0 14px;
+    height: 42px;
+    background: #f7fbfb;
+    border: 1px solid #e4eeee;
+    border-radius: 12px;
+    color: #90a4ae;
+}
+
+.pms-topbar-search svg {
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+}
+
+.pms-topbar-search input {
+    flex: 1;
+    border: 0;
+    background: transparent;
+    outline: none;
+    font-size: 13px;
+    color: #263238;
+}
+
+.pms-topbar-search input::placeholder {
+    color: #a3b3b8;
+}
+
+.pms-notification-count {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    min-width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: #ef5350;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    border: 2px solid #fff;
+}
+
+.pms-online-dot {
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #2ecc71;
+    border: 2px solid #ffffff;
+}
+
+.pms-online-text-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #2ecc71;
+    margin-right: 4px;
+}
+
+@media (max-width: 900px) {
+    .pms-topbar-search {
+        display: none;
+    }
+}
+
+
+.pms-nav-section-label {
+    margin: 14px 16px 6px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #90a4ae;
+    text-transform: uppercase;
+}
+
+.pms-nav-section-label:first-child {
+    margin-top: 4px;
+}
+
+html[data-pms-sidebar="collapsed"] .pms-nav-section-label {
+    display: none !important;
+}
+</style>
+@endpersist

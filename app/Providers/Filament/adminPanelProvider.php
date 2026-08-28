@@ -2,11 +2,12 @@
 
 namespace App\Providers\Filament;
 
+use App\Models\PharmacySetting;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
+use App\Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\View\PanelsRenderHook;
@@ -18,6 +19,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Illuminate\Support\Facades\Storage;
 
 class adminPanelProvider extends PanelProvider
 {
@@ -27,10 +29,16 @@ class adminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-             
-        ->viteTheme('resources/css/filament/admin/theme.css')
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->login()
-            ->brandName('MediCare Pharmacy System')
+            ->sidebarCollapsibleOnDesktop(false)
+            ->brandName(fn () => PharmacySetting::current()->pharmacy_name ?? 'Pharmacy Management System')
+            ->brandLogo(function () {
+                $logo = PharmacySetting::current()->logo;
+
+                return $logo ? Storage::url($logo) : null;
+            })
+            ->brandLogoHeight('2.5rem')
             ->colors([
                 'primary' => [
                     50 => '224, 247, 250',
@@ -46,24 +54,21 @@ class adminPanelProvider extends PanelProvider
                     950 => '0, 51, 56',
                 ],
             ])
-          ->renderHook(
-    PanelsRenderHook::BODY_START,
-    fn (): string => request()->is('admin/login')
-        ? ''
-        : view('filament.custom-navbar')->render(),
-)
-           ->renderHook(
-    PanelsRenderHook::SIDEBAR_START,
-    fn (): string => view('filament.custom-sidebar')->render(),
-)
-            // ->renderHook(
-            //     PanelsRenderHook::SIDEBAR_FOOTER,
-            //     fn (): string => view('filament.sidebar-footer')->render(),
-            // )
+            ->renderHook(
+                PanelsRenderHook::BODY_START,
+                fn (): string => request()->is('admin/login')
+                    ? ''
+                    : view('filament.custom-navbar')->render(),
+            )
+            ->renderHook(
+                PanelsRenderHook::SIDEBAR_START,
+                fn (): string => view('filament.custom-sidebar')->render(),
+            )
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
                 Dashboard::class,
+                \App\Filament\Pages\EditProfile::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([

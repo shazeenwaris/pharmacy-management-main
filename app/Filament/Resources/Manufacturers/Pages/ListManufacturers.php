@@ -3,7 +3,8 @@
 namespace App\Filament\Resources\Manufacturers\Pages;
 
 use App\Filament\Resources\Manufacturers\ManufacturerResource;
-use Filament\Actions\CreateAction;
+use App\Filament\Resources\Manufacturers\Widgets\ManufacturerBanner;
+use App\Filament\Resources\Manufacturers\Widgets\ManufacturerStats;
 use Filament\Resources\Pages\ListRecords;
 
 class ListManufacturers extends ListRecords
@@ -12,8 +13,19 @@ class ListManufacturers extends ListRecords
 
     protected function getHeaderActions(): array
     {
+        return [];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
         return [
-            CreateAction::make(),
+            ManufacturerBanner::class,
+            ManufacturerStats::class,
         ];
+    }
+
+    public function getHeaderWidgetsColumns(): int|array
+    {
+        return 1;
     }
 }

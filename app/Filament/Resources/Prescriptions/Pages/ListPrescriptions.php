@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Prescriptions\Pages;
 
 use App\Filament\Resources\Prescriptions\PrescriptionResource;
+use App\Filament\Widgets\PrescriptionOverview;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,15 @@ class ListPrescriptions extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            CreateAction::make()
+                ->extraAttributes(['class' => 'pms-hide-header-action']),
+        ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            PrescriptionOverview::class,
         ];
     }
 

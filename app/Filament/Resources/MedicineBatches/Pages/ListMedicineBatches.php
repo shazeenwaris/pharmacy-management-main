@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\MedicineBatches\Pages;
 
 use App\Filament\Resources\MedicineBatches\MedicineBatchResource;
+use App\Filament\Widgets\MedicineBatchOverview;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,15 @@ class ListMedicineBatches extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            CreateAction::make()
+                ->extraAttributes(['class' => 'pms-hide-header-action']),
+        ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            MedicineBatchOverview::class,
         ];
     }
 }

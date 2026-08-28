@@ -3,6 +3,10 @@
 
 namespace App\Filament\Resources\StockAdjustments\Tables;
 
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -42,6 +46,16 @@ class StockAdjustmentsTable
                     'correction' => 'Correction',
                     'returned' => 'Returned',
                     'other' => 'Other',
+                ]),
+            ])
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
+            ])
+            ->recordActionsColumnLabel('Actions')
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

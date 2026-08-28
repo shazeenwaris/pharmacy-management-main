@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Sales\Pages;
 
 use App\Filament\Resources\Sales\SaleResource;
+use App\Filament\Widgets\SaleOverview;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
@@ -13,7 +14,15 @@ class ListSales extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            CreateAction::make()
+                ->extraAttributes(['class' => 'pms-hide-header-action']),
+        ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            SaleOverview::class,
         ];
     }
 }

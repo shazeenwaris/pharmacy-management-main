@@ -6,7 +6,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
-class SupplierInfolist
+class SupplierForm
 {
     public static function configure(Schema $schema): Schema
     {

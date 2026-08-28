@@ -13,6 +13,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
@@ -20,6 +21,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use UnitEnum;
 
 class UnitResource extends Resource
 {
@@ -27,7 +29,9 @@ class UnitResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedScale;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Medicines';
+    protected static string|UnitEnum|null $navigationGroup = 'Medicines';
+
+    protected static ?string $navigationLabel = 'Units';
 
     protected static ?int $navigationSort = 4;
 
@@ -55,15 +59,27 @@ class UnitResource extends Resource
     {
         return $schema
             ->components([
-                TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('short_code')
-                    ->maxLength(20),
-                Textarea::make('description')
-                    ->columnSpanFull(),
-                Toggle::make('status')
-                    ->default(true),
+                Section::make('Unit Details')
+                    ->description('Define a measurement unit for medicines (e.g. Tablet, Bottle, Box)')
+                    ->icon(Heroicon::OutlinedScale)
+                    ->columnSpanFull()
+                    ->columns(2)
+                    ->schema([
+                        TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+                        TextInput::make('short_code')
+                            ->label('Short Code')
+                            ->maxLength(20),
+                        Textarea::make('description')
+                            ->rows(3)
+                            ->columnSpanFull(),
+                        Toggle::make('status')
+                            ->label('Active')
+                            ->default(true)
+                            ->onColor('success')
+                            ->offColor('danger'),
+                    ]),
             ]);
     }
 
@@ -73,16 +89,26 @@ class UnitResource extends Resource
             ->columns([
                 TextColumn::make('name')
                     ->searchable()
-                    ->sortable(),
-                TextColumn::make('short_code'),
+                    ->sortable()
+                    ->weight('medium'),
+                TextColumn::make('short_code')
+                    ->label('Code')
+                    ->badge(),
                 TextColumn::make('medicines_count')
                     ->counts('medicines')
-                    ->label('Medicines'),
+                    ->label('Medicines')
+                    ->badge()
+                    ->color('info'),
                 IconColumn::make('status')
+                    ->label('Active')
                     ->boolean(),
             ])
             ->filters([
-                TernaryFilter::make('status'),
+                TernaryFilter::make('status')
+                    ->label('Status')
+                    ->placeholder('All units')
+                    ->trueLabel('Active only')
+                    ->falseLabel('Inactive only'),
             ])
             ->recordActions([
                 EditAction::make(),
@@ -92,7 +118,8 @@ class UnitResource extends Resource
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('name');
     }
 
     public static function getPages(): array
