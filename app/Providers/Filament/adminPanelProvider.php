@@ -13,6 +13,7 @@ use Filament\PanelProvider;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
+use Filament\Support\Colors\Color;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -32,6 +33,7 @@ class adminPanelProvider extends PanelProvider
             ->path('admin')
             ->profile(EditProfile::class)
             ->viteTheme('resources/css/filament/admin/theme.css')
+            ->darkMode(false)
             ->login()
             ->sidebarCollapsibleOnDesktop(false)
             ->brandName(fn () => PharmacySetting::current()->pharmacy_name ?? 'Pharmacy Management System')
