@@ -18,6 +18,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use App\Filament\Pages\Auth\EditProfile;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Illuminate\Support\Facades\Storage;
 
@@ -29,6 +30,7 @@ class adminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->profile(EditProfile::class)
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->login()
             ->sidebarCollapsibleOnDesktop(false)
@@ -56,7 +58,10 @@ class adminPanelProvider extends PanelProvider
             ])
             ->renderHook(
                 PanelsRenderHook::BODY_START,
-                fn (): string => request()->is('admin/login')
+                fn (): string => request()->is([
+                    'admin/login',
+                    'admin/profile',
+                ])
                     ? ''
                     : view('filament.custom-navbar')->render(),
             )
@@ -64,6 +69,10 @@ class adminPanelProvider extends PanelProvider
                 PanelsRenderHook::SIDEBAR_START,
                 fn (): string => view('filament.custom-sidebar')->render(),
             )
+            // ->renderHook(
+            //     PanelsRenderHook::SIDEBAR_FOOTER,
+            //     fn (): string => view('filament.sidebar-footer')->render(),
+            // )
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
