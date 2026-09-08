@@ -12,11 +12,11 @@
 <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: -10px; margin-bottom: 4px;">
 
     <div style="display: flex; align-items: center; gap: 10px;">
-        <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #78909c;">
+        <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #00838F;">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 14px; height: 14px;">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
-            <span>Home</span>
+            <span style="color: #00838F; font-weight: 600;">Home</span>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 10px; height: 10px;">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
             </svg>
@@ -59,17 +59,24 @@
             {{ now()->format('D, d M Y') }}
         </div>
 
-        {{-- Month Progress --}}
+        <!-- {{-- Month Progress --}}
         <div title="{{ $dayOfMonth }} of {{ $daysInMonth }} days into {{ now()->format('F') }}" style="display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; background: #FFF7ED; border: 1px solid rgba(234,145,55,0.15); font-size: 11px; color: #C2610C; font-weight: 600;">
             <div style="width: 32px; height: 5px; border-radius: 999px; background: rgba(234,145,55,0.15); overflow: hidden;">
                 <div style="height: 100%; width: {{ $monthProgress }}%; background: #EA9137; border-radius: 999px;"></div>
             </div>
             {{ $monthProgress }}% of {{ now()->format('M') }}
-        </div>
+        </div> -->
+        {{-- Month Progress --}}
+<div title="{{ $dayOfMonth }} of {{ $daysInMonth }} days into {{ now()->format('F') }}" style="display: flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; background: #F1FBFC; border: 1px solid rgba(0,131,143,0.12); font-size: 11px; color: #00636C; font-weight: 600;">
+    <div style="width: 32px; height: 5px; border-radius: 999px; background: rgba(0,131,143,0.15); overflow: hidden;">
+        <div style="height: 100%; width: {{ $monthProgress }}%; background: #00838F; border-radius: 999px;"></div>
+    </div>
+    {{ $monthProgress }}% of {{ now()->format('M') }}
+</div>
 
         {{-- Status Badge --}}
-        <div style="display: flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 999px; background: #ECFDF5; border: 1px solid rgba(16,185,129,0.15); font-size: 11px; color: #059669; font-weight: 600;">
-            <span style="width: 6px; height: 6px; border-radius: 999px; background: #10B981; animation: pms-pulse 1.5s infinite;"></span>
+        <div style="display: flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 999px; background: #ECFDF5; border: 1px solid rgba(16,185,129,0.15); font-size: 11px; color: #00838F; font-weight: 600;">
+            <span style="width: 6px; height: 6px; border-radius: 999px; background: #00838F; animation: pms-pulse 1.5s infinite;"></span>
             All Systems Operational
         </div>
     </div>
@@ -272,7 +279,7 @@
                                 labels: ['In Stock', 'Low Stock', 'Out of Stock'],
                                 datasets: [{
                                     data: [{{ $stockStatus['in_stock'] }}, {{ $stockStatus['low_stock'] }}, {{ $stockStatus['out_of_stock'] }}],
-                                    backgroundColor: ['#26A69A', '#F59E0B', '#EF4444'],
+                                    backgroundColor: ['#00707A', '#00707A', '#00707A'],
                                     borderWidth: 0,
                                 }]
                             },
@@ -388,6 +395,6 @@
     </div>
 
     @once
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
     @endonce
 </x-filament-panels::page>

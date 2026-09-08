@@ -5,7 +5,7 @@
         {{-- Hero --}}
         <div
             class="relative overflow-hidden rounded-2xl px-6 py-6 shadow-sm"
-            style="background:linear-gradient(135deg,#087f73 0%,#118b80 55%,#08766d 100%);"
+            style="background:linear-gradient(135deg,#00707A 0%,#00707A 55%,#00707A 100%);"
         >
 
             <div

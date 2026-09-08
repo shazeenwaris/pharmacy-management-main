@@ -12,14 +12,22 @@ class Medicine extends Model
 {
     use LogsActivity;
 
+    // protected $fillable = [
+    //     'name', 'generic_name', 'medicine_type', 'brand_name', 'sku', 'barcode',
+    //     'category_id', 'manufacturer_id', 'dosage_form_id', 'unit_id', 'strength', 'pack_size',
+    //     'purchase_price', 'sale_price', 'wholesale_price', 'minimum_sale_price',
+    //     'tax_percent', 'discount_percent',
+    //     'minimum_stock_level', 'maximum_stock_level', 'reorder_level', 'opening_stock',
+    //     'prescription_required', 'status', 'description', 'notes',
+    // ];
     protected $fillable = [
-        'name', 'generic_name', 'medicine_type', 'brand_name', 'sku', 'barcode',
-        'category_id', 'manufacturer_id', 'dosage_form_id', 'unit_id', 'strength', 'pack_size',
-        'purchase_price', 'sale_price', 'wholesale_price', 'minimum_sale_price',
-        'tax_percent', 'discount_percent',
-        'minimum_stock_level', 'maximum_stock_level', 'reorder_level', 'opening_stock',
-        'prescription_required', 'status', 'description', 'notes',
-    ];
+    'image', 'name', 'generic_name', 'medicine_type', 'brand_name', 'sku', 'barcode',
+    'category_id', 'manufacturer_id', 'supplier_id', 'dosage_form_id', 'unit_id', 'strength', 'pack_size',
+    'purchase_price', 'sale_price', 'wholesale_price', 'minimum_sale_price',
+    'tax_percent', 'discount_percent',
+    'minimum_stock_level', 'maximum_stock_level', 'reorder_level', 'opening_stock',
+    'prescription_required', 'status', 'description', 'notes',
+];
 
     protected $casts = [
         'prescription_required' => 'boolean',

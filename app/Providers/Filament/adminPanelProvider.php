@@ -19,7 +19,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
-use App\Filament\Pages\Auth\EditProfile;
+
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Illuminate\Support\Facades\Storage;
 
@@ -67,10 +67,13 @@ class adminPanelProvider extends PanelProvider
                     ? ''
                     : view('filament.custom-navbar')->render(),
             )
+            
+            
             ->renderHook(
                 PanelsRenderHook::SIDEBAR_START,
                 fn (): string => view('filament.custom-sidebar')->render(),
             )
+            
             // ->renderHook(
             //     PanelsRenderHook::SIDEBAR_FOOTER,
             //     fn (): string => view('filament.sidebar-footer')->render(),

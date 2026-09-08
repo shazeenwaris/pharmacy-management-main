@@ -188,6 +188,7 @@ class FinancialTransactionsTable
     EditAction::make(),
     DeleteAction::make(),
 ])
+->recordActionsColumnLabel('Actions')
             /*
             |--------------------------------------------------------------------------
             | Bulk Actions

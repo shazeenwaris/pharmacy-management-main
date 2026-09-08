@@ -65,15 +65,8 @@ class MedicinesTable
                     ->label('Strength')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('sale_price')
-                    ->label('Sale Price')
-                    ->formatStateUsing(fn ($state) => format_currency($state))
-                    ->sortable()
-                    ->weight('medium'),
-
-                TextColumn::make('batches_sum_quantity')
+                TextColumn::make('opening_stock')
                     ->label('Stock')
-                    ->sum('batches', 'quantity')
                     ->badge()
                     ->color(fn ($state, $record) => match (true) {
                         (int) $state <= 0 => 'danger',
@@ -140,13 +133,13 @@ class MedicinesTable
                 Filter::make('low_stock')
                     ->label('Low / Out of Stock')
                     ->query(fn (Builder $query): Builder => $query
-                        ->withSum('batches', 'quantity')
-                        ->havingRaw('COALESCE(batches_sum_quantity, 0) <= minimum_stock_level')),
+                        ->whereColumn('opening_stock', '<=', 'minimum_stock_level')),
             ])
             ->recordActions([
                 EditAction::make(),
                 DeleteAction::make(),
             ])
+            ->recordActionsColumnLabel('Actions')
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

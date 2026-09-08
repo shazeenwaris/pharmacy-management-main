@@ -3,7 +3,8 @@
 namespace App\Filament\Resources\Expenses\Pages;
 
 use App\Filament\Resources\Expenses\ExpenseResource;
-use Filament\Actions\CreateAction;
+use App\Filament\Resources\Expenses\Widgets\ExpenseBanner;
+use App\Filament\Resources\Expenses\Widgets\ExpenseStats;
 use Filament\Resources\Pages\ListRecords;
 
 class ListExpenses extends ListRecords
@@ -12,8 +13,19 @@ class ListExpenses extends ListRecords
 
     protected function getHeaderActions(): array
     {
+        return [];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
         return [
-            CreateAction::make(),
+            ExpenseBanner::class,
+            ExpenseStats::class,
         ];
+    }
+
+    public function getHeaderWidgetsColumns(): int|array
+    {
+        return 1;
     }
 }

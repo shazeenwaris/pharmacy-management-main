@@ -17,7 +17,7 @@ class ManageUnits extends ManageRecords
             CreateAction::make()
                 ->label('New Unit')
                 ->icon('heroicon-m-plus')
-                ->extraAttributes(['class' => 'pms-hide-header-action']),
+                ->extraAttributes(['style' => 'display:none !important;']),
         ];
     }
 

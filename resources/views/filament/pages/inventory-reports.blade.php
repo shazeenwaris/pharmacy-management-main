@@ -6,7 +6,7 @@
         {{-- PAGE HEADER --}}
         {{-- ========================================================= --}}
 
-        <div class="relative overflow-hidden rounded-2xl bg-[#008894] px-6 py-7 shadow-lg">
+        <div class="relative overflow-hidden rounded-2xl bg-[#00707A] px-6 py-7 shadow-lg">
 
             {{-- Decorative circles --}}
             <div class="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-white/10 blur-2xl"></div>
@@ -19,7 +19,9 @@
                     <div class="mb-2 flex items-center gap-2 text-sm font-medium text-white/80">
 
                         <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-white/15">
-                            📊
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4 text-white">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+                            </svg>
                         </span>
 
                         Inventory Management
@@ -69,8 +71,10 @@
                 <div class="flex items-center gap-3">
 
                     <div
-                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#008894]/10 text-[#008894]">
-                        🔎
+                        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#00707A]/10 text-[#00707A]">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
+                        </svg>
                     </div>
 
                     <div>
@@ -90,9 +94,11 @@
                 <button
                     type="button"
                     wire:click="resetFilters"
-                    class="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-[#008894] hover:bg-[#008894]/5 hover:text-[#008894]"
+                    class="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition hover:border-[#00707A] hover:bg-[#00707A]/5 hover:text-[#00707A]"
                 >
-                    <span>↻</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                    </svg>
                     Reset Filters
                 </button>
 
@@ -113,14 +119,16 @@
                         <div class="relative">
 
                             <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                                🔍
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
+                                </svg>
                             </span>
 
                             <input
                                 type="text"
                                 wire:model.live.debounce.400ms="search"
                                 placeholder="Medicine, SKU, barcode..."
-                                class="w-full rounded-xl border-gray-200 bg-gray-50 py-2.5 pl-10 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#008894] focus:bg-white focus:ring-[#008894]"
+                                class="w-full rounded-xl border-gray-200 bg-gray-50 py-2.5 pl-10 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-[#00707A] focus:bg-white focus:ring-[#00707A]"
                             >
 
                         </div>
@@ -137,7 +145,7 @@
 
                         <select
                             wire:model.live="category"
-                            class="w-full rounded-xl border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700 focus:border-[#008894] focus:bg-white focus:ring-[#008894]"
+                            class="w-full rounded-xl border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700 focus:border-[#00707A] focus:bg-white focus:ring-[#00707A]"
                         >
 
                             <option value="">
@@ -166,7 +174,7 @@
 
                         <select
                             wire:model.live="manufacturer"
-                            class="w-full rounded-xl border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700 focus:border-[#008894] focus:bg-white focus:ring-[#008894]"
+                            class="w-full rounded-xl border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700 focus:border-[#00707A] focus:bg-white focus:ring-[#00707A]"
                         >
 
                             <option value="">
@@ -195,7 +203,7 @@
 
                         <select
                             wire:model.live="stockStatus"
-                            class="w-full rounded-xl border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700 focus:border-[#008894] focus:bg-white focus:ring-[#008894]"
+                            class="w-full rounded-xl border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700 focus:border-[#00707A] focus:bg-white focus:ring-[#00707A]"
                         >
 
                             <option value="">
@@ -228,7 +236,7 @@
 
                         <select
                             wire:model.live="expiryStatus"
-                            class="w-full rounded-xl border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700 focus:border-[#008894] focus:bg-white focus:ring-[#008894]"
+                            class="w-full rounded-xl border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700 focus:border-[#00707A] focus:bg-white focus:ring-[#00707A]"
                         >
 
                             <option value="">
@@ -267,7 +275,7 @@
             {{-- Total Medicines --}}
             <div class="relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md">
 
-                <div class="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#008894]/10 blur-2xl"></div>
+                <div class="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#00707A]/10 blur-2xl"></div>
 
                 <div class="relative flex items-start justify-between">
 
@@ -287,8 +295,10 @@
 
                     </div>
 
-                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-[#008894]/10 text-xl">
-                        💊
+                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-[#00707A]/10 text-[#00707A]">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-6 w-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3v4.5a3.375 3.375 0 01-.673 2.014L5.25 15.75A2.25 2.25 0 007 19.5h10a2.25 2.25 0 001.75-3.736l-3.827-6.236A3.375 3.375 0 0114.25 7.5V3M8.25 3h7.5" />
+                        </svg>
                     </div>
 
                 </div>
@@ -319,8 +329,10 @@
 
                     </div>
 
-                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-xl">
-                        📦
+                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-6 w-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-8.25 4.5-8.25-4.5M20.25 7.5v9l-8.25 4.5m8.25-13.5l-8.25-4.5-8.25 4.5m16.5 0l-8.25 4.5m0 0l-8.25-4.5m8.25 4.5v9m-8.25-13.5v9l8.25 4.5" />
+                        </svg>
                     </div>
 
                 </div>
@@ -351,8 +363,10 @@
 
                     </div>
 
-                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-xl">
-                        📊
+                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-6 w-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+                        </svg>
                     </div>
 
                 </div>
@@ -374,7 +388,7 @@
                         </p>
 
                         <p class="mt-2 text-2xl font-bold tracking-tight text-gray-900">
-                            Rs. {{ number_format($stockValuation, 2) }}
+                            {{ format_currency($stockValuation) }}
                         </p>
 
                         <p class="mt-2 text-xs text-gray-400">
@@ -383,8 +397,10 @@
 
                     </div>
 
-                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-xl">
-                        💰
+                    <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-6 w-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                     </div>
 
                 </div>
@@ -405,8 +421,10 @@
 
                 <div class="flex items-center gap-4">
 
-                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-lg">
-                        ⚠️
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                        </svg>
                     </div>
 
                     <div>
@@ -435,8 +453,10 @@
 
                 <div class="flex items-center gap-4">
 
-                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-lg">
-                        ⏳
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                     </div>
 
                     <div>
@@ -465,8 +485,10 @@
 
                 <div class="flex items-center gap-4">
 
-                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-red-100 text-lg">
-                        ⛔
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-red-100 text-red-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                        </svg>
                     </div>
 
                     <div>
@@ -502,8 +524,10 @@
 
                 <div class="flex items-center gap-3">
 
-                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50">
-                        ⚠️
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                        </svg>
                     </div>
 
                     <div>
@@ -563,14 +587,16 @@
 
                         @forelse($lowStockMedicines as $medicine)
 
-                            <tr class="transition hover:bg-[#008894]/5">
+                            <tr class="transition hover:bg-[#00707A]/5">
 
                                 <td class="px-6 py-4">
 
                                     <div class="flex items-center gap-3">
 
-                                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#008894]/10">
-                                            💊
+                                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#00707A]/10 text-[#00707A]">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3v4.5a3.375 3.375 0 01-.673 2.014L5.25 15.75A2.25 2.25 0 007 19.5h10a2.25 2.25 0 001.75-3.736l-3.827-6.236A3.375 3.375 0 0114.25 7.5V3M8.25 3h7.5" />
+                                            </svg>
                                         </div>
 
                                         <div>
@@ -629,8 +655,10 @@
 
                                 <td colspan="5" class="px-6 py-12 text-center">
 
-                                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#008894]/10 text-xl">
-                                        ✓
+                                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#00707A]/10 text-[#00707A]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-6 w-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                        </svg>
                                     </div>
 
                                     <p class="mt-3 font-semibold text-gray-900">
@@ -670,8 +698,10 @@
 
                     <div class="flex items-center gap-3">
 
-                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-50">
-                            🚫
+                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                            </svg>
                         </div>
 
                         <div>
@@ -703,8 +733,10 @@
 
                             <div class="flex min-w-0 items-center gap-3">
 
-                                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-50">
-                                    💊
+                                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3v4.5a3.375 3.375 0 01-.673 2.014L5.25 15.75A2.25 2.25 0 007 19.5h10a2.25 2.25 0 001.75-3.736l-3.827-6.236A3.375 3.375 0 0114.25 7.5V3M8.25 3h7.5" />
+                                    </svg>
                                 </div>
 
                                 <div class="min-w-0">
@@ -731,8 +763,10 @@
 
                         <div class="px-5 py-12 text-center">
 
-                            <div class="text-2xl">
-                                ✓
+                            <div class="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-[#00707A]/10 text-[#00707A]">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                </svg>
                             </div>
 
                             <p class="mt-2 text-sm font-semibold text-gray-900">
@@ -755,8 +789,10 @@
 
                     <div class="flex items-center gap-3">
 
-                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50">
-                            ⏳
+                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
                         </div>
 
                         <div>
@@ -795,8 +831,10 @@
 
                             <div class="flex min-w-0 items-center gap-3">
 
-                                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-50">
-                                    📦
+                                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-orange-50 text-orange-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-8.25 4.5-8.25-4.5M20.25 7.5v9l-8.25 4.5m8.25-13.5l-8.25-4.5-8.25 4.5m16.5 0l-8.25 4.5m0 0l-8.25-4.5m8.25 4.5v9m-8.25-13.5v9l8.25 4.5" />
+                                    </svg>
                                 </div>
 
                                 <div class="min-w-0">
@@ -831,8 +869,10 @@
 
                         <div class="px-5 py-12 text-center">
 
-                            <div class="text-2xl">
-                                ✓
+                            <div class="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-[#00707A]/10 text-[#00707A]">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                </svg>
                             </div>
 
                             <p class="mt-2 text-sm font-semibold text-gray-900">
@@ -860,8 +900,10 @@
 
                 <div class="flex items-center gap-3">
 
-                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-50">
-                        ⛔
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-5 w-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                        </svg>
                     </div>
 
                     <div>
@@ -928,8 +970,10 @@
 
                                     <div class="flex items-center gap-3">
 
-                                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-50">
-                                            💊
+                                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-500">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3v4.5a3.375 3.375 0 01-.673 2.014L5.25 15.75A2.25 2.25 0 007 19.5h10a2.25 2.25 0 001.75-3.736l-3.827-6.236A3.375 3.375 0 0114.25 7.5V3M8.25 3h7.5" />
+                                            </svg>
                                         </div>
 
                                         <div>
@@ -992,8 +1036,10 @@
 
                                 <td colspan="5" class="px-6 py-12 text-center">
 
-                                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#008894]/10 text-xl text-[#008894]">
-                                        ✓
+                                    <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#00707A]/10 text-[#00707A]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-6 w-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                                        </svg>
                                     </div>
 
                                     <p class="mt-3 font-semibold text-gray-900">

@@ -67,12 +67,12 @@ class ExpenseForm
                 | Amount
                 |--------------------------------------------------------------------------
                 */
-                TextInput::make('amount')
-                    ->label('Amount')
-                    ->numeric()
-                    ->prefix('Rs.')
-                    ->required()
-                    ->minValue(0.01),
+                        TextInput::make('amount')
+    ->label('Amount')
+    ->numeric()
+    ->prefix(fn () => currency_symbol())
+    ->required()
+    ->minValue(0.01),
 
                 /*
                 |--------------------------------------------------------------------------

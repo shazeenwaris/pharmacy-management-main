@@ -173,10 +173,10 @@ class MedicineForm
                             ->label('Reorder Level')
                             ->numeric(),
 
-                        TextInput::make('opening_stock')
-                            ->label('Opening Stock')
-                            ->numeric()
-                            ->default(0),
+                        // TextInput::make('opening_stock')
+                        //     ->label('Opening Stock')
+                        //     ->numeric()
+                        //     ->default(0),
                     ]),
 
                 Section::make('Additional Details')

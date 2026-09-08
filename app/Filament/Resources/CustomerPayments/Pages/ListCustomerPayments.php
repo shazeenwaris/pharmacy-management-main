@@ -15,7 +15,7 @@ class ListCustomerPayments extends ListRecords
     {
         return [
             CreateAction::make()
-                ->extraAttributes(['class' => 'pms-hide-header-action']),
+                 ->extraAttributes(['style' => 'display:none !important;']),
         ];
     }
 

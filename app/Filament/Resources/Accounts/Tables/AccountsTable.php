@@ -44,12 +44,12 @@ class AccountsTable
 
                 TextColumn::make('opening_balance')
                     ->label('Opening Balance')
-                    ->money('PKR')
+                    ->formatStateUsing(fn ($state) => format_currency($state))
                     ->sortable(),
 
                 TextColumn::make('current_balance')
                     ->label('Current Balance')
-                    ->money('PKR')
+                    ->formatStateUsing(fn ($state) => format_currency($state))
                     ->sortable(),
 
                 TextColumn::make('status')
@@ -93,6 +93,7 @@ class AccountsTable
                     \Filament\Actions\DeleteBulkAction::make(),
                 ]),
             ])
+            ->recordActionsColumnLabel('Actions')
 
             ->defaultSort('created_at', 'desc');
     }

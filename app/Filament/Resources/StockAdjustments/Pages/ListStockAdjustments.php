@@ -18,7 +18,7 @@ class ListStockAdjustments extends ListRecords
                 ->label('New Adjustment')
                 ->icon('heroicon-m-plus')
                 ->extraAttributes([
-                    'class' => 'pms-hide-header-action',
+                    'style' => 'display:none !important;',
                 ]),
         ];
     }

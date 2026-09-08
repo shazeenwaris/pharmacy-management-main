@@ -15,7 +15,7 @@ class Purchase extends Model
     protected $fillable = [
         'supplier_id', 'invoice_number', 'purchase_date',
         'subtotal', 'discount_amount', 'tax_amount', 'total_amount',
-        'status', 'notes', 'created_by',
+        'status', 'notes', 'created_by','paid_amount', 'payment_method'
     ];
 
     protected $casts = [
@@ -24,6 +24,8 @@ class Purchase extends Model
         'discount_amount' => 'decimal:2',
         'tax_amount' => 'decimal:2',
         'total_amount' => 'decimal:2',
+        'paid_amount' => 'decimal:2',
+        'payment_method' => 'string',
     ];
 
     public function supplier(): BelongsTo
@@ -48,4 +50,8 @@ class Purchase extends Model
             ->logOnlyDirty()
             ->useLogName('Purchase');
     }
+    public function payments(): HasMany
+{
+    return $this->hasMany(PurchasePayment::class);
+}
 }

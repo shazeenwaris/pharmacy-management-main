@@ -4,7 +4,7 @@
         {{-- Hero --}}
         <div
             class="relative overflow-hidden rounded-2xl px-6 py-6 shadow-sm"
-            style="background: linear-gradient(135deg, #087f73 0%, #118b80 55%, #08766d 100%);"
+            style="background: linear-gradient(135deg, #00707A 0%, #00707A 55%, #00707A 100%);"
         >
             <div
                 class="absolute -right-10 -top-16 h-40 w-40 rounded-full opacity-10"
@@ -42,7 +42,7 @@
                 <a
                     href="{{ \App\Filament\Resources\Users\Pages\CreateUser::getUrl() }}"
                     class="inline-flex shrink-0 items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-semibold shadow-sm transition hover:bg-gray-50"
-                    style="color:#087f73;"
+                    style="color:#00707A;"
                 >
                     <x-heroicon-m-plus class="h-4 w-4" />
                     New User

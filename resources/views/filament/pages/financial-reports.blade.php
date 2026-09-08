@@ -1,7 +1,7 @@
 <x-filament-panels::page>
 
     @php
-        $money = fn ($value) => number_format((float) $value, 2);
+        $money = fn ($value) => format_currency((float) $value);
     @endphp
 
     <div class="pms-financial-page">
@@ -279,7 +279,7 @@
                         </span>
 
                         <h3>
-                            Rs. {{ $money($totalRevenue) }}
+                            {{ $money($totalRevenue) }}
                         </h3>
 
                         <small>
@@ -320,7 +320,7 @@
                         </span>
 
                         <h3>
-                            Rs. {{ $money($totalPurchaseCost) }}
+                            {{ $money($totalPurchaseCost) }}
                         </h3>
 
                         <small>
@@ -361,7 +361,7 @@
                         </span>
 
                         <h3 class="{{ $grossProfit < 0 ? 'negative' : '' }}">
-                            Rs. {{ $money($grossProfit) }}
+                            {{ $money($grossProfit) }}
                         </h3>
 
                         <small>
@@ -402,7 +402,7 @@
                         </span>
 
                         <h3 class="{{ $netProfit < 0 ? 'negative' : '' }}">
-                            Rs. {{ $money($netProfit) }}
+                            {{ $money($netProfit) }}
                         </h3>
 
                         <small>
@@ -455,7 +455,7 @@
                     <span>Total Expenses</span>
 
                     <strong>
-                        Rs. {{ $money($totalExpenses) }}
+                        {{ $money($totalExpenses) }}
                     </strong>
 
                     <small>
@@ -483,7 +483,7 @@
                     <span>Supplier Dues</span>
 
                     <strong>
-                        Rs. {{ $money($supplierDues) }}
+                        {{ $money($supplierDues) }}
                     </strong>
 
                     <small>
@@ -511,7 +511,7 @@
                     <span>Customer Dues</span>
 
                     <strong>
-                        Rs. {{ $money($customerDues) }}
+                        {{ $money($customerDues) }}
                     </strong>
 
                     <small>
@@ -555,7 +555,7 @@
                     <span>Revenue</span>
 
                     <strong>
-                        Rs. {{ $money($totalRevenue) }}
+                        {{ $money($totalRevenue) }}
                     </strong>
 
                 </div>
@@ -566,7 +566,7 @@
                     <span>Purchase Cost</span>
 
                     <strong>
-                        Rs. {{ $money($totalPurchaseCost) }}
+                        {{ $money($totalPurchaseCost) }}
                     </strong>
 
                 </div>
@@ -577,7 +577,7 @@
                     <span>Expenses</span>
 
                     <strong>
-                        Rs. {{ $money($totalExpenses) }}
+                        {{ $money($totalExpenses) }}
                     </strong>
 
                 </div>
@@ -598,7 +598,7 @@
                     </div>
 
                     <strong class="{{ $grossProfit < 0 ? 'negative' : '' }}">
-                        Rs. {{ $money($grossProfit) }}
+                        {{ $money($grossProfit) }}
                     </strong>
 
                 </div>
@@ -615,7 +615,7 @@
                     </div>
 
                     <strong class="{{ $netProfit < 0 ? 'negative' : '' }}">
-                        Rs. {{ $money($netProfit) }}
+                        {{ $money($netProfit) }}
                     </strong>
 
                 </div>
@@ -682,7 +682,7 @@
                                 </td>
 
                                 <td class="right strong">
-                                    Rs. {{ $money($row->total_amount) }}
+                                    {{ $money($row->total_amount) }}
                                 </td>
 
                             </tr>
@@ -765,7 +765,7 @@
                                     </td>
 
                                     <td class="right strong">
-                                        Rs. {{ $money($expense->total_amount) }}
+                                        {{ $money($expense->total_amount) }}
                                     </td>
 
                                 </tr>
@@ -819,7 +819,7 @@
                         </div>
 
                         <strong>
-                            Rs. {{ $money($supplierDues) }}
+                            {{ $money($supplierDues) }}
                         </strong>
 
                     </div>
@@ -833,7 +833,7 @@
                         </div>
 
                         <strong>
-                            Rs. {{ $money($customerDues) }}
+                            {{ $money($customerDues) }}
                         </strong>
 
                     </div>
@@ -847,7 +847,7 @@
                         </div>
 
                         <strong>
-                            Rs. {{ $money($supplierPayments) }}
+                            {{ $money($supplierPayments) }}
                         </strong>
 
                     </div>
@@ -861,7 +861,7 @@
                         </div>
 
                         <strong>
-                            Rs. {{ $money($customerPaid) }}
+                            {{ $money($customerPaid) }}
                         </strong>
 
                     </div>
@@ -930,11 +930,11 @@
                                 </td>
 
                                 <td class="right strong">
-                                    Rs. {{ $money($sale->grand_total) }}
+                                    {{ $money($sale->grand_total) }}
                                 </td>
 
                                 <td class="right paid-text">
-                                    Rs. {{ $money($sale->paid_amount) }}
+                                    {{ $money($sale->paid_amount) }}
                                 </td>
 
                             </tr>
@@ -1019,7 +1019,7 @@
                                 </td>
 
                                 <td class="right strong">
-                                    Rs. {{ $money($expense->amount) }}
+                                    {{ $money($expense->amount) }}
                                 </td>
 
                             </tr>

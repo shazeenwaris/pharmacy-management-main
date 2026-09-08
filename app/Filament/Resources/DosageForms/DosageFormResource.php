@@ -112,6 +112,7 @@ class DosageFormResource extends Resource
                 EditAction::make(),
                 DeleteAction::make(),
             ])
+            ->recordActionsColumnLabel('Actions')
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

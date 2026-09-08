@@ -137,7 +137,7 @@
                     </p>
 
                     <h3>
-                        Rs. {{ number_format($this->totalRevenue, 2) }}
+                        {{ format_currency($this->totalRevenue) }}
                     </h3>
 
                     <span class="sr-kpi-note">
@@ -239,7 +239,7 @@
                     </p>
 
                     <h3>
-                        Rs. {{ number_format($this->averageSale, 2) }}
+                      {{ format_currency($this->averageSale) }}
                     </h3>
 
                     <span class="sr-kpi-note">
@@ -312,7 +312,7 @@
                                 </td>
 
                                 <td class="text-right font-semibold">
-                                    Rs. {{ number_format($sale->total_revenue, 2) }}
+                                    {{ format_currency($sale->total_revenue) }}
                                 </td>
 
                             </tr>
@@ -401,7 +401,7 @@
                                 </td>
 
                                 <td class="text-right font-semibold">
-                                    Rs. {{ number_format($medicine->revenue, 2) }}
+                                    {{ format_currency($medicine->revenue) }}
                                 </td>
 
                             </tr>
@@ -473,7 +473,7 @@
                                 </td>
 
                                 <td class="text-right font-semibold">
-                                    Rs. {{ number_format($category->revenue, 2) }}
+                                   {{ format_currency($category->revenue) }}
                                 </td>
 
                             </tr>
@@ -559,7 +559,7 @@
                                 </td>
 
                                 <td class="text-right font-semibold">
-                                    Rs. {{ number_format($cashier->revenue, 2) }}
+                                    {{ format_currency($cashier->revenue) }}
                                 </td>
 
                             </tr>

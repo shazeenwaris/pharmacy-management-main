@@ -17,6 +17,14 @@ class PosScreen extends Component
     public float $paidAmount = 0;
     public float $discount = 0;
     public float $tax = 0;
+    public ?int $customerId = null;
+
+    public function getCustomersProperty()
+    {
+        return \App\Models\Customer::where('status', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'phone']);
+    }
 
     public function searchResults()
     {
@@ -74,14 +82,6 @@ class PosScreen extends Component
         $this->search = '';
     }
 
-    /**
-     * Called when the cashier presses Enter in the search box — this is
-     * how barcode scanners behave (they type digits then send an Enter
-     * keystroke). PDF section 9 flow:
-     *   Scan Barcode -> Find Medicine -> Find Available Batch (FEFO)
-     *   -> Add to Cart -> Generate Invoice
-     * No manual click should be needed for a genuine barcode scan.
-     */
     public function scanBarcode()
     {
         if (trim($this->search) === '') {
@@ -100,8 +100,6 @@ class PosScreen extends Component
 
         $this->addToCart($medicine->id);
 
-        // Tell the browser to refocus the search input so the cashier
-        // can immediately scan the next item without touching the mouse.
         $this->dispatch('focus-search');
     }
 
@@ -144,6 +142,7 @@ class PosScreen extends Component
         DB::transaction(function () use (&$saleId) {
             $sale = Sale::create([
                 'invoice_number' => 'INV-' . now()->format('Ymd') . '-' . rand(1000, 9999),
+                'customer_id' => $this->customerId ?: null,
                 'subtotal' => $this->subtotal,
                 'discount' => $this->discount,
                 'tax' => $this->tax,
@@ -170,6 +169,7 @@ class PosScreen extends Component
             $this->paidAmount = 0;
             $this->discount = 0;
             $this->tax = 0;
+            $this->customerId = null;
 
             $saleId = $sale->id;
         });

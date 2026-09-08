@@ -88,8 +88,10 @@ class MedicineBatchResource extends Resource
 
                         DatePicker::make('manufacturing_date'),
 
-                        DatePicker::make('expiry_date')
-                            ->required(),
+                                                DatePicker::make('expiry_date')
+                            ->required()
+                            ->minDate(now()->addDay())
+                            ->helperText('Must be a future date — today or past dates are not allowed.'),
                     ]),
 
                 Section::make('Pricing')
@@ -107,20 +109,7 @@ class MedicineBatchResource extends Resource
                             ->prefix(fn () => currency_symbol()),
                     ]),
 
-                Section::make('Supplier / Purchase Reference')
-                    ->description('Where this batch was sourced from')
-                    ->icon(Heroicon::OutlinedTruck)
-                    ->columnSpanFull()
-                    ->columns(2)
-                    ->schema([
-                        Select::make('supplier_id')
-                            ->label('Supplier')
-                            ->relationship('supplier', 'supplier_name')
-                            ->searchable()
-                            ->preload(),
-
-                        TextInput::make('purchase_reference'),
-                    ]),
+               
 
                 Section::make('Status & Notes')
                     ->icon(Heroicon::OutlinedCheckCircle)

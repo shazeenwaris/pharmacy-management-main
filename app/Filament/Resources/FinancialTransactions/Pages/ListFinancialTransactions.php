@@ -3,7 +3,8 @@
 namespace App\Filament\Resources\FinancialTransactions\Pages;
 
 use App\Filament\Resources\FinancialTransactions\FinancialTransactionResource;
-use Filament\Actions\CreateAction;
+use App\Filament\Resources\FinancialTransactions\Widgets\FinancialTransactionBanner;
+use App\Filament\Resources\FinancialTransactions\Widgets\FinancialTransactionStats;
 use Filament\Resources\Pages\ListRecords;
 
 class ListFinancialTransactions extends ListRecords
@@ -12,8 +13,19 @@ class ListFinancialTransactions extends ListRecords
 
     protected function getHeaderActions(): array
     {
+        return [];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
         return [
-            CreateAction::make(),
+            FinancialTransactionBanner::class,
+            FinancialTransactionStats::class,
         ];
+    }
+
+    public function getHeaderWidgetsColumns(): int|array
+    {
+        return 1;
     }
 }

@@ -5,18 +5,18 @@
         {{-- =========================================================
              PAGE HEADER
         ========================================================== --}}
-        <div class="relative overflow-hidden rounded-3xl border border-teal-100 bg-gradient-to-br from-teal-50 via-white to-emerald-50 px-6 py-6 shadow-sm sm:px-7 sm:py-7">
+        <div class="relative overflow-hidden rounded-3xl px-6 py-6 shadow-sm sm:px-7 sm:py-7" style="background: #00707A;">
 
             {{-- Decorative Background --}}
-            <div class="pointer-events-none absolute -right-16 -top-20 h-52 w-52 rounded-full bg-teal-100/60 blur-3xl"></div>
-            <div class="pointer-events-none absolute -bottom-20 left-1/3 h-44 w-44 rounded-full bg-emerald-100/50 blur-3xl"></div>
+            <div class="pointer-events-none absolute -right-16 -top-20 h-52 w-52 rounded-full bg-white/10 blur-3xl"></div>
+            <div class="pointer-events-none absolute -bottom-20 left-1/3 h-44 w-44 rounded-full bg-white/10 blur-3xl"></div>
 
             <div class="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
 
                 {{-- Title --}}
                 <div class="flex min-w-0 items-center gap-4">
 
-                    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-teal-600 text-white shadow-lg shadow-teal-600/20">
+                    <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-white shadow-lg" style="background: rgba(255,255,255,0.15);">
                         <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
                                 stroke-linecap="round"
@@ -29,16 +29,16 @@
 
                     <div class="min-w-0">
                         <div class="flex flex-wrap items-center gap-3">
-                            <h2 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+                            <h2 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">
                                 Purchase Reports
                             </h2>
 
-                            <span class="rounded-full bg-teal-100 px-3 py-1 text-xs font-semibold text-teal-700">
+                            <span class="rounded-full px-3 py-1 text-xs font-semibold text-white" style="background: rgba(255,255,255,0.18);">
                                 Procurement Analytics
                             </span>
                         </div>
 
-                        <p class="mt-1.5 text-sm leading-6 text-slate-500">
+                        <p class="mt-1.5 text-sm leading-6 text-white/80">
                             Analyze purchases, suppliers, medicine costs and purchasing activity.
                         </p>
                     </div>
@@ -46,14 +46,14 @@
                 </div>
 
                 {{-- Live Status --}}
-                <div class="flex shrink-0 items-center gap-2 self-start rounded-xl border border-white/80 bg-white/80 px-4 py-2.5 shadow-sm backdrop-blur-sm lg:self-auto">
+                <div class="flex shrink-0 items-center gap-2 self-start rounded-xl border border-white/20 px-4 py-2.5 shadow-sm backdrop-blur-sm lg:self-auto" style="background: rgba(255,255,255,0.10);">
 
                     <span class="relative flex h-2.5 w-2.5">
-                        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60"></span>
-                        <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500"></span>
+                        <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-300 opacity-60"></span>
+                        <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
                     </span>
 
-                    <span class="text-xs font-semibold text-slate-600">
+                    <span class="text-xs font-semibold text-white">
                         Live Database
                     </span>
 
@@ -73,7 +73,7 @@
                 <div>
                     <div class="flex items-center gap-2">
 
-                        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-50 text-teal-600">
+                        <div class="flex h-9 w-9 items-center justify-center rounded-xl" style="background: rgba(0,112,122,0.1); color: #00707A;">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path
                                     stroke-linecap="round"
@@ -198,7 +198,10 @@
                 <button
                     type="button"
                     wire:click="applyFilters"
-                    class="inline-flex items-center justify-center gap-2 rounded-xl bg-teal-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-teal-600/20 transition hover:bg-teal-700 hover:shadow-md"
+                    class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:shadow-md"
+                    style="background: #00707A;"
+                    onmouseover="this.style.background='#005a63'"
+                    onmouseout="this.style.background='#00707A'"
                 >
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path
@@ -223,9 +226,9 @@
         <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
 
             {{-- Total Purchases --}}
-            <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-teal-200 hover:shadow-lg hover:shadow-teal-100/50">
+            <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg" style="--hover-border: #00707A;">
 
-                <div class="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-teal-50 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
+                <div class="absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100" style="background: rgba(0,112,122,0.08);"></div>
 
                 <div class="relative flex items-start justify-between gap-4">
 
@@ -238,7 +241,7 @@
                             {{ number_format($totalPurchases) }}
                         </h3>
 
-                        <div class="mt-3 flex items-center gap-1.5 text-xs font-medium text-teal-600">
+                        <div class="mt-3 flex items-center gap-1.5 text-xs font-medium" style="color: #00707A;">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"/>
                             </svg>
@@ -247,7 +250,7 @@
                         </div>
                     </div>
 
-                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-600 transition-all duration-300 group-hover:scale-110 group-hover:bg-teal-600 group-hover:text-white">
+                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-all duration-300 group-hover:scale-110 group-hover:text-white" style="background: rgba(0,112,122,0.1); color: #00707A;" onmouseover="this.style.background='#00707A'" onmouseout="this.style.background='rgba(0,112,122,0.1)'">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
                                 stroke-linecap="round"
@@ -275,7 +278,7 @@
                         </p>
 
                         <h3 class="mt-2 truncate text-2xl font-bold tracking-tight text-slate-900">
-                            Rs. {{ number_format($totalPurchaseAmount, 2) }}
+                            {{ format_currency($totalPurchaseAmount) }}
                         </h3>
 
                         <div class="mt-3 flex items-center gap-1.5 text-xs font-medium text-emerald-600">
@@ -308,9 +311,9 @@
 
 
             {{-- Items Purchased --}}
-            <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-teal-200 hover:shadow-lg hover:shadow-teal-100/50">
+            <div class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
 
-                <div class="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-teal-50 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
+                <div class="absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100" style="background: rgba(0,112,122,0.08);"></div>
 
                 <div class="relative flex items-start justify-between gap-4">
 
@@ -323,7 +326,7 @@
                             {{ number_format($totalItemsPurchased) }}
                         </h3>
 
-                        <div class="mt-3 flex items-center gap-1.5 text-xs font-medium text-teal-600">
+                        <div class="mt-3 flex items-center gap-1.5 text-xs font-medium" style="color: #00707A;">
                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path
                                     stroke-linecap="round"
@@ -337,7 +340,7 @@
                         </div>
                     </div>
 
-                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-600 transition-all duration-300 group-hover:scale-110 group-hover:bg-teal-600 group-hover:text-white">
+                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-all duration-300 group-hover:scale-110 group-hover:text-white" style="background: rgba(0,112,122,0.1); color: #00707A;" onmouseover="this.style.background='#00707A'" onmouseout="this.style.background='rgba(0,112,122,0.1)'">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
                                 stroke-linecap="round"
@@ -365,7 +368,7 @@
                         </p>
 
                         <h3 class="mt-2 text-2xl font-bold tracking-tight text-slate-900">
-                            Rs. {{ number_format($totalReturns, 2) }}
+                            {{ format_currency($totalReturns) }}
                         </h3>
 
                         <div class="mt-3 flex items-center gap-1.5 text-xs font-medium text-rose-600">
@@ -405,11 +408,11 @@
         <div class="grid grid-cols-1 gap-5 md:grid-cols-3">
 
             {{-- Daily --}}
-            <div class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-teal-200 hover:shadow-md">
+            <div class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
 
                 <div class="flex items-center gap-4">
 
-                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-600 transition group-hover:bg-teal-600 group-hover:text-white">
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition group-hover:text-white" style="background: rgba(0,112,122,0.1); color: #00707A;" onmouseover="this.style.background='#00707A'" onmouseout="this.style.background='rgba(0,112,122,0.1)'">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
                                 stroke-linecap="round"
@@ -435,11 +438,11 @@
 
 
             {{-- Supplier --}}
-            <div class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-teal-200 hover:shadow-md">
+            <div class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
 
                 <div class="flex items-center gap-4">
 
-                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-600 transition group-hover:bg-teal-600 group-hover:text-white">
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition group-hover:text-white" style="background: rgba(0,112,122,0.1); color: #00707A;" onmouseover="this.style.background='#00707A'" onmouseout="this.style.background='rgba(0,112,122,0.1)'">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
                                 stroke-linecap="round"
@@ -465,11 +468,11 @@
 
 
             {{-- Medicine --}}
-            <div class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-teal-200 hover:shadow-md">
+            <div class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
 
                 <div class="flex items-center gap-4">
 
-                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-600 transition group-hover:bg-teal-600 group-hover:text-white">
+                    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition group-hover:text-white" style="background: rgba(0,112,122,0.1); color: #00707A;" onmouseover="this.style.background='#00707A'" onmouseout="this.style.background='rgba(0,112,122,0.1)'">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
                                 stroke-linecap="round"
@@ -513,7 +516,7 @@
                     </p>
                 </div>
 
-                <div class="w-fit rounded-lg bg-teal-50 px-3 py-1.5 text-xs font-semibold text-teal-700">
+                <div class="w-fit rounded-lg px-3 py-1.5 text-xs font-semibold" style="background: rgba(0,112,122,0.1); color: #00707A;">
                     Last 10 records
                 </div>
 
@@ -552,7 +555,7 @@
 
                                     <div class="flex items-center gap-3">
 
-                                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-teal-600">
+                                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg" style="background: rgba(0,112,122,0.1); color: #00707A;">
                                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path
                                                     stroke-linecap="round"
@@ -572,13 +575,13 @@
                                 </td>
 
                                 <td class="px-6 py-4">
-                                    <span class="inline-flex rounded-lg bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-700">
+                                    <span class="inline-flex rounded-lg px-2.5 py-1 text-xs font-semibold" style="background: rgba(0,112,122,0.1); color: #00707A;">
                                         {{ number_format($purchase->purchase_count) }}
                                     </span>
                                 </td>
 
                                 <td class="px-6 py-4 text-right font-bold text-slate-900">
-                                    Rs. {{ number_format($purchase->total_amount, 2) }}
+                                    {{ format_currency($purchase->total_amount) }}
                                 </td>
 
                             </tr>
@@ -638,7 +641,7 @@
                             </p>
                         </div>
 
-                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-600">
+                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style="background: rgba(0,112,122,0.1); color: #00707A;">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path
                                     stroke-linecap="round"
@@ -685,7 +688,7 @@
 
                                         <div class="flex items-center gap-3">
 
-                                            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-xs font-bold text-teal-600">
+                                            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-xs font-bold" style="background: rgba(0,112,122,0.1); color: #00707A;">
                                                 {{ strtoupper(substr($supplier->supplier_name, 0, 1)) }}
                                             </div>
 
@@ -698,13 +701,13 @@
                                     </td>
 
                                     <td class="px-6 py-4 text-center">
-                                        <span class="inline-flex rounded-lg bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-700">
+                                        <span class="inline-flex rounded-lg px-2.5 py-1 text-xs font-semibold" style="background: rgba(0,112,122,0.1); color: #00707A;">
                                             {{ number_format($supplier->purchase_count) }}
                                         </span>
                                     </td>
 
                                     <td class="px-6 py-4 text-right font-bold text-slate-900">
-                                        Rs. {{ number_format($supplier->total_amount, 2) }}
+                                       {{ format_currency($supplier->total_amount) }}
                                     </td>
 
                                 </tr>
@@ -744,7 +747,7 @@
                             </p>
                         </div>
 
-                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-600">
+                        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl" style="background: rgba(0,112,122,0.1); color: #00707A;">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path
                                     stroke-linecap="round"
@@ -791,7 +794,7 @@
 
                                         <div class="flex items-center gap-3">
 
-                                            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-teal-600">
+                                            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg" style="background: rgba(0,112,122,0.1); color: #00707A;">
                                                 <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path
                                                         stroke-linecap="round"
@@ -811,13 +814,13 @@
                                     </td>
 
                                     <td class="px-6 py-4 text-center">
-                                        <span class="inline-flex rounded-lg bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-700">
+                                        <span class="inline-flex rounded-lg px-2.5 py-1 text-xs font-semibold" style="background: rgba(0,112,122,0.1); color: #00707A;">
                                             {{ number_format($medicine->total_quantity) }}
                                         </span>
                                     </td>
 
                                     <td class="px-6 py-4 text-right font-bold text-slate-900">
-                                        Rs. {{ number_format($medicine->total_amount, 2) }}
+                                        {{ format_currency($medicine->total_amount) }}
                                     </td>
 
                                 </tr>
@@ -859,7 +862,7 @@
                     </p>
                 </div>
 
-                <span class="w-fit rounded-lg bg-teal-50 px-3 py-1.5 text-xs font-semibold text-teal-700">
+                <span class="w-fit rounded-lg px-3 py-1.5 text-xs font-semibold" style="background: rgba(0,112,122,0.1); color: #00707A;">
                     Latest 10
                 </span>
 
@@ -908,7 +911,7 @@
 
                                     <div class="flex items-center gap-3">
 
-                                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-teal-600">
+                                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg" style="background: rgba(0,112,122,0.1); color: #00707A;">
                                             <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path
                                                     stroke-linecap="round"
@@ -942,7 +945,7 @@
 
                                 {{-- Amount --}}
                                 <td class="px-6 py-4 text-right font-bold text-slate-900">
-                                    Rs. {{ number_format($purchase->total_amount, 2) }}
+                                   {{ format_currency($purchase->total_amount) }}
                                 </td>
 
 

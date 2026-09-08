@@ -17,7 +17,7 @@ class ManageDosageForms extends ManageRecords
             CreateAction::make()
                 ->label('New Dosage Form')
                 ->icon('heroicon-m-plus')
-                ->extraAttributes(['class' => 'pms-hide-header-action']),
+                ->extraAttributes(['style' => 'display:none !important;']),
         ];
     }
 

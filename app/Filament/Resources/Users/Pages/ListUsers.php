@@ -18,7 +18,7 @@ class ListUsers extends ListRecords
                 ->label('New User')
                 ->icon('heroicon-m-plus')
                 ->extraAttributes([
-                    'class' => 'pms-hide-header-action',
+                    'style' => 'display:none !important;',
                 ]),
         ];
     }

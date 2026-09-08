@@ -40,9 +40,9 @@ class MedicineBatch extends Model
             return 'expired';
         }
 
-        if ($daysLeft <= 30) {
-            return 'expiring_soon';
-        }
+      if ($daysLeft <= 7) {
+    return 'expiring_soon';
+}
 
         return 'active';
     }

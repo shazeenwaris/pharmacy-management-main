@@ -4,7 +4,7 @@
         {{-- Hero --}}
         <div
             class="relative overflow-hidden rounded-2xl px-6 py-6 shadow-sm"
-            style="background: linear-gradient(135deg, #087f73 0%, #118b80 55%, #08766d 100%);"
+            style="background: linear-gradient(135deg, #00707A 0%, #00707A 55%, #00707A 100%);"
         >
 
             {{-- Decorative circles --}}
@@ -77,7 +77,7 @@
                     >
                         <x-heroicon-o-list-bullet
                             class="h-5 w-5"
-                            style="color:#07877d;"
+                            style="color:#00707A;"
                         />
                     </div>
 
@@ -108,11 +108,11 @@
 
                     <div
                         class="flex h-11 w-11 items-center justify-center rounded-xl"
-                        style="background:#edf6ff;"
+                        style="background:#e4f7f5;"
                     >
                         <x-heroicon-o-calendar-days
                             class="h-5 w-5"
-                            style="color:#3b82f6;"
+                            style="color:#00707A;"
                         />
                     </div>
 
@@ -143,11 +143,11 @@
 
                     <div
                         class="flex h-11 w-11 items-center justify-center rounded-xl"
-                        style="background:#fff7e8;"
+                        style="background:#e4f7f5;"
                     >
                         <x-heroicon-o-arrow-path
                             class="h-5 w-5"
-                            style="color:#f59e0b;"
+                            style="color:#00707A;"
                         />
                     </div>
 
@@ -183,7 +183,7 @@
             >
                 <x-heroicon-o-information-circle
                     class="h-5 w-5"
-                    style="color:#07877d;"
+                    style="color:#00707A;"
                 />
             </div>
 

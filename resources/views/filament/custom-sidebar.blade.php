@@ -1,4 +1,3 @@
-
 @persist('pms-sidebar')
 <script>
     (function () {
@@ -69,21 +68,6 @@
     }
 }
 
-
-
-
-
-
-
-
-
-    .pms-sidebar {
-        width: var(--pms-sidebar-width) !important;
-        min-width: var(--pms-sidebar-width) !important;
-        overflow: hidden;
-        transition: width 0.2s ease, min-width 0.2s ease;
-    }
-
    html[data-pms-sidebar="collapsed"] .pms-sidebar-brand-title,
 html[data-pms-sidebar="collapsed"] .pms-sidebar-brand-subtitle,
 html[data-pms-sidebar="collapsed"] .pms-nav-label,
@@ -114,12 +98,6 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
         white-space: nowrap;
     }
 
-
-
-
-
-
-
 .fi-sidebar,
 .fi-sidebar *,
 .fi-sidebar-nav,
@@ -137,11 +115,7 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
     display: none !important;
 }
 
-
-
-
-
-</style> 
+</style>
 
 
 <div class="pms-sidebar">
@@ -188,58 +162,58 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
                 </svg>
                 <input
-                    type="text"
-                    x-model="query"
-                    @input="
-                        $refs.navList.querySelectorAll('[data-nav-item]').forEach(el => {
-                            const label = (el.dataset.navLabel || '').toLowerCase();
-                            const match = label.includes(query.toLowerCase());
-                            el.style.display = match || query === '' ? '' : 'none';
+    type="text"
+    x-model="query"
+    @input="
+        document.querySelector('.pms-sidebar-nav').querySelectorAll('[data-nav-item]').forEach(el => {
+            const label = (el.dataset.navLabel || '').toLowerCase();
+            const match = label.includes(query.toLowerCase());
+            el.style.display = match || query === '' ? '' : 'none';
 
-                            const group = el.closest('[data-nav-group]');
-                            if (group) {
-                                const anyVisible = [...group.querySelectorAll('[data-nav-item]')].some(i => i.style.display !== 'none');
-                                group.style.display = anyVisible || query === '' ? '' : 'none';
-                                if (query !== '' && anyVisible) {
-                                    $store.sidebarState.expand();
-                                }
-                            }
-                        });
+            const group = el.closest('[data-nav-group]');
+            if (group) {
+                const anyVisible = [...group.querySelectorAll('[data-nav-item]')].some(i => i.style.display !== 'none');
+                group.style.display = anyVisible || query === '' ? '' : 'none';
+                if (query !== '' && anyVisible) {
+                    $store.sidebarState.expand();
+                }
+            }
+        });
 
-                        $refs.navList.querySelectorAll('.pms-nav-section-label').forEach(label => {
-                            let sibling = label.nextElementSibling;
-                            let anyVisible = false;
-                            while (sibling && !sibling.classList.contains('pms-nav-section-label')) {
-                                if (sibling.style.display !== 'none') { anyVisible = true; }
-                                sibling = sibling.nextElementSibling;
-                            }
-                            label.style.display = anyVisible || query === '' ? '' : 'none';
-                        });
-                    "
-                    placeholder="Search menu..."
-                    class="w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-9 pr-3 text-sm text-gray-700 placeholder-gray-400 focus:border-[#00838F] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#00838F] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
-                >
+        document.querySelector('.pms-sidebar-nav').querySelectorAll('.pms-nav-section-label').forEach(label => {
+            let sibling = label.nextElementSibling;
+            let anyVisible = false;
+            while (sibling && !sibling.classList.contains('pms-nav-section-label')) {
+                if (sibling.style.display !== 'none') { anyVisible = true; }
+                sibling = sibling.nextElementSibling;
+            }
+            label.style.display = anyVisible || query === '' ? '' : 'none';
+        });
+    "
+    placeholder="Search menu..."
+    class="w-full rounded-lg border border-gray-200 bg-gray-50 py-2 pl-9 pr-3 text-sm text-gray-700 placeholder-gray-400 focus:border-[#00838F] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#00838F] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
+>
             </div>
         </div>
 
         @php
             $unreadNotifications = \App\Models\AppNotification::unread()->count();
 
-
             $items = [
-    ['label' => 'Dashboard',      'icon' => 'home',      'route' => '/admin',                'active' => request()->is('admin'), 'section' => 'Main Menu'],
-    ['label' => 'Medicines',      'icon' => 'beaker',    'route' => '/admin/medicines',       'active' => request()->is('admin/medicines*'), 'section' => 'Inventory'],
-    ['label' => 'Purchases',      'icon' => 'cart',      'route' => '/admin/purchases',       'active' => request()->is('admin/purchases*'), 'section' => 'Inventory'],
-    ['label' => 'Stock',          'icon' => 'box',       'route' => '/admin/stock',           'active' => request()->is('admin/stock*'), 'section' => 'Inventory'],
-    ['label' => 'Sales / POS',    'icon' => 'card',      'route' => '/admin/sales',           'active' => request()->is('admin/sales*'), 'section' => 'Sales'],
-    ['label' => 'Prescriptions',  'icon' => 'prescription', 'route' => '/admin/prescriptions', 'active' => request()->is('admin/prescriptions*'), 'section' => 'Sales'],
-    ['label' => 'Customers',      'icon' => 'users',     'route' => '/admin/customers',       'active' => request()->is('admin/customers*'), 'section' => 'People'],
-    ['label' => 'Suppliers',      'icon' => 'truck',     'route' => '/admin/suppliers',       'active' => request()->is('admin/suppliers*'), 'section' => 'People'],
-    ['label' => 'Reports',        'icon' => 'chart',     'route' => '/admin/reports',         'active' => request()->is('admin/reports*'), 'section' => 'Insights'],
-    ['label' => 'Alerts',         'icon' => 'bell',      'route' => '/admin/app-notifications', 'active' => request()->is('admin/app-notifications*'), 'badge' => $unreadNotifications > 0 ? $unreadNotifications : null, 'section' => 'Insights'],
-    ['label' => 'Expiry Tracker', 'icon' => 'clock',     'route' => '/admin/expiry-tracker',  'active' => request()->is('admin/expiry-tracker*'), 'section' => 'Insights'],
-    ['label' => 'Settings',       'icon' => 'cog',       'route' => '/admin/settings',        'active' => request()->is('admin/settings*'), 'section' => 'System'],
-];
+                ['label' => 'Dashboard',      'icon' => 'home',      'route' => '/admin',                'active' => request()->is('admin'), 'section' => 'Main Menu'],
+                ['label' => 'Medicines',      'icon' => 'beaker',    'route' => '/admin/medicines',       'active' => request()->is('admin/medicines*'), 'section' => 'Inventory'],
+                ['label' => 'Purchases',      'icon' => 'cart',      'route' => '/admin/purchases',       'active' => request()->is('admin/purchases*'), 'section' => 'Inventory'],
+                ['label' => 'Stock',          'icon' => 'box',       'route' => '/admin/stock',           'active' => request()->is('admin/stock*'), 'section' => 'Inventory'],
+                ['label' => 'Sales / POS',    'icon' => 'card',      'route' => '/admin/sales',           'active' => request()->is('admin/sales*'), 'section' => 'Sales'],
+                ['label' => 'Customers',      'icon' => 'users',     'route' => '/admin/customers',       'active' => request()->is('admin/customers*'), 'section' => 'People'],
+                ['label' => 'Suppliers',      'icon' => 'truck',     'route' => '/admin/suppliers',       'active' => request()->is('admin/suppliers*'), 'section' => 'People'],
+                ['label' => 'Accounting & Finance', 'icon' => 'finance', 'route' => '/admin/accounts', 'active' => request()->is('admin/accounts*') || request()->is('admin/financial-transactions*'), 'section' => 'Finance'],
+                ['label' => 'Expenses',       'icon' => 'expense',   'route' => '/admin/expenses',        'active' => request()->is('admin/expenses*') || request()->is('admin/expense-categories*'), 'section' => 'Finance'],
+                ['label' => 'Reports',        'icon' => 'chart',     'route' => '/admin/reports',         'active' => request()->is('admin/reports*'), 'section' => 'Insights'],
+                ['label' => 'Alerts',         'icon' => 'bell',      'route' => '/admin/app-notifications', 'active' => request()->is('admin/app-notifications*'), 'badge' => $unreadNotifications > 0 ? $unreadNotifications : null, 'section' => 'Insights'],
+                ['label' => 'Expiry Tracker', 'icon' => 'clock',     'route' => '/admin/expiry-tracker',  'active' => request()->is('admin/expiry-tracker*'), 'section' => 'Insights'],
+                ['label' => 'Settings',       'icon' => 'cog',       'route' => '/admin/settings',        'active' => request()->is('admin/settings*'), 'section' => 'System'],
+            ];
 
             $icons = [
                 'home'   => 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
@@ -254,6 +228,8 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
                 'clock'  => 'M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z',
                 'cog'    => 'M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.38.138.752.43.992l1.005.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.542-.56.94-1.11.94h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.38-.138-.752-.43-.992l-1.004-.827a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.28z',
                 'prescription' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
+                'finance' => 'M12 6v12m-3-3l3 3 3-3M6.75 9.75h10.5M6.75 14.25h10.5M4.5 4.5h15A2.25 2.25 0 0121.75 6.75v10.5A2.25 2.25 0 0119.5 19.5h-15a2.25 2.25 0 01-2.25-2.25V6.75A2.25 2.25 0 014.5 4.5z',
+                'expense' => 'M12 6v12m-3-3l3 3 3-3M6.75 9.75h10.5M6.75 14.25h10.5',
             ];
 
             $groups = [
@@ -274,7 +250,6 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
                     'active' => request()->is('admin/purchases*') || request()->is('admin/purchase-returns*'),
                     'links' => [
                         ['url' => '/admin/purchases', 'label' => 'All Purchases', 'active' => request()->is('admin/purchases*') && !request()->is('admin/purchase-returns*')],
-                        ['url' => '/admin/purchases/create', 'label' => 'New Purchase', 'active' => false],
                         ['url' => '/admin/purchase-returns', 'label' => 'Purchase Returns', 'active' => request()->is('admin/purchase-returns*')],
                     ],
                 ],
@@ -295,20 +270,11 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
                         ['url' => '/admin/customer-payments', 'label' => 'Customer Payments', 'active' => request()->is('admin/customer-payments*')],
                     ],
                 ],
-                'Suppliers' => [
-                    'icon' => 'truck',
-                    'active' => request()->is('admin/suppliers*') || request()->is('admin/supplier-payments*'),
-                    'links' => [
-                        ['url' => '/admin/suppliers', 'label' => 'All Suppliers', 'active' => request()->is('admin/suppliers*') && !request()->is('admin/supplier-payments*')],
-                        ['url' => '/admin/supplier-payments', 'label' => 'Supplier Payments', 'active' => request()->is('admin/supplier-payments*')],
-                    ],
-                ],
                 'Prescriptions' => [
                     'icon' => 'prescription',
                     'active' => request()->is('admin/prescriptions*'),
                     'links' => [
                         ['url' => '/admin/prescriptions', 'label' => 'All Prescriptions', 'active' => request()->is('admin/prescriptions')],
-                        ['url' => '/admin/prescriptions/create', 'label' => 'New Prescription', 'active' => false],
                         ['url' => '/admin/prescriptions?status=active', 'label' => 'Pending / Active', 'active' => false],
                         ['url' => '/admin/prescriptions?status=dispensed', 'label' => 'Dispensed', 'active' => false],
                     ],
@@ -321,6 +287,48 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
                         ['url' => '/admin/stock', 'label' => 'Stock Adjustments', 'active' => request()->is('admin/stock')],
                     ],
                 ],
+                'Accounting & Finance' => [
+                    'icon' => 'finance',
+                    'active' => request()->is('admin/accounts*') || request()->is('admin/financial-transactions*'),
+                    'links' => [
+                        ['url' => '/admin/accounts', 'label' => 'Cash / Bank Accounts', 'active' => request()->is('admin/accounts*')],
+                        ['url' => '/admin/financial-transactions', 'label' => 'Transactions', 'active' => request()->is('admin/financial-transactions*')],
+                    ],
+                ],
+                'Expenses' => [
+                    'icon' => 'expense',
+                    'active' => request()->is('admin/expenses*') || request()->is('admin/expense-categories*'),
+                    'links' => [
+                        ['url' => '/admin/expenses', 'label' => 'All Expenses', 'active' => request()->is('admin/expenses*') && !request()->is('admin/expense-categories*')],
+                        ['url' => '/admin/expense-categories', 'label' => 'Expense Categories', 'active' => request()->is('admin/expense-categories*')],
+                    ],
+                ],
+                'Reports' => [
+                    'icon' => 'chart',
+                    'active' => request()->is('admin/reports*'),
+                    'links' => [
+                        [
+                            'url' => \App\Filament\Pages\SalesReports::getUrl(),
+                            'label' => 'Sales Reports',
+                            'active' => request()->is('admin/reports/sales*'),
+                        ],
+                        [
+                            'url' => \App\Filament\Pages\PurchaseReports::getUrl(),
+                            'label' => 'Purchase Reports',
+                            'active' => request()->is('admin/reports/purchases*'),
+                        ],
+                        [
+                            'url' => \App\Filament\Pages\InventoryReports::getUrl(),
+                            'label' => 'Inventory Reports',
+                            'active' => request()->is('admin/reports/inventory*'),
+                        ],
+                        [
+                            'url' => \App\Filament\Pages\FinancialReports::getUrl(),
+                            'label' => 'Financial Reports',
+                            'active' => request()->is('admin/reports/financial*'),
+                        ],
+                    ],
+                ],
                 'Settings' => [
                     'icon' => 'cog',
                     'active' => request()->is('admin/settings*') || request()->is('admin/users*') || request()->is('admin/roles*') || request()->is('admin/audit-logs*') || request()->is('admin/backup*'),
@@ -329,7 +337,6 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
                         ['url' => '/admin/users', 'label' => 'Users', 'active' => request()->is('admin/users*')],
                         ['url' => '/admin/roles', 'label' => 'Roles & Permissions', 'active' => request()->is('admin/roles*')],
                         ['url' => '/admin/audit-logs', 'label' => 'Audit Logs', 'active' => request()->is('admin/audit-logs*')],
-                        ['url' => '/admin/backup', 'label' => 'Backup & Restore', 'active' => request()->is('admin/backup*')],
                     ],
                 ],
             ];
@@ -344,7 +351,7 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
         <p class="pms-nav-section-label">{{ strtoupper($item['section']) }}</p>
     @endif
 
-    @if (array_key_exists($item['label'], $groups))
+    @if (array_key_exists($item['label'], $groups) && isset($groups[$item['label']]['links']))
 
                 @php $group = $groups[$item['label']]; @endphp
 
@@ -378,8 +385,7 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
 
                     <div x-show="open" x-collapse class="pms-submenu">
                         @foreach ($group['links'] as $link)
-                                    <a href="{{ $link['url'] }}" wire:navigate class="pms-submenu-item {{ $link['active'] ? 'pms-submenu-item-active' : '' }}">
-                            <!-- <a href="{{ $link['url'] }}" class="pms-submenu-item {{ $link['active'] ? 'pms-submenu-item-active' : '' }}"> -->
+                            <a href="{{ $link['url'] }}" wire:navigate class="pms-submenu-item {{ $link['active'] ? 'pms-submenu-item-active' : '' }}">
                                 <span class="pms-submenu-dot"></span>
                                 <span>{{ $link['label'] }}</span>
                             </a>
@@ -387,80 +393,34 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
                     </div>
                 </div>
 
-            @else
+    @else
 
-                {{-- ===== NORMAL SIDEBAR ITEMS (Dashboard, Reports, Alerts, Expiry Tracker) ===== --}}
-                <!-- <a href="{{ $item['route'] }}" class="pms-nav-item {{ $item['active'] ? 'pms-nav-item-active' : '' }}"> -->
-                    <a href="{{ $item['route'] }}" wire:navigate data-nav-item data-nav-label="{{ $item['label'] }}" class="pms-nav-item {{ $item['active'] ? 'pms-nav-item-active' : '' }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pms-nav-icon">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="{{ $icons[$item['icon']] }}" />
-                    </svg>
+        {{-- ===== NORMAL SIDEBAR ITEMS (Dashboard, Stock, Suppliers, Alerts, Expiry Tracker, etc.) ===== --}}
+        <a href="{{ $item['route'] }}" wire:navigate data-nav-item data-nav-label="{{ $item['label'] }}" class="pms-nav-item {{ $item['active'] ? 'pms-nav-item-active' : '' }}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="pms-nav-icon">
+                <path stroke-linecap="round" stroke-linejoin="round" d="{{ $icons[$item['icon']] }}" />
+            </svg>
 
-                    <span class="pms-nav-label">
-                        {{ $item['label'] }}
-                    </span>
+            <span class="pms-nav-label">
+                {{ $item['label'] }}
+            </span>
 
-                    @if (isset($item['badge']))
-                        <span class="pms-nav-badge">
-                            {{ $item['badge'] }}
-                        </span>
-                    @else
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="pms-nav-chevron">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                        </svg>
-                    @endif
-
-                </a>
-
+            @if (isset($item['badge']) && $item['badge'])
+                <span class="pms-nav-badge">
+                    {{ $item['badge'] }}
+                </span>
             @endif
+        </a>
 
-        @endforeach
+    @endif
+
+@endforeach
+
     </nav>
 
 </div>
 
-{{-- ===== SIDEBAR BRAND FOOTER ===== --}}
-<div class="pms-sidebar-footer">
-    <div class="pms-footer-card">
 
-        <div class="pms-footer-logo">
-            @if ($pharmacySettings->logo)
-                <img
-                    src="{{ \Illuminate\Support\Facades\Storage::url($pharmacySettings->logo) }}"
-                    alt="{{ $pharmacySettings->pharmacy_name ?? 'Pharmacy' }}"
-                >
-            @else
-                <div class="pms-footer-logo-placeholder">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         viewBox="0 0 24 24"
-                         fill="none"
-                         stroke="currentColor"
-                         stroke-width="2">
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              d="M12 4v16M4 12h16"/>
-                    </svg>
-                </div>
-            @endif
-        </div>
-
-        <div class="pms-footer-info">
-            <div class="pms-footer-title">
-                {{ $pharmacySettings->pharmacy_name ?? 'MediCare Pharmacy' }}
-            </div>
-
-            <div class="pms-footer-subtitle">
-                Pharmacy System
-            </div>
-
-            <div class="pms-footer-tagline">
-                Healthcare Today,<br>
-                Better Tomorrow.
-            </div>
-        </div>
-
-    </div>
-</div>
 <style>
     /* =========================================================
    PROFESSIONAL STICKY FOOTER
@@ -473,16 +433,11 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
     overflow: hidden !important;
 }
 
-
-/* Navigation scrolls behind/above footer */
 .pms-sidebar-nav {
     height: 100% !important;
-
     overflow-y: auto !important;
     overflow-x: hidden !important;
-
     padding-bottom: 92px !important;
-
     scrollbar-width: none !important;
 }
 
@@ -490,27 +445,15 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
     display: none !important;
 }
 
-
-/* =========================================================
-   FOOTER — ALWAYS STAYS AT BOTTOM
-   ========================================================= */
-
 .pms-sidebar-footer {
     position: absolute !important;
-
     left: 0;
     right: 0;
     bottom: 0;
-
     width: 100%;
-
     z-index: 999;
-
     padding: 9px 10px 11px;
-
     box-sizing: border-box;
-
-    /* Glass bottom layer */
     background:
         linear-gradient(
             180deg,
@@ -518,140 +461,72 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
             rgba(239, 250, 251, 0.82) 45%,
             rgba(239, 250, 251, 0.96)
         );
-
-    border-top:
-        1px solid rgba(255, 255, 255, 0.72);
-
-    backdrop-filter:
-        blur(20px)
-        saturate(140%);
-
-    -webkit-backdrop-filter:
-        blur(20px)
-        saturate(140%);
-
-    box-shadow:
-        0 -10px 30px rgba(0, 105, 115, 0.055);
+    border-top: 1px solid rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    box-shadow: 0 -10px 30px rgba(0, 105, 115, 0.055);
 }
-
-
-/* =========================================================
-   FOOTER CARD
-   ========================================================= */
 
 .pms-footer-card {
     position: relative;
-
     width: 100%;
-
     height: 70px;
     min-height: 70px;
-
     display: flex;
     align-items: center;
-
     gap: 10px;
-
     padding: 9px 10px;
-
     box-sizing: border-box;
-
     overflow: hidden;
-
     border-radius: 14px;
-
-    border:
-        1px solid rgba(255, 255, 255, 0.92);
-
+    border: 1px solid rgba(255, 255, 255, 0.92);
     background:
         linear-gradient(
             135deg,
             rgba(255, 255, 255, 0.84),
             rgba(229, 248, 250, 0.62)
         );
-
-    backdrop-filter:
-        blur(24px)
-        saturate(150%);
-
-    -webkit-backdrop-filter:
-        blur(24px)
-        saturate(150%);
-
+    backdrop-filter: blur(24px) saturate(150%);
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
     box-shadow:
         0 10px 28px rgba(0, 100, 110, 0.08),
         0 2px 7px rgba(0, 100, 110, 0.035),
         inset 0 1px 0 rgba(255, 255, 255, 0.98);
-
-    transition:
-        transform 0.25s ease,
-        box-shadow 0.25s ease;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
-
-
-/* =========================================================
-   SUBTLE GLASS SHINE
-   ========================================================= */
 
 .pms-footer-card::before {
     content: "";
-
     position: absolute;
-
     top: 0;
     left: 12px;
     right: 12px;
-
     height: 1px;
-
-    background:
-        rgba(255, 255, 255, 1);
-
+    background: rgba(255, 255, 255, 1);
     pointer-events: none;
 }
 
-
-/* =========================================================
-   FOOTER HOVER
-   ========================================================= */
-
 .pms-footer-card:hover {
     transform: translateY(-2px);
-
     box-shadow:
         0 14px 32px rgba(0, 100, 110, 0.11),
         0 3px 8px rgba(0, 100, 110, 0.045),
         inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
-
-/* =========================================================
-   LOGO
-   ========================================================= */
-
 .pms-footer-logo {
     position: relative;
     z-index: 2;
-
     width: 42px;
     height: 42px;
-
     min-width: 42px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     overflow: hidden;
-
     border-radius: 11px;
-
-    background:
-        rgba(255, 255, 255, 0.78);
-
-    border:
-        1px solid rgba(255, 255, 255, 0.95);
-
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid rgba(255, 255, 255, 0.95);
     box-shadow:
         0 5px 14px rgba(0, 131, 143, 0.09),
         inset 0 1px 0 rgba(255, 255, 255, 1);
@@ -660,63 +535,40 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
 .pms-footer-logo img {
     width: 100%;
     height: 100%;
-
     object-fit: cover;
 }
-
-
-/* =========================================================
-   FOOTER INFO
-   ========================================================= */
 
 .pms-footer-info {
     position: relative;
     z-index: 2;
-
     flex: 1;
-
     min-width: 0;
-
     overflow: hidden;
 }
 
 .pms-footer-title {
     color: #006b73;
-
     font-size: 0.72rem;
     font-weight: 700;
-
     white-space: nowrap;
-
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .pms-footer-subtitle {
     margin-top: 3px;
-
     color: #78909c;
-
     font-size: 0.56rem;
     font-weight: 500;
-
     white-space: nowrap;
 }
 
 .pms-footer-tagline {
     margin-top: 4px;
-
     color: #90a4ae;
-
     font-size: 0.49rem;
-
     white-space: nowrap;
 }
-
-
-/* =========================================================
-   COLLAPSED SIDEBAR
-   ========================================================= */
 
 html[data-pms-sidebar="collapsed"] .pms-sidebar-footer {
     padding: 7px 6px 9px;
@@ -728,28 +580,19 @@ html[data-pms-sidebar="collapsed"] .pms-sidebar-nav {
 
 html[data-pms-sidebar="collapsed"] .pms-footer-card {
     width: 52px;
-
     height: 52px;
     min-height: 52px;
-
     padding: 5px;
-
     justify-content: center;
-
     border-radius: 13px;
 }
 
 html[data-pms-sidebar="collapsed"] .pms-footer-logo {
     width: 40px;
     height: 40px;
-
     min-width: 40px;
 }
     </style>
- 
-
-
-
 
  <style>
 /* =========================================================
@@ -848,7 +691,6 @@ html[data-pms-sidebar="collapsed"] .pms-footer-logo {
         display: none;
     }
 }
-
 
 .pms-nav-section-label {
     margin: 14px 16px 6px;

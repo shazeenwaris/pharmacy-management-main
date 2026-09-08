@@ -199,9 +199,9 @@
             background:
                 linear-gradient(
                     135deg,
-                    #08766e,
-                    #087e73 55%,
-                    #096b67
+                    #00707A,
+                    #00707A 55%,
+                    #00707A
                 );
 
             box-shadow:
@@ -530,7 +530,7 @@
     border: none;
     cursor: pointer;
 
-    color: #08766e;
+    color: #00707A;
     background: white;
 
     font-size: 12px;

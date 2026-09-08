@@ -42,7 +42,7 @@
                 <a
                     href="{{ \App\Filament\Resources\Roles\Pages\CreateRole::getUrl() }}"
                     class="inline-flex shrink-0 items-center gap-2 rounded-lg bg-white px-5 py-2.5 text-sm font-semibold shadow-sm transition hover:bg-gray-50"
-                    style="color:#087f73;"
+                    style="color:#00707A;"
                 >
                     <x-heroicon-m-plus class="h-4 w-4" />
                     New Role

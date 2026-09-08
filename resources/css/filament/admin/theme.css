@@ -1,4 +1,4 @@
- @import '../../../../vendor/filament/filament/resources/css/theme.css';
+ @import '../../../../vendor/filament/filament/resources/css/theme.css'; 
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*'; 
@@ -18,12 +18,13 @@
     --color-pms-accent: #26A69A;
 
     /* 2. Background Colors */
+
     --color-pms-bg-page: #F8FAFA;
     --color-pms-bg-surface: #FFFFFF;
-    --color-pms-bg-sidebar: #F0FAFA;
-    --color-pms-bg-sidebar-active: #D4F3F4;
-    --color-pms-bg-sidebar-hover: #E0F2F1;
 
+    --color-pms-bg-sidebar: #DDEFEF;
+    --color-pms-bg-sidebar-active: #BFE3E5;
+    --color-pms-bg-sidebar-hover: #D2EBEC;
     /* 3. Text Colors */
     --color-pms-text-primary: #123047;
     --color-pms-text-secondary: #405A68;
@@ -380,7 +381,11 @@
    -------------------------------------------------------------------------- */
 
 .pms-sidebar {
-    @apply flex flex-col h-full bg-pms-bg-sidebar border-r border-pms-border;
+    @apply flex flex-col bg-pms-bg-sidebar border-r border-pms-border;
+
+    width: 100%;
+    height: 100%;
+    min-height: 0;
 }
 
 /* Brand / Logo */
@@ -402,13 +407,16 @@
 
 /* Navigation */
 .pms-sidebar-nav {
-    @apply flex-1 overflow-y-auto px-3 space-y-1;
+    @apply flex-1 px-3 space-y-1;
+
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .pms-nav-item {
-    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-pms-text-secondary transition-colors;
+    @apply flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-sm text-pms-text-secondary transition-colors;
 }
-
 .pms-nav-item:hover {
     @apply bg-pms-bg-sidebar-hover text-pms-primary-dark;
 }
@@ -532,6 +540,8 @@
     background: #00838F;
     box-shadow: 0 0 6px rgba(0, 131, 143, 0.35);
 }
+
+
 
 /* =========================================================
    MEDICARE SUPPLIERS PAGE
@@ -3612,17 +3622,22 @@
         display: none;
     }
 
+
 }
+
+
 
 
 
 .pms-hide-header-action {
     display: none !important;
+
 }
 
 
 
 /* =========================================================
+<<<<<<< HEAD
    FORCE-FIX TOPBAR LAYOUT (must stay at very end of file)
    ========================================================= */
 
@@ -3685,4 +3700,62 @@
 }
 html, body {
     background-color: #eefafb !important;
+}
+
+
+/* =========================================================
+   FIX: Dropdown parent buttons — reset browser button
+   defaults so icon/label gap matches Dashboard <a> link
+========================================================= */
+
+button.pms-nav-item {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    font: inherit !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    line-height: inherit !important;
+    margin: 0 !important;
+    text-align: left !important;
+
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+}
+
+button.pms-nav-item .pms-nav-label {
+    flex: 1 1 auto !important;
+    text-align: left !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+}
+button.pms-nav-item .pms-nav-icon {
+    flex-shrink: 0 !important;
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+}
+
+
+
+button.pms-nav-item .pms-nav-chevron {
+    flex-shrink: 0 !important;
+}
+
+
+
+
+/* =========================================================
+   FIX: Center "Actions" header + limit column width so gap
+   between columns matches the rest of the table
+========================================================= */
+
+th.fi-align-end {
+    text-align: center !important;
+    width: 1% !important;
+    white-space: nowrap !important;
+}
+
+td.fi-ta-cell:last-child {
+    width: 1% !important;
+    white-space: nowrap !important;
 }

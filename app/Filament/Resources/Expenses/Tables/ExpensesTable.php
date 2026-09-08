@@ -28,9 +28,9 @@ class ExpensesTable
                     ->sortable(),
 
                 TextColumn::make('amount')
-                    ->label('Amount')
-                    ->money('PKR')
-                    ->sortable(),
+    ->label('Amount')
+    ->formatStateUsing(fn ($state) => format_currency($state))
+    ->sortable(),
 
                 TextColumn::make('payment_method')
                     ->label('Payment')

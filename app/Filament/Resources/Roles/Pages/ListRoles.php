@@ -18,7 +18,7 @@ class ListRoles extends ListRecords
                 ->label('New Role')
                 ->icon('heroicon-m-plus')
                 ->extraAttributes([
-                    'class' => 'pms-hide-header-action',
+                    'style' => 'display:none !important;',
                 ]),
         ];
     }
