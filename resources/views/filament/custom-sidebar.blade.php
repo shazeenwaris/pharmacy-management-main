@@ -121,6 +121,7 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
 <div class="pms-sidebar">
     @php
         $pharmacySettings = \App\Models\PharmacySetting::current();
+        $currentUser = auth()->user();
     @endphp
 
     <div class="pms-sidebar-brand" style="display: flex; align-items: center; justify-content: space-between; padding: 1rem;">
@@ -200,19 +201,19 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
             $unreadNotifications = \App\Models\AppNotification::unread()->count();
 
             $items = [
-                ['label' => 'Dashboard',      'icon' => 'home',      'route' => '/admin',                'active' => request()->is('admin'), 'section' => 'Main Menu'],
-                ['label' => 'Medicines',      'icon' => 'beaker',    'route' => '/admin/medicines',       'active' => request()->is('admin/medicines*'), 'section' => 'Inventory'],
-                ['label' => 'Purchases',      'icon' => 'cart',      'route' => '/admin/purchases',       'active' => request()->is('admin/purchases*'), 'section' => 'Inventory'],
-                ['label' => 'Stock',          'icon' => 'box',       'route' => '/admin/stock',           'active' => request()->is('admin/stock*'), 'section' => 'Inventory'],
-                ['label' => 'Sales / POS',    'icon' => 'card',      'route' => '/admin/sales',           'active' => request()->is('admin/sales*'), 'section' => 'Sales'],
-                ['label' => 'Customers',      'icon' => 'users',     'route' => '/admin/customers',       'active' => request()->is('admin/customers*'), 'section' => 'People'],
-                ['label' => 'Suppliers',      'icon' => 'truck',     'route' => '/admin/suppliers',       'active' => request()->is('admin/suppliers*'), 'section' => 'People'],
-                ['label' => 'Accounting & Finance', 'icon' => 'finance', 'route' => '/admin/accounts', 'active' => request()->is('admin/accounts*') || request()->is('admin/financial-transactions*'), 'section' => 'Finance'],
-                ['label' => 'Expenses',       'icon' => 'expense',   'route' => '/admin/expenses',        'active' => request()->is('admin/expenses*') || request()->is('admin/expense-categories*'), 'section' => 'Finance'],
-                ['label' => 'Reports',        'icon' => 'chart',     'route' => '/admin/reports',         'active' => request()->is('admin/reports*'), 'section' => 'Insights'],
-                ['label' => 'Alerts',         'icon' => 'bell',      'route' => '/admin/app-notifications', 'active' => request()->is('admin/app-notifications*'), 'badge' => $unreadNotifications > 0 ? $unreadNotifications : null, 'section' => 'Insights'],
-                ['label' => 'Expiry Tracker', 'icon' => 'clock',     'route' => '/admin/expiry-tracker',  'active' => request()->is('admin/expiry-tracker*'), 'section' => 'Insights'],
-                ['label' => 'Settings',       'icon' => 'cog',       'route' => '/admin/settings',        'active' => request()->is('admin/settings*'), 'section' => 'System'],
+                ['label' => 'Dashboard',      'icon' => 'home',      'route' => '/admin',                'active' => request()->is('admin'), 'section' => 'Main Menu', 'permission' => null],
+                ['label' => 'Medicines',      'icon' => 'beaker',    'route' => '/admin/medicines',       'active' => request()->is('admin/medicines*'), 'section' => 'Inventory', 'permission' => 'manage medicines'],
+                ['label' => 'Purchases',      'icon' => 'cart',      'route' => '/admin/purchases',       'active' => request()->is('admin/purchases*'), 'section' => 'Inventory', 'permission' => 'manage purchases'],
+                ['label' => 'Stock',          'icon' => 'box',       'route' => '/admin/stock',           'active' => request()->is('admin/stock*'), 'section' => 'Inventory', 'permission' => 'manage stock adjustments'],
+                ['label' => 'Sales / POS',    'icon' => 'card',      'route' => '/admin/sales',           'active' => request()->is('admin/sales*'), 'section' => 'Sales', 'permission' => 'create sales'],
+                ['label' => 'Customers',      'icon' => 'users',     'route' => '/admin/customers',       'active' => request()->is('admin/customers*'), 'section' => 'People', 'permission' => 'manage customers'],
+                ['label' => 'Suppliers',      'icon' => 'truck',     'route' => '/admin/suppliers',       'active' => request()->is('admin/suppliers*'), 'section' => 'People', 'permission' => 'manage suppliers'],
+                ['label' => 'Accounting & Finance', 'icon' => 'finance', 'route' => '/admin/accounts', 'active' => request()->is('admin/accounts*') || request()->is('admin/financial-transactions*'), 'section' => 'Finance', 'permission' => 'process payments'],
+                ['label' => 'Expenses',       'icon' => 'expense',   'route' => '/admin/expenses',        'active' => request()->is('admin/expenses*') || request()->is('admin/expense-categories*'), 'section' => 'Finance', 'permission' => 'process payments'],
+                ['label' => 'Reports',        'icon' => 'chart',     'route' => '/admin/reports',         'active' => request()->is('admin/reports*'), 'section' => 'Insights', 'permission' => 'view reports'],
+                ['label' => 'Alerts',         'icon' => 'bell',      'route' => '/admin/app-notifications', 'active' => request()->is('admin/app-notifications*'), 'badge' => $unreadNotifications > 0 ? $unreadNotifications : null, 'section' => 'Insights', 'permission' => null],
+                ['label' => 'Expiry Tracker', 'icon' => 'clock',     'route' => '/admin/expiry-tracker',  'active' => request()->is('admin/expiry-tracker*'), 'section' => 'Insights', 'permission' => 'track expiry'],
+                ['label' => 'Settings',       'icon' => 'cog',       'route' => '/admin/settings',        'active' => request()->is('admin/settings*'), 'section' => 'System', 'permission' => 'manage settings'],
             ];
 
             $icons = [
@@ -237,70 +238,70 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
                     'icon' => 'beaker',
                     'active' => request()->is('admin/medicines*') || request()->is('admin/categories*') || request()->is('admin/manufacturers*') || request()->is('admin/units*') || request()->is('admin/dosage-forms*') || request()->is('admin/medicine-batches*'),
                     'links' => [
-                        ['url' => '/admin/medicines', 'label' => 'All Medicines', 'active' => request()->is('admin/medicines*')],
-                        ['url' => '/admin/categories', 'label' => 'Categories', 'active' => request()->is('admin/categories*')],
-                        ['url' => '/admin/manufacturers', 'label' => 'Manufacturers', 'active' => request()->is('admin/manufacturers*')],
-                        ['url' => '/admin/units', 'label' => 'Units', 'active' => request()->is('admin/units*')],
-                        ['url' => '/admin/dosage-forms', 'label' => 'Dosage Forms', 'active' => request()->is('admin/dosage-forms*')],
-                        ['url' => '/admin/medicine-batches', 'label' => 'Batches & Expiry', 'active' => request()->is('admin/medicine-batches*')],
+                        ['url' => '/admin/medicines', 'label' => 'All Medicines', 'active' => request()->is('admin/medicines*'), 'permission' => 'manage medicines'],
+                        ['url' => '/admin/categories', 'label' => 'Categories', 'active' => request()->is('admin/categories*'), 'permission' => 'manage categories'],
+                        ['url' => '/admin/manufacturers', 'label' => 'Manufacturers', 'active' => request()->is('admin/manufacturers*'), 'permission' => 'manage manufacturers'],
+                        ['url' => '/admin/units', 'label' => 'Units', 'active' => request()->is('admin/units*'), 'permission' => 'manage medicines'],
+                        ['url' => '/admin/dosage-forms', 'label' => 'Dosage Forms', 'active' => request()->is('admin/dosage-forms*'), 'permission' => 'manage medicines'],
+                        ['url' => '/admin/medicine-batches', 'label' => 'Batches & Expiry', 'active' => request()->is('admin/medicine-batches*'), 'permission' => 'track batches'],
                     ],
                 ],
                 'Purchases' => [
                     'icon' => 'cart',
                     'active' => request()->is('admin/purchases*') || request()->is('admin/purchase-returns*'),
                     'links' => [
-                        ['url' => '/admin/purchases', 'label' => 'All Purchases', 'active' => request()->is('admin/purchases*') && !request()->is('admin/purchase-returns*')],
-                        ['url' => '/admin/purchase-returns', 'label' => 'Purchase Returns', 'active' => request()->is('admin/purchase-returns*')],
+                        ['url' => '/admin/purchases', 'label' => 'All Purchases', 'active' => request()->is('admin/purchases*') && !request()->is('admin/purchase-returns*'), 'permission' => 'manage purchases'],
+                        ['url' => '/admin/purchase-returns', 'label' => 'Purchase Returns', 'active' => request()->is('admin/purchase-returns*'), 'permission' => 'handle returns'],
                     ],
                 ],
                 'Sales / POS' => [
                     'icon' => 'card',
                     'active' => request()->is('admin/sales') || request()->is('admin/sales-history*') || request()->is('admin/sale-returns*'),
                     'links' => [
-                        ['url' => '/admin/sales', 'label' => 'New Sale', 'active' => request()->is('admin/sales')],
-                        ['url' => '/admin/sales-history', 'label' => 'Sales History', 'active' => request()->is('admin/sales-history*')],
-                        ['url' => '/admin/sale-returns', 'label' => 'Sales Returns', 'active' => request()->is('admin/sale-returns*')],
+                        ['url' => '/admin/sales', 'label' => 'New Sale', 'active' => request()->is('admin/sales'), 'permission' => 'create sales'],
+                        ['url' => '/admin/sales-history', 'label' => 'Sales History', 'active' => request()->is('admin/sales-history*'), 'permission' => 'view daily sales'],
+                        ['url' => '/admin/sale-returns', 'label' => 'Sales Returns', 'active' => request()->is('admin/sale-returns*'), 'permission' => 'handle returns'],
                     ],
                 ],
                 'Customers' => [
                     'icon' => 'users',
                     'active' => request()->is('admin/customers*') || request()->is('admin/customer-payments*'),
                     'links' => [
-                        ['url' => '/admin/customers', 'label' => 'All Customers', 'active' => request()->is('admin/customers*') && !request()->is('admin/customer-payments*')],
-                        ['url' => '/admin/customer-payments', 'label' => 'Customer Payments', 'active' => request()->is('admin/customer-payments*')],
+                        ['url' => '/admin/customers', 'label' => 'All Customers', 'active' => request()->is('admin/customers*') && !request()->is('admin/customer-payments*'), 'permission' => 'manage customers'],
+                        ['url' => '/admin/customer-payments', 'label' => 'Customer Payments', 'active' => request()->is('admin/customer-payments*'), 'permission' => 'process payments'],
                     ],
                 ],
                 'Prescriptions' => [
                     'icon' => 'prescription',
                     'active' => request()->is('admin/prescriptions*'),
                     'links' => [
-                        ['url' => '/admin/prescriptions', 'label' => 'All Prescriptions', 'active' => request()->is('admin/prescriptions')],
-                        ['url' => '/admin/prescriptions?status=active', 'label' => 'Pending / Active', 'active' => false],
-                        ['url' => '/admin/prescriptions?status=dispensed', 'label' => 'Dispensed', 'active' => false],
+                        ['url' => '/admin/prescriptions', 'label' => 'All Prescriptions', 'active' => request()->is('admin/prescriptions'), 'permission' => 'manage prescriptions'],
+                        ['url' => '/admin/prescriptions?status=active', 'label' => 'Pending / Active', 'active' => false, 'permission' => 'manage prescriptions'],
+                        ['url' => '/admin/prescriptions?status=dispensed', 'label' => 'Dispensed', 'active' => false, 'permission' => 'manage prescriptions'],
                     ],
                 ],
                 'Stock' => [
                     'icon' => 'box',
                     'active' => request()->is('admin/stock*') || request()->is('admin/inventory-overview*'),
                     'links' => [
-                        ['url' => '/admin/inventory-overview', 'label' => 'Inventory Overview', 'active' => request()->is('admin/inventory-overview*')],
-                        ['url' => '/admin/stock', 'label' => 'Stock Adjustments', 'active' => request()->is('admin/stock')],
+                        ['url' => '/admin/inventory-overview', 'label' => 'Inventory Overview', 'active' => request()->is('admin/inventory-overview*'), 'permission' => 'view stock'],
+                        ['url' => '/admin/stock', 'label' => 'Stock Adjustments', 'active' => request()->is('admin/stock'), 'permission' => 'manage stock adjustments'],
                     ],
                 ],
                 'Accounting & Finance' => [
                     'icon' => 'finance',
                     'active' => request()->is('admin/accounts*') || request()->is('admin/financial-transactions*'),
                     'links' => [
-                        ['url' => '/admin/accounts', 'label' => 'Cash / Bank Accounts', 'active' => request()->is('admin/accounts*')],
-                        ['url' => '/admin/financial-transactions', 'label' => 'Transactions', 'active' => request()->is('admin/financial-transactions*')],
+                        ['url' => '/admin/accounts', 'label' => 'Cash / Bank Accounts', 'active' => request()->is('admin/accounts*'), 'permission' => 'process payments'],
+                        ['url' => '/admin/financial-transactions', 'label' => 'Transactions', 'active' => request()->is('admin/financial-transactions*'), 'permission' => 'process payments'],
                     ],
                 ],
                 'Expenses' => [
                     'icon' => 'expense',
                     'active' => request()->is('admin/expenses*') || request()->is('admin/expense-categories*'),
                     'links' => [
-                        ['url' => '/admin/expenses', 'label' => 'All Expenses', 'active' => request()->is('admin/expenses*') && !request()->is('admin/expense-categories*')],
-                        ['url' => '/admin/expense-categories', 'label' => 'Expense Categories', 'active' => request()->is('admin/expense-categories*')],
+                        ['url' => '/admin/expenses', 'label' => 'All Expenses', 'active' => request()->is('admin/expenses*') && !request()->is('admin/expense-categories*'), 'permission' => 'process payments'],
+                        ['url' => '/admin/expense-categories', 'label' => 'Expense Categories', 'active' => request()->is('admin/expense-categories*'), 'permission' => 'process payments'],
                     ],
                 ],
                 'Reports' => [
@@ -311,21 +312,25 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
                             'url' => \App\Filament\Pages\SalesReports::getUrl(),
                             'label' => 'Sales Reports',
                             'active' => request()->is('admin/reports/sales*'),
+                            'permission' => 'view reports',
                         ],
                         [
                             'url' => \App\Filament\Pages\PurchaseReports::getUrl(),
                             'label' => 'Purchase Reports',
                             'active' => request()->is('admin/reports/purchases*'),
+                            'permission' => 'view reports',
                         ],
                         [
                             'url' => \App\Filament\Pages\InventoryReports::getUrl(),
                             'label' => 'Inventory Reports',
                             'active' => request()->is('admin/reports/inventory*'),
+                            'permission' => 'view reports',
                         ],
                         [
                             'url' => \App\Filament\Pages\FinancialReports::getUrl(),
                             'label' => 'Financial Reports',
                             'active' => request()->is('admin/reports/financial*'),
+                            'permission' => 'view reports',
                         ],
                     ],
                 ],
@@ -333,10 +338,10 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
                     'icon' => 'cog',
                     'active' => request()->is('admin/settings*') || request()->is('admin/users*') || request()->is('admin/roles*') || request()->is('admin/audit-logs*') || request()->is('admin/backup*'),
                     'links' => [
-                        ['url' => '/admin/settings', 'label' => 'General Settings', 'active' => request()->is('admin/settings*')],
-                        ['url' => '/admin/users', 'label' => 'Users', 'active' => request()->is('admin/users*')],
-                        ['url' => '/admin/roles', 'label' => 'Roles & Permissions', 'active' => request()->is('admin/roles*')],
-                        ['url' => '/admin/audit-logs', 'label' => 'Audit Logs', 'active' => request()->is('admin/audit-logs*')],
+                        ['url' => '/admin/settings', 'label' => 'General Settings', 'active' => request()->is('admin/settings*'), 'permission' => 'manage settings'],
+                        ['url' => '/admin/users', 'label' => 'Users', 'active' => request()->is('admin/users*'), 'permission' => 'manage users'],
+                        ['url' => '/admin/roles', 'label' => 'Roles & Permissions', 'active' => request()->is('admin/roles*'), 'permission' => 'manage roles'],
+                        ['url' => '/admin/audit-logs', 'label' => 'Audit Logs', 'active' => request()->is('admin/audit-logs*'), 'permission' => 'view activity logs'],
                     ],
                 ],
             ];
@@ -346,6 +351,8 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
 
 @foreach ($items as $item)
 
+    @continue(!is_null($item['permission']) && !$currentUser->can($item['permission']))
+
     @if ($item['section'] !== $lastSection)
         @php $lastSection = $item['section']; @endphp
         <p class="pms-nav-section-label">{{ strtoupper($item['section']) }}</p>
@@ -353,7 +360,14 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
 
     @if (array_key_exists($item['label'], $groups) && isset($groups[$item['label']]['links']))
 
-                @php $group = $groups[$item['label']]; @endphp
+                @php
+                    $group = $groups[$item['label']];
+                    $visibleLinks = collect($group['links'])
+                        ->filter(fn ($link) => !isset($link['permission']) || is_null($link['permission']) || $currentUser->can($link['permission']))
+                        ->values();
+                @endphp
+
+                @continue($visibleLinks->isEmpty())
 
                 <div x-data="{ open: {{ $group['active'] ? 'true' : 'false' }} }" data-nav-group>
 
@@ -384,7 +398,7 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
                     </button>
 
                     <div x-show="open" x-collapse class="pms-submenu">
-                        @foreach ($group['links'] as $link)
+                        @foreach ($visibleLinks as $link)
                             <a href="{{ $link['url'] }}" wire:navigate class="pms-submenu-item {{ $link['active'] ? 'pms-submenu-item-active' : '' }}">
                                 <span class="pms-submenu-dot"></span>
                                 <span>{{ $link['label'] }}</span>

@@ -80,14 +80,14 @@ class MedicinesTable
                     })
                     ->sortable(),
 
-                IconColumn::make('prescription_required')
-                    ->label('Rx')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-exclamation-triangle')
-                    ->falseIcon('heroicon-o-check-circle')
-                    ->trueColor('danger')
-                    ->falseColor('success')
-                    ->tooltip(fn ($state) => $state ? 'Prescription Required' : 'No Prescription Needed'),
+                // IconColumn::make('prescription_required')
+                //     ->label('Rx')
+                //     ->boolean()
+                //     ->trueIcon('heroicon-o-exclamation-triangle')
+                //     ->falseIcon('heroicon-o-check-circle')
+                //     ->trueColor('danger')
+                //     ->falseColor('success')
+                //     ->tooltip(fn ($state) => $state ? 'Prescription Required' : 'No Prescription Needed'),
 
                 IconColumn::make('status')
                     ->label('Active')

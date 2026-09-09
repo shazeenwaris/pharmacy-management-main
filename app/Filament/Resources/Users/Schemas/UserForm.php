@@ -2,12 +2,12 @@
 
 namespace App\Filament\Resources\Users\Schemas;
 
+use App\Models\Role;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Role;
 
 class UserForm
 {
@@ -30,15 +30,13 @@ class UserForm
                     ->tel()
                     ->default(null),
 
-                Select::make('role')
+                Select::make('roles')
                     ->label('Role')
-                    ->options(
-                        Role::query()
-                            ->pluck('name', 'name')
-                            ->toArray()
-                    )
+                    ->relationship('roles', 'name')
+                    ->options(fn () => \Spatie\Permission\Models\Role::query()->pluck('name', 'id'))
                     ->required()
-                    ->native(false),
+                    ->native(false)
+                    ->preload(),
 
                 Toggle::make('is_active')
                     ->label('Active')
@@ -52,12 +50,9 @@ class UserForm
                     ->minLength(8)
                     ->dehydrated(fn ($state) => filled($state))
                     ->dehydrateStateUsing(fn ($state) => Hash::make($state))
-                    ->helperText(
-                        fn (string $operation) =>
-                            $operation === 'edit'
-                                ? 'Leave blank to keep the current password.'
-                                : null
-                    ),
+                    ->helperText(fn (string $operation) => $operation === 'edit'
+                        ? 'Leave blank to keep the current password.'
+                        : null),
             ]);
     }
 }

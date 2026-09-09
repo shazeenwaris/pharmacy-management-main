@@ -2,27 +2,23 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Storage;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
-use Filament\Panel;
-class User extends Authenticatable
+
+class User extends Authenticatable implements FilamentUser
 {
-    /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable, HasRoles, LogsActivity;
+    use HasFactory, Notifiable, HasRoles;
 
     protected $fillable = [
         'name',
         'email',
         'phone',
         'is_active',
-        'avatar',
         'password',
     ];
 
@@ -40,28 +36,8 @@ class User extends Authenticatable
         ];
     }
 
-    public function getActivitylogOptions(): LogOptions
-    {
-        return LogOptions::defaults()
-            ->logOnly(['name', 'email', 'is_active'])
-            ->logOnlyDirty()
-            ->useLogName('User');
-    }
-
-    public function getFilamentAvatarUrl(): ?string
-    {
-        return $this->avatar ? Storage::url($this->avatar) : null;
-    }
     public function canAccessPanel(Panel $panel): bool
-{
-    if (! $this->is_active) {
-        return false;
+    {
+        return true;
     }
-
-    return match ($panel->getId()) {
-        'admin' => $this->hasRole('Admin'),
-        'cashier' => $this->hasRole('Cashier'),
-        default => false,
-    };
-}
 }

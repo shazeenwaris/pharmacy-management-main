@@ -1,352 +1,149 @@
-<div class="pos-wrapper" x-data="{}" x-on:focus-search.window="$refs.searchInput.focus()">
-    <div class="pos-grid">
+<div x-data="{}" x-on:focus-search.window="$refs.searchInput.focus()">
 
-        {{-- LEFT: Search + Cart --}}
-        <div>
-            <div class="pos-search-wrap">
-                <input
-                    type="text"
-                    x-ref="searchInput"
-                    wire:model.live.debounce.300ms="search"
-                    wire:keydown.enter="scanBarcode"
-                    placeholder="Scan barcode, or search by name, generic name or SKU..."
-                    autofocus
-                    class="pos-search-input"
-                >
-                <span class="pos-search-hint">⌨ scan or press Enter</span>
-            </div>
+    {{-- Find Medicine (full width) --}}
+    <div class="mp-card" style="padding: 1.5rem; border-radius: 0.75rem; border: 1px solid #E2EEEE; background: white; margin-bottom: 1.5rem;">
+        <h3 style="margin: 0 0 1rem 0; font-size: 1.05rem; font-weight: 600; color: #123047;">Find Medicine</h3>
 
-            @if ($search && count($results))
-                <div class="pos-results">
-                    @foreach ($results as $medicine)
-                        <div
-                            wire:key="search-result-{{ $medicine->id }}"
-                            wire:click="addToCart({{ $medicine->id }})"
-                            class="pos-result-item"
-                        >
-                            <strong>{{ $medicine->name }}</strong>
-                            <span class="pos-muted">({{ $medicine->generic_name }})</span>
-                            — {{ currency_symbol() }} {{ number_format($medicine->sale_price, 2) }}
-                            @if ($medicine->barcode)
-                                <span class="pos-muted"> · {{ $medicine->barcode }}</span>
-                            @endif
-                        </div>
-                    @endforeach
-                </div>
-            @endif
-
-            <div class="pos-table-wrap">
-                <table class="pos-table">
-                    <thead>
-                        <tr>
-                            <th>Medicine</th>
-                            <th>Batch</th>
-                            <th>Expiry</th>
-                            <th>Qty</th>
-                            <th>Price</th>
-                            <th>Total</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($cart as $batchId => $item)
-                            <tr>
-                                <td class="pos-strong">{{ $item['medicine_name'] }}</td>
-                                <td>{{ $item['batch_number'] }}</td>
-                                <td>{{ $item['expiry_date'] }}</td>
-                                <td>
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        max="{{ $item['available_qty'] }}"
-                                        value="{{ $item['quantity'] }}"
-                                        wire:change="updateQuantity({{ $batchId }}, $event.target.value)"
-                                        class="pos-qty-input"
-                                    >
-                                </td>
-                                <td>{{ currency_symbol() }} {{ number_format($item['unit_price'], 2) }}</td>
-                                <td class="pos-strong">{{ currency_symbol() }} {{ number_format($item['unit_price'] * $item['quantity'], 2) }}</td>
-                                <td>
-                                    <button wire:click="removeFromCart({{ $batchId }})" class="pos-remove-btn">✕</button>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="7" class="pos-empty">Cart is empty</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+        <div style="position: relative;">
+            <input
+                type="text"
+                x-ref="searchInput"
+                wire:model.live.debounce.300ms="search"
+                wire:keydown.enter="scanBarcode"
+                placeholder="Scan barcode, or search by name, generic name or SKU..."
+                style="width: 100%; padding: 0.7rem 5.5rem 0.7rem 1rem; border-radius: 0.5rem; border: 1px solid #D7E4E4; background: #F9FBFB; color: #123047; font-size: 0.95rem;"
+                autofocus
+            >
+            <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #A9B7BC; font-size: 0.75rem; white-space: nowrap;">
+                ⌨ scan or press Enter
+            </span>
         </div>
 
-        {{-- RIGHT: Payment Panel --}}
-        <div class="pos-payment-panel">
-            <h3 class="pos-payment-title">Payment</h3>
-
-            <label class="pos-label">Customer</label>
-            <select wire:model="customerId" class="pos-select">
-                <option value="">Walk-in Customer</option>
-                @foreach ($this->customers as $customer)
-                    <option value="{{ $customer->id }}">
-                        {{ $customer->name }}{{ $customer->phone ? ' — ' . $customer->phone : '' }}
-                    </option>
+        @if ($search && count($results))
+            <div style="margin-top: 0.5rem; border: 1px solid #E2EEEE; border-radius: 0.5rem; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                @foreach ($results as $medicine)
+                    <div
+                        wire:key="search-result-{{ $medicine->id }}"
+                        wire:click="addToCart({{ $medicine->id }})"
+                        style="padding: 0.75rem 1rem; cursor: pointer; border-bottom: 1px solid #EEF2F3; display: flex; justify-content: space-between; align-items: center;"
+                        class="hover:bg-gray-50"
+                    >
+                        <span>
+                            <strong style="color: #123047;">{{ $medicine->name }}</strong>
+                            <span style="color: #718792; font-size: 0.85rem;">({{ $medicine->generic_name }})</span>
+                            @if ($medicine->barcode)
+                                <span style="color: #A9B7BC; font-size: 0.75rem;">&middot; {{ $medicine->barcode }}</span>
+                            @endif
+                        </span>
+                        <span style="font-weight: 600; color: #0F7B6C;">{{ currency_symbol() }} {{ number_format($medicine->sale_price, 2) }}</span>
+                    </div>
                 @endforeach
-            </select>
-
-            <div class="pos-row">
-                <span class="pos-muted">Subtotal</span>
-                <span class="pos-strong">{{ currency_symbol() }} {{ number_format($this->subtotal, 2) }}</span>
             </div>
+        @endif
 
-            <label class="pos-label">Discount</label>
-            <input type="number" wire:model.live="discount" class="pos-input">
-
-            <label class="pos-label">Tax</label>
-            <input type="number" wire:model.live="tax" class="pos-input">
-
-            <div class="pos-total-box">
-                <span>Grand Total</span>
-                <span class="pos-total-amount">{{ currency_symbol() }} {{ number_format($this->grandTotal, 2) }}</span>
-            </div>
-
-            <label class="pos-label">Payment Method</label>
-            <select wire:model="paymentMethod" class="pos-select">
-                <option value="cash">Cash</option>
-                <option value="card">Card</option>
-                <option value="bank">Bank Transfer</option>
-                <option value="other">Other</option>
-            </select>
-
-            <label class="pos-label">Paid Amount</label>
-            <input type="number" wire:model.live="paidAmount" class="pos-input">
-
-            <div class="pos-row" style="margin-bottom: 16px;">
-                <span class="pos-muted">Change</span>
-                <span class="pos-strong">{{ currency_symbol() }} {{ number_format($this->change, 2) }}</span>
-            </div>
-
-            <button wire:click="completeSale" class="pos-complete-btn">
-                Complete Sale
-            </button>
+        <div style="margin-top: 1.5rem; border: 1px solid #E2EEEE; border-radius: 0.5rem; overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="text-align: left; background: #F9FBFB; border-bottom: 1px solid #E2EEEE;">
+                        <th style="padding: 0.65rem 0.75rem; font-size: 0.8rem; color: #718792; text-transform: uppercase; letter-spacing: 0.03em;">Medicine</th>
+                        <th style="padding: 0.65rem 0.75rem; font-size: 0.8rem; color: #718792; text-transform: uppercase; letter-spacing: 0.03em;">Batch</th>
+                        <th style="padding: 0.65rem 0.75rem; font-size: 0.8rem; color: #718792; text-transform: uppercase; letter-spacing: 0.03em;">Expiry</th>
+                        <th style="padding: 0.65rem 0.75rem; font-size: 0.8rem; color: #718792; text-transform: uppercase; letter-spacing: 0.03em;">Qty</th>
+                        <th style="padding: 0.65rem 0.75rem; font-size: 0.8rem; color: #718792; text-transform: uppercase; letter-spacing: 0.03em;">Price</th>
+                        <th style="padding: 0.65rem 0.75rem; font-size: 0.8rem; color: #718792; text-transform: uppercase; letter-spacing: 0.03em;">Total</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($cart as $batchId => $item)
+                        <tr style="border-bottom: 1px solid #EEF2F3;">
+                            <td style="padding: 0.65rem 0.75rem; color: #123047; font-weight: 500;">{{ $item['medicine_name'] }}</td>
+                            <td style="padding: 0.65rem 0.75rem; color: #718792;">{{ $item['batch_number'] }}</td>
+                            <td style="padding: 0.65rem 0.75rem; color: #718792;">{{ $item['expiry_date'] }}</td>
+                            <td style="padding: 0.65rem 0.75rem;">
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="{{ $item['available_qty'] }}"
+                                    value="{{ $item['quantity'] }}"
+                                    wire:change="updateQuantity({{ $batchId }}, $event.target.value)"
+                                    style="width: 60px; border: 1px solid #E2EEEE; border-radius: 4px; padding: 4px 6px;"
+                                >
+                            </td>
+                            <td style="padding: 0.65rem 0.75rem; color: #123047;">{{ currency_symbol() }} {{ number_format($item['unit_price'], 2) }}</td>
+                            <td style="padding: 0.65rem 0.75rem; color: #123047; font-weight: 600;">{{ currency_symbol() }} {{ number_format($item['unit_price'] * $item['quantity'], 2) }}</td>
+                            <td style="padding: 0.65rem 0.75rem; text-align: right;">
+                                <button wire:click="removeFromCart({{ $batchId }})" style="color: #DC4C4C; background: none; border: none; cursor: pointer; font-size: 1.1rem;">✕</button>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="7" style="padding: 2rem; text-align: center; color: #A9B7BC;">Cart is empty — search or scan above to add medicines</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <style>
-        .pos-wrapper {
-            background: white;
-            border-radius: 14px;
-            border: 1px solid #e5e7eb;
-            padding: 24px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-        }
+    {{-- Payment (full width) --}}
+    <div class="mp-card" style="padding: 1.5rem; border-radius: 0.75rem; border: 1px solid #E2EEEE; background: white;">
+        <h3 style="margin: 0 0 1rem 0; font-size: 1.05rem; font-weight: 600; color: #123047;">Payment</h3>
 
-        .pos-grid {
-            display: grid;
-            grid-template-columns: 1.5fr 1fr;
-            gap: 24px;
-        }
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+            <div>
+                <label style="display: block; font-size: 0.85rem; color: #718792; margin-bottom: 0.25rem;">Customer</label>
+                <select wire:model="customerId" style="width: 100%; border: 1px solid #E2EEEE; border-radius: 0.5rem; padding: 0.5rem 0.75rem; background: white;">
+                    <option value="">Walk-in Customer</option>
+                    @foreach ($this->customers as $customer)
+                        <option value="{{ $customer->id }}">{{ $customer->name }} ({{ $customer->phone }})</option>
+                    @endforeach
+                </select>
+            </div>
 
-        @media (max-width: 900px) {
-            .pos-grid { grid-template-columns: 1fr; }
-        }
+            <div>
+                <label style="display: block; font-size: 0.85rem; color: #718792; margin-bottom: 0.25rem;">Discount</label>
+                <input type="number" wire:model.live="discount" style="width: 100%; border: 1px solid #E2EEEE; border-radius: 0.5rem; padding: 0.5rem 0.75rem;">
+            </div>
 
-        .pos-search-wrap { position: relative; }
+            <div>
+                <label style="display: block; font-size: 0.85rem; color: #718792; margin-bottom: 0.25rem;">Tax</label>
+                <input type="number" wire:model.live="tax" style="width: 100%; border: 1px solid #E2EEEE; border-radius: 0.5rem; padding: 0.5rem 0.75rem;">
+            </div>
 
-        .pos-search-input {
-            width: 100%;
-            padding: 12px 16px;
-            border-radius: 10px;
-            border: 1.5px solid #d1e0e0;
-            background: white;
-            color: #123047;
-            font-size: 14px;
-            outline: none;
-            transition: border-color .15s ease, box-shadow .15s ease;
-        }
+            <div>
+                <label style="display: block; font-size: 0.85rem; color: #718792; margin-bottom: 0.25rem;">Payment Method</label>
+                <select wire:model="paymentMethod" style="width: 100%; border: 1px solid #E2EEEE; border-radius: 0.5rem; padding: 0.5rem 0.75rem; background: white;">
+                    <option value="cash">Cash</option>
+                    <option value="card">Card</option>
+                    <option value="bank">Bank Transfer</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+        </div>
 
-        .pos-search-input:focus {
-            border-color: #08766e;
-            box-shadow: 0 0 0 3px rgba(8,118,110,0.12);
-        }
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1rem;">
+            <div>
+                <label style="display: block; font-size: 0.85rem; color: #718792; margin-bottom: 0.25rem;">Paid Amount</label>
+                <input type="number" wire:model.live="paidAmount" style="width: 100%; border: 1px solid #E2EEEE; border-radius: 0.5rem; padding: 0.5rem 0.75rem;">
+            </div>
+        </div>
 
-        .pos-search-hint {
-            position: absolute;
-            right: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 11px;
-            color: #9ca3af;
-            pointer-events: none;
-        }
+        <div style="display: flex; justify-content: flex-end; gap: 2.5rem; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px dashed #E2EEEE;">
+            <div style="text-align: right;">
+                <div style="color: #718792; font-size: 0.85rem;">Subtotal</div>
+                <div style="color: #123047; font-weight: 500;">{{ currency_symbol() }} {{ number_format($this->subtotal, 2) }}</div>
+            </div>
+            <div style="text-align: right;">
+                <div style="color: #718792; font-size: 0.85rem;">Grand Total</div>
+                <div style="color: #123047; font-weight: 700; font-size: 1.15rem;">{{ currency_symbol() }} {{ number_format($this->grandTotal, 2) }}</div>
+            </div>
+            <div style="text-align: right;">
+                <div style="color: #718792; font-size: 0.85rem;">Change</div>
+                <div style="color: #123047; font-weight: 500;">{{ currency_symbol() }} {{ number_format($this->change, 2) }}</div>
+            </div>
+        </div>
 
-        .pos-results {
-            margin-top: 8px;
-            border: 1px solid #e5e7eb;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .pos-result-item {
-            padding: 12px 16px;
-            cursor: pointer;
-            border-bottom: 1px solid #f1f5f5;
-            font-size: 13.5px;
-            transition: background .12s ease;
-        }
-
-        .pos-result-item:last-child { border-bottom: none; }
-        .pos-result-item:hover { background: #f0fdfa; }
-
-        .pos-muted { color: #78909c; font-size: 12px; }
-
-        .pos-table-wrap {
-            margin-top: 24px;
-            border: 1px solid #e5e7eb;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .pos-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13.5px;
-        }
-
-        .pos-table thead tr {
-            background: #f9fafb;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
-        .pos-table th {
-            text-align: left;
-            padding: 12px 16px;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            color: #6b7280;
-            font-weight: 600;
-        }
-
-        .pos-table td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #f1f5f5;
-            color: #374151;
-        }
-
-        .pos-table tbody tr:last-child td { border-bottom: none; }
-
-        .pos-strong { font-weight: 600; color: #17374a; }
-
-        .pos-qty-input {
-            width: 60px;
-            border: 1px solid #d1e0e0;
-            border-radius: 6px;
-            padding: 4px 6px;
-            font-size: 13px;
-        }
-
-        .pos-remove-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            color: #9ca3af;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            transition: all .15s ease;
-        }
-
-        .pos-remove-btn:hover { background: #fee2e2; color: #dc2626; }
-
-        .pos-empty {
-            text-align: center;
-            padding: 32px;
-            color: #9ca3af;
-        }
-
-        .pos-payment-panel {
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 20px;
-        }
-
-        .pos-payment-title {
-            font-size: 15px;
-            font-weight: 700;
-            color: #17374a;
-            margin: 0 0 16px;
-        }
-
-        .pos-label {
-            display: block;
-            font-size: 11.5px;
-            font-weight: 600;
-            color: #6b7280;
-            margin-bottom: 5px;
-        }
-
-        .pos-input, .pos-select {
-            width: 100%;
-            padding: 9px 12px;
-            border: 1px solid #d1e0e0;
-            border-radius: 8px;
-            font-size: 13.5px;
-            color: #17374a;
-            background: white;
-            margin-bottom: 14px;
-            outline: none;
-        }
-
-        .pos-input:focus, .pos-select:focus {
-            border-color: #08766e;
-            box-shadow: 0 0 0 3px rgba(8,118,110,0.12);
-        }
-
-        .pos-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 13.5px;
-        }
-
-        .pos-total-box {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #e6f7f5;
-            border: 1px solid #b8e6e0;
-            border-radius: 10px;
-            padding: 12px 14px;
-            margin-bottom: 14px;
-            font-weight: 600;
-            color: #17374a;
-        }
-
-        .pos-total-amount {
-            font-size: 18px;
-            font-weight: 800;
-            color: #08766e;
-        }
-
-        .pos-complete-btn {
-            width: 100%;
-            padding: 13px;
-            border-radius: 10px;
-            border: none;
-            background: #08766e;
-            color: white;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background .15s ease, transform .1s ease;
-        }
-
-        .pos-complete-btn:hover { background: #066a62; }
-        .pos-complete-btn:active { transform: translateY(1px); }
-    </style>
+        <button wire:click="completeSale" style="width: 100%; margin-top: 1.25rem; padding: 0.75rem; background: #00707A; color: white; border: none; border-radius: 0.5rem; font-weight: 600; font-size: 0.95rem; cursor: pointer;">
+            Complete Sale
+        </button>
+    </div>
 </div>

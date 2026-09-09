@@ -222,15 +222,7 @@ public $paidAmount = 0;
                 'available_qty' => (int) $batch->quantity,
 
                 'quantity' => 1,
-
-                /*
-                |--------------------------------------------------------------------------
-                | Sale Price Snapshot
-                |--------------------------------------------------------------------------
-                */
-
-                'unit_price' => $unitPrice,
-
+                'unit_price' => (float) $medicine->sale_price,
                 'discount' => 0,
 
                 'total' => $unitPrice,

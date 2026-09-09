@@ -2,7 +2,6 @@
 
 return [
     App\Providers\AppServiceProvider::class,
-    App\Providers\Filament\CashierPanelProvider::class,
-    App\Providers\Filament\PharmacistPanelProvider::class,
+    App\Providers\Filament\StaffPanelProvider::class,
     App\Providers\Filament\adminPanelProvider::class,
 ];
