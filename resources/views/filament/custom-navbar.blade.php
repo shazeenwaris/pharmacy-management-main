@@ -125,110 +125,530 @@
     </div>
 </div>
 <style>
+
 /* =========================================================
-   TOPBAR
+   1. HIDE FILAMENT DEFAULT TOPBAR
+   ========================================================= */
+
+body:has(.pms-topbar) .fi-topbar-ctn,
+body:has(.pms-topbar) .fi-topbar {
+    display: none !important;
+}
+
+
+/* =========================================================
+   2. CUSTOM NAVBAR
+   ========================================================= */
+
+.pms-topbar {
+    position: fixed !important;
+
+    top: 0 !important;
+    right: 0 !important;
+    left: var(--pms-sidebar-width, 280px) !important;
+
+    width: calc(
+        100% - var(--pms-sidebar-width, 280px)
+    ) !important;
+
+    height: 64px !important;
+    min-height: 64px !important;
+
+    margin: 0 !important;
+    padding: 0 18px !important;
+
+    z-index: 9999 !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto
+        auto !important;
+
+    align-items: center !important;
+
+    background: #ffffff !important;
+
+    border-bottom: 1px solid #e5eeee !important;
+
+    box-sizing: border-box !important;
+
+    transition:
+        left 0.2s ease,
+        width 0.2s ease !important;
+}
+
+
+/* =========================================================
+   3. EXPANDED SIDEBAR
+   ========================================================= */
+
+html[data-pms-sidebar="expanded"] .pms-topbar {
+    left: 280px !important;
+
+    width: calc(100% - 280px) !important;
+}
+
+
+/* =========================================================
+   4. COLLAPSED SIDEBAR
+   ========================================================= */
+
+html[data-pms-sidebar="collapsed"] .pms-topbar {
+    left: 70px !important;
+
+    width: calc(100% - 70px) !important;
+}
+
+
+/* =========================================================
+   5. LEFT SIDE
+   ========================================================= */
+
+.pms-topbar-left {
+    grid-column: 1 !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    justify-content: flex-start !important;
+
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+
+/* =========================================================
+   6. SEARCH WRAPPER
    ========================================================= */
 
 .pms-topbar-search-wrap {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-width: 0;
+    display: flex !important;
+
+    align-items: center !important;
+
+    width: 100% !important;
+    max-width: 380px !important;
+
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    gap: 8px !important;
+
+    box-sizing: border-box !important;
 }
+
 
 .pms-topbar-search-wrap > * {
     width: 100% !important;
     max-width: 100% !important;
+
+    min-width: 0 !important;
 }
+
 
 .pms-topbar-search-wrap input {
     width: 100% !important;
     max-width: 100% !important;
+
     font-size: 13px !important;
+
     text-overflow: clip !important;
     white-space: nowrap !important;
-    overflow: visible !important;
 }
 
-.pms-notification-count {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    min-width: 16px;
-    height: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 4px;
-    border-radius: 999px;
-    background: #ef5350;
-    color: #fff;
-    font-size: 9px;
-    font-weight: 700;
-    border: 2px solid #fff;
-}
 
-.pms-online-dot {
-    position: absolute;
-    bottom: -1px;
-    right: -1px;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #2ecc71;
-    border: 2px solid #ffffff;
-}
-
-.pms-online-text-dot {
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #2ecc71;
-    margin-right: 4px;
-}
-
-.pms-topbar {
-    position: sticky !important;
-    top: 0 !important;
-    z-index: 30 !important;
-    display: grid !important;
-    grid-template-columns: 1fr auto 1fr !important;
-    align-items: center !important;
-    margin-left: var(--pms-sidebar-width, 280px) !important;
-    width: calc(100% - var(--pms-sidebar-width, 280px)) !important;
-    box-sizing: border-box !important;
-}
-
-.pms-topbar-left {
-    grid-column: 1 !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 12px !important;
-    justify-content: flex-start !important;
-    min-width: 0 !important;
-    flex: 1;
-}
+/* =========================================================
+   7. CENTER
+   ========================================================= */
 
 .pms-topbar-center {
     grid-column: 2 !important;
+
+    width: 1px !important;
+    min-width: 1px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
 }
+
+
+/* =========================================================
+   8. RIGHT SIDE
+   ========================================================= */
 
 .pms-topbar-right {
     grid-column: 3 !important;
+
     display: flex !important;
+    align-items: center !important;
     justify-content: flex-end !important;
+
+    min-width: 0 !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    gap: 8px !important;
+}
+
+
+/* =========================================================
+   9. TOPBAR ACTION BUTTONS
+   ========================================================= */
+
+.pms-topbar-action {
+    position: relative !important;
+
+    width: 38px !important;
+    height: 38px !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding: 0 !important;
+
+    border: 0 !important;
+    border-radius: 9px !important;
+
+    background: transparent !important;
+
+    color: #507681 !important;
+
+    cursor: pointer !important;
+
+    text-decoration: none !important;
+
+    box-sizing: border-box !important;
+
+    transition:
+        background 0.15s ease,
+        color 0.15s ease !important;
+}
+
+
+.pms-topbar-action:hover {
+    background: #eaf7f8 !important;
+
+    color: #00838f !important;
+}
+
+
+.pms-topbar-action svg {
+    width: 19px !important;
+    height: 19px !important;
+
+    min-width: 19px !important;
+    min-height: 19px !important;
+
+    max-width: 19px !important;
+    max-height: 19px !important;
+}
+
+
+/* =========================================================
+   10. NOTIFICATION BADGE
+   ========================================================= */
+
+.pms-notification-count {
+    position: absolute !important;
+
+    top: 2px !important;
+    right: 1px !important;
+
+    min-width: 16px !important;
+    height: 16px !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding: 0 4px !important;
+
+    border-radius: 999px !important;
+
+    background: #ef5350 !important;
+
+    color: #ffffff !important;
+
+    font-size: 9px !important;
+    font-weight: 700 !important;
+
+    line-height: 1 !important;
+
+    border: 2px solid #ffffff !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   11. DIVIDER
+   ========================================================= */
+
+.pms-topbar-divider {
+    width: 1px !important;
+
+    height: 30px !important;
+
+    margin: 0 8px !important;
+
+    background: #dce9eb !important;
+
+    flex-shrink: 0 !important;
+}
+
+
+/* =========================================================
+   12. USER
+   ========================================================= */
+
+.pms-user {
+    position: relative !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    min-width: 0 !important;
+
+    cursor: pointer !important;
+}
+
+
+.pms-user > div:first-child {
+    display: flex !important;
+
+    align-items: center !important;
+
+    gap: 9px !important;
+}
+
+
+/* =========================================================
+   13. AVATAR
+   ========================================================= */
+
+.pms-user-avatar {
+    position: relative !important;
+
+    width: 38px !important;
+    height: 38px !important;
+
+    min-width: 38px !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    overflow: hidden !important;
+
+    border-radius: 50% !important;
+
+    background: #00838f !important;
+
+    color: #ffffff !important;
+
+    font-size: 14px !important;
+    font-weight: 700 !important;
+
+    box-sizing: border-box !important;
+}
+
+
+.pms-user-avatar img {
+    width: 100% !important;
+    height: 100% !important;
+
+    object-fit: cover !important;
+
+    border-radius: inherit !important;
+}
+
+
+/* =========================================================
+   14. ONLINE DOT
+   ========================================================= */
+
+.pms-online-dot {
+    position: absolute !important;
+
+    right: 0 !important;
+    bottom: 0 !important;
+
+    width: 10px !important;
+    height: 10px !important;
+
+    border-radius: 50% !important;
+
+    background: #2ecc71 !important;
+
+    border: 2px solid #ffffff !important;
+
+    box-sizing: border-box !important;
+}
+
+
+.pms-online-text-dot {
+    display: inline-block !important;
+
+    width: 6px !important;
+    height: 6px !important;
+
+    margin-right: 4px !important;
+
+    border-radius: 50% !important;
+
+    background: #2ecc71 !important;
+}
+
+
+/* =========================================================
+   15. USER INFO
+   ========================================================= */
+
+.pms-user-info {
+    display: flex !important;
+
+    flex-direction: column !important;
+
     min-width: 0 !important;
 }
 
-@media (max-width: 900px) {
+
+.pms-user-name {
+    color: #24566a !important;
+
+    font-size: 13px !important;
+    font-weight: 600 !important;
+
+    line-height: 18px !important;
+
+    white-space: nowrap !important;
+}
+
+
+.pms-user-role {
+    display: flex !important;
+
+    align-items: center !important;
+
+    color: #71909a !important;
+
+    font-size: 10px !important;
+    font-weight: 500 !important;
+
+    line-height: 14px !important;
+}
+
+
+/* =========================================================
+   16. CHEVRON
+   ========================================================= */
+
+.pms-user-chevron {
+    width: 15px !important;
+    height: 15px !important;
+
+    min-width: 15px !important;
+
+    color: #6e8c94 !important;
+}
+
+
+/* =========================================================
+   17. MOBILE MENU
+   ========================================================= */
+
+.pms-mobile-menu {
+    display: none !important;
+}
+
+
+.pms-mobile-menu button {
+    width: 38px !important;
+    height: 38px !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    padding: 0 !important;
+
+    border: 0 !important;
+    border-radius: 8px !important;
+
+    background: transparent !important;
+
+    color: #507681 !important;
+
+    cursor: pointer !important;
+}
+
+
+.pms-mobile-menu svg {
+    width: 20px !important;
+    height: 20px !important;
+}
+
+
+/* =========================================================
+   18. MOBILE
+   ========================================================= */
+
+@media (max-width: 1023px) {
+
+    .pms-topbar {
+        left: 0 !important;
+
+        width: 100% !important;
+
+        padding: 0 12px !important;
+
+        grid-template-columns:
+            auto minmax(0, 1fr) auto !important;
+    }
+
+
+    .pms-mobile-menu {
+        display: flex !important;
+    }
+
+
+    .pms-topbar-left {
+        grid-column: 1 / 3 !important;
+
+        gap: 8px !important;
+    }
+
+
     .pms-topbar-search-wrap {
+        max-width: 300px !important;
+    }
+
+
+    .pms-topbar-center {
         display: none !important;
     }
 
-    .pms-topbar {
-        margin-left: 0 !important;
-        width: 100% !important;
+
+    .pms-topbar-right {
+        grid-column: 3 !important;
+    }
+
+
+    .pms-user-info,
+    .pms-user-chevron {
+        display: none !important;
     }
 }
 </style>

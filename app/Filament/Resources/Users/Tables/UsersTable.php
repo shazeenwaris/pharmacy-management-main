@@ -28,9 +28,12 @@ class UsersTable
                 TextColumn::make('phone')
                     ->searchable(),
 
-                TextColumn::make('role')
-                    ->badge()
-                    ->searchable()
+               TextColumn::make('roles.name')
+    ->label('Role')
+    ->badge()
+    ->getStateUsing(function ($record) {
+        return $record->roles->pluck('name')->implode(', ');
+    })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'admin' => 'Admin',
                         'pharmacist' => 'Pharmacist',
@@ -62,12 +65,20 @@ class UsersTable
             ])
             ->filters([
                 SelectFilter::make('role')
-                    ->options([
-                        'admin' => 'Admin',
-                        'pharmacist' => 'Pharmacist',
-                        'cashier' => 'Cashier',
-                        'inventory_manager' => 'Inventory Manager',
-                    ]),
+    ->label('Role')
+    ->options([
+        'admin' => 'Admin',
+        'pharmacist' => 'Pharmacist',
+        'cashier' => 'Cashier',
+        'inventory_manager' => 'Inventory Manager',
+    ])
+    ->query(function ($query, array $data) {
+        if (filled($data['value'])) {
+            $query->whereHas('roles', function ($roleQuery) use ($data) {
+                $roleQuery->where('name', $data['value']);
+            });
+        }
+    }),
 
                 TernaryFilter::make('is_active')
                     ->label('Active status'),

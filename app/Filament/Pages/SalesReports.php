@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Models\Sale;
 use App\Models\SaleItem;
+use App\Models\User;
 use Filament\Pages\Page;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -127,28 +128,42 @@ class SalesReports extends Page
             ->get();
     }
 
-    public function getSalesByCashierProperty()
-    {
-        return Sale::query()
-            ->leftJoin(
-                'users',
-                'users.id',
-                '=',
-                'sales.created_by'
-            )
-            ->whereDate('sales.created_at', '>=', $this->fromDate)
-            ->whereDate('sales.created_at', '<=', $this->toDate)
-            ->select(
-                'users.id',
-                'users.name',
-                DB::raw('COUNT(sales.id) as total_bills'),
-                DB::raw('SUM(sales.grand_total) as revenue')
-            )
-            ->groupBy('users.id', 'users.name')
-            ->orderByDesc('revenue')
-            ->get();
-    }
+   public function getSalesByCashierProperty()
+{
+    // Get IDs of users who actually have the cashier role
+    $cashierIds = User::role('cashier')->pluck('id');
 
+    return Sale::query()
+        ->leftJoin(
+            'users',
+            'users.id',
+            '=',
+            'sales.created_by'
+        )
+        ->whereIn('sales.created_by', $cashierIds)
+        ->whereDate(
+            'sales.created_at',
+            '>=',
+            $this->fromDate
+        )
+        ->whereDate(
+            'sales.created_at',
+            '<=',
+            $this->toDate
+        )
+        ->select(
+            'users.id',
+            'users.name',
+            DB::raw('COUNT(sales.id) as total_bills'),
+            DB::raw('SUM(sales.grand_total) as revenue')
+        )
+        ->groupBy(
+            'users.id',
+            'users.name'
+        )
+        ->orderByDesc('revenue')
+        ->get();
+}
     public function applyFilters(): void
     {
         $this->validate([

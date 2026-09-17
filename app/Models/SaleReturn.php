@@ -8,11 +8,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class SaleReturn extends Model
 {
     protected $fillable = [
-        'sale_id', 'sale_item_id', 'medicine_id', 'medicine_batch_id',
-        'quantity', 'refund_amount', 'reason', 'return_date', 'processed_by',
+        'sale_id',
+        'sale_item_id',
+        'medicine_id',
+        'medicine_batch_id',
+        'quantity',
+        'refund_amount',
+        'reason',
+        'return_date',
+        'processed_by',
     ];
 
     protected $casts = [
+        'quantity' => 'integer',
         'refund_amount' => 'decimal:2',
         'return_date' => 'date',
     ];
@@ -34,11 +42,18 @@ class SaleReturn extends Model
 
     public function batch(): BelongsTo
     {
-        return $this->belongsTo(MedicineBatch::class, 'medicine_batch_id');
+        return $this->belongsTo(
+            MedicineBatch::class,
+            'medicine_batch_id'
+        );
     }
 
     public function processedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'processed_by');
+        return $this->belongsTo(
+            User::class,
+            'processed_by'
+        );
     }
 }
+

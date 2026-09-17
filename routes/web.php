@@ -1,7 +1,10 @@
 <?php
+use App\Livewire\PosScreen;
+use App\Models\Sale;
+
 
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\Cashier\SaleController;
 Route::get('/', function () {
     return view('welcome');
 });
@@ -54,3 +57,17 @@ Route::middleware(['web', 'auth'])->get('/admin/global-search', function (\Illum
 
     return response()->json($medicines->concat($customers)->values());
 })->name('admin.global-search');
+
+Route::middleware(['auth'])
+    ->prefix('cashier')
+    ->name('cashier.')
+    ->group(function () {
+
+        Route::get('/sales/search-medicines', [SaleController::class, 'searchMedicines'])
+            ->name('sales.search-medicines');
+
+        Route::post('/sales', [SaleController::class, 'store'])
+            ->name('sales.store');
+
+        
+    });

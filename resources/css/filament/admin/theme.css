@@ -1,1157 +1,1160 @@
- @import '../../../../vendor/filament/filament/resources/css/theme.css'; 
+ @import '../../../../vendor/filament/filament/resources/css/theme.css';
 
-@source '../../../../app/Filament/**/*';
-@source '../../../../resources/views/filament/**/*'; 
+ @source '../../../../app/Filament/**/*';
+ @source '../../../../resources/views/filament/**/*';
 
-/* ==========================================================================
+ /* ==========================================================================
    MediCare Pharmacy System — Filament Admin Theme
    Path: resources/css/filament/admin/theme.css
    ========================================================================== */
 
-@import '/vendor/filament/filament/resources/css/theme.css';
 
-@theme {
-    /* 1. Primary Colors */
-    --color-pms-primary: #00838F;
-    --color-pms-primary-light: #00ACC1;
-    --color-pms-primary-dark: #006064;
-    --color-pms-accent: #26A69A;
 
-    /* 2. Background Colors */
+ @theme {
+     /* 1. Primary Colors */
+     --color-pms-primary: #00838F;
+     --color-pms-primary-light: #00ACC1;
+     --color-pms-primary-dark: #006064;
+     --color-pms-accent: #26A69A;
 
-    --color-pms-bg-page: #F8FAFA;
-    --color-pms-bg-surface: #FFFFFF;
+     /* 2. Background Colors */
 
-    --color-pms-bg-sidebar: #DDEFEF;
-    --color-pms-bg-sidebar-active: #BFE3E5;
-    --color-pms-bg-sidebar-hover: #D2EBEC;
-    /* 3. Text Colors */
-    --color-pms-text-primary: #123047;
-    --color-pms-text-secondary: #405A68;
-    --color-pms-text-muted: #718792;
-    --color-pms-text-light: #98A7AF;
-    --color-pms-text-placeholder: #B0BEC5;
+     --color-pms-bg-page: #F8FAFA;
+     --color-pms-bg-surface: #FFFFFF;
 
-    /* 4. Status Colors */
-    --color-pms-success: #2E7D5B;
-    --color-pms-warning: #F59E0B;
-    --color-pms-danger: #DC4C4C;
+     --color-pms-bg-sidebar: #DDEFEF;
+     --color-pms-bg-sidebar-active: #BFE3E5;
+     --color-pms-bg-sidebar-hover: #D2EBEC;
+     /* 3. Text Colors */
+     --color-pms-text-primary: #123047;
+     --color-pms-text-secondary: #405A68;
+     --color-pms-text-muted: #718792;
+     --color-pms-text-light: #98A7AF;
+     --color-pms-text-placeholder: #B0BEC5;
 
-    /* 5. Status Light Backgrounds */
-    --color-pms-success-light: #E8F5EF;
-    --color-pms-warning-light: #FFF7E6;
-    --color-pms-danger-light: #FDECEC;
+     /* 4. Status Colors */
+     --color-pms-success: #2E7D5B;
+     --color-pms-warning: #F59E0B;
+     --color-pms-danger: #DC4C4C;
 
-    /* 6. Border & Divider */
-    --color-pms-border: #E2EEEE;
-    --color-pms-divider: #EEF2F3;
+     /* 5. Status Light Backgrounds */
+     --color-pms-success-light: #E8F5EF;
+     --color-pms-warning-light: #FFF7E6;
+     --color-pms-danger-light: #FDECEC;
 
-    /* 7. Other UI Elements */
-    --color-pms-notification-red: #FF5252;
-    --color-pms-icon-color: #26A69A;
-    --color-pms-icon-light: #80CBC4;
-    --color-pms-chart-line: #00838F;
-    --color-pms-chart-area: #E0F7FA;
-    --color-pms-link-highlight: #00838F;
-}
+     /* 6. Border & Divider */
+     --color-pms-border: #E2EEEE;
+     --color-pms-divider: #EEF2F3;
 
-/* --------------------------------------------------------------------------
+     /* 7. Other UI Elements */
+     --color-pms-notification-red: #FF5252;
+     --color-pms-icon-color: #26A69A;
+     --color-pms-icon-light: #80CBC4;
+     --color-pms-chart-line: #00838F;
+     --color-pms-chart-area: #E0F7FA;
+     --color-pms-link-highlight: #00838F;
+ }
+
+ /* --------------------------------------------------------------------------
    1. BASE PAGE / LAYOUT
    -------------------------------------------------------------------------- */
 
-.fi-body,
-.fi-main {
-    @apply bg-pms-bg-page;
-}
+ .fi-body,
+ .fi-main {
+     @apply bg-pms-bg-page;
+ }
 
-.fi-sidebar {
-    @apply bg-pms-bg-sidebar border-r border-pms-border;
-}
+ .fi-sidebar {
+     @apply bg-pms-bg-sidebar border-r border-pms-border;
+ }
 
-.fi-sidebar-item.fi-active .fi-sidebar-item-button {
-    @apply bg-pms-bg-sidebar-active text-pms-primary-dark font-semibold;
-}
+ .fi-sidebar-item.fi-active .fi-sidebar-item-button {
+     @apply bg-pms-bg-sidebar-active text-pms-primary-dark font-semibold;
+ }
 
-.fi-sidebar-item.fi-active .fi-sidebar-item-icon {
-    @apply text-pms-primary-dark;
-}
+ .fi-sidebar-item.fi-active .fi-sidebar-item-icon {
+     @apply text-pms-primary-dark;
+ }
 
-.fi-sidebar-item-button {
-    @apply rounded-xl mx-2 my-0.5 text-pms-text-secondary;
-}
+ .fi-sidebar-item-button {
+     @apply rounded-xl mx-2 my-0.5 text-pms-text-secondary;
+ }
 
-.fi-sidebar-item-button:hover {
-    @apply bg-pms-bg-sidebar-hover;
-}
+ .fi-sidebar-item-button:hover {
+     @apply bg-pms-bg-sidebar-hover;
+ }
 
-.fi-sidebar-item-icon {
-    @apply text-pms-icon-color;
-}
+ .fi-sidebar-item-icon {
+     @apply text-pms-icon-color;
+ }
 
-.fi-sidebar-nav {
-    @apply px-2;
-}
+ .fi-sidebar-nav {
+     @apply px-2;
+ }
 
-.fi-logo {
-    @apply text-pms-primary-dark font-bold;
-}
+ .fi-logo {
+     @apply text-pms-primary-dark font-bold;
+ }
 
-/* Sidebar footer card (MediCare Pharmacy - Healthier Today card) */
-.pms-sidebar-footer-card {
-    @apply flex items-center gap-3 bg-pms-bg-sidebar-active rounded-xl p-3 mx-3 mb-3 mt-4;
-}
+ /* Sidebar footer card (MediCare Pharmacy - Healthier Today card) */
+ .pms-sidebar-footer-card {
+     @apply flex items-center gap-3 bg-pms-bg-sidebar-active rounded-xl p-3 mx-3 mb-3 mt-4;
+ }
 
-.pms-sidebar-footer-icon {
-    @apply w-9 h-9 rounded-lg bg-pms-primary text-white flex items-center justify-center shrink-0;
-}
+ .pms-sidebar-footer-icon {
+     @apply w-9 h-9 rounded-lg bg-pms-primary text-white flex items-center justify-center shrink-0;
+ }
 
-.pms-sidebar-footer-title {
-    @apply text-sm font-semibold text-pms-text-primary leading-tight;
-}
+ .pms-sidebar-footer-title {
+     @apply text-sm font-semibold text-pms-text-primary leading-tight;
+ }
 
-.pms-sidebar-footer-sub {
-    @apply text-xs text-pms-text-muted leading-tight;
-}
+ .pms-sidebar-footer-sub {
+     @apply text-xs text-pms-text-muted leading-tight;
+ }
 
-.fi-sidebar-item-button:hover {
-    @apply bg-pms-bg-sidebar-hover;
-}
+ .fi-sidebar-item-button:hover {
+     @apply bg-pms-bg-sidebar-hover;
+ }
 
-.fi-topbar {
-    @apply bg-white border-b border-pms-border;
-}
-.fi-body {
-    padding-top: 0 !important;
-}
-/* --------------------------------------------------------------------------
+ .fi-topbar {
+     @apply bg-white border-b border-pms-border;
+ }
+
+ .fi-body {
+     padding-top: 0 !important;
+ }
+
+ /* --------------------------------------------------------------------------
    2. TEXT UTILITIES
    -------------------------------------------------------------------------- */
 
-.pms-text-heading {
-    @apply text-pms-text-primary font-semibold;
-}
+ .pms-text-heading {
+     @apply text-pms-text-primary font-semibold;
+ }
 
-.pms-text-body {
-    @apply text-pms-text-secondary;
-}
+ .pms-text-body {
+     @apply text-pms-text-secondary;
+ }
 
-.pms-text-muted {
-    @apply text-pms-text-muted text-sm;
-}
+ .pms-text-muted {
+     @apply text-pms-text-muted text-sm;
+ }
 
-/* --------------------------------------------------------------------------
+ /* --------------------------------------------------------------------------
    3. CARDS (Stat Cards, Widget Cards)
    -------------------------------------------------------------------------- */
 
-.pms-card {
-    @apply bg-pms-bg-surface rounded-xl border border-pms-border p-4;
-    box-shadow: 0 4px 16px rgba(19, 68, 104, 0.06);
-}
+ .pms-card {
+     @apply bg-pms-bg-surface rounded-xl border border-pms-border p-4;
+     box-shadow: 0 4px 16px rgba(19, 68, 104, 0.06);
+ }
 
-.pms-stat-card {
-    @apply bg-pms-bg-surface rounded-xl border border-pms-border p-4 flex flex-col gap-2;
-    box-shadow: 0 4px 16px rgba(17, 61, 92, 0.06);
-}
+ .pms-stat-card {
+     @apply bg-pms-bg-surface rounded-xl border border-pms-border p-4 flex flex-col gap-2;
+     box-shadow: 0 4px 16px rgba(17, 61, 92, 0.06);
+ }
 
-.pms-stat-card-icon {
-    @apply w-10 h-10 rounded-lg flex items-center justify-center bg-pms-success-light text-pms-primary;
-}
+ .pms-stat-card-icon {
+     @apply w-10 h-10 rounded-lg flex items-center justify-center bg-pms-success-light text-pms-primary;
+ }
 
-.pms-stat-value {
-    @apply text-2xl font-bold text-pms-text-primary;
-}
+ .pms-stat-value {
+     @apply text-2xl font-bold text-pms-text-primary;
+ }
 
-.pms-stat-label {
-    @apply text-sm text-pms-text-muted;
-}
+ .pms-stat-label {
+     @apply text-sm text-pms-text-muted;
+ }
 
-.pms-stat-trend-up {
-    @apply text-pms-success text-xs font-medium flex items-center gap-1;
-}
+ .pms-stat-trend-up {
+     @apply text-pms-success text-xs font-medium flex items-center gap-1;
+ }
 
-.pms-stat-trend-down {
-    @apply text-pms-danger text-xs font-medium flex items-center gap-1;
-}
+ .pms-stat-trend-down {
+     @apply text-pms-danger text-xs font-medium flex items-center gap-1;
+ }
 
-/* --------------------------------------------------------------------------
+ /* --------------------------------------------------------------------------
    4. HERO / BANNER (Smart Pharmacy Management section)
    -------------------------------------------------------------------------- */
 
-.pms-hero-banner {
-    @apply rounded-2xl p-6 text-white flex items-center justify-between overflow-hidden;
-    background-image: linear-gradient(135deg, #00838F 0%, #26A69A 100%);
-}
+ .pms-hero-banner {
+     @apply rounded-2xl p-6 text-white flex items-center justify-between overflow-hidden;
+     background-image: linear-gradient(135deg, #00838F 0%, #26A69A 100%);
+ }
 
-.pms-hero-title {
-    @apply text-xl md:text-2xl font-bold text-white;
-}
+ .pms-hero-title {
+     @apply text-xl md:text-2xl font-bold text-white;
+ }
 
-.pms-hero-subtitle {
-    @apply text-white/80 text-sm mt-1;
-}
+ .pms-hero-subtitle {
+     @apply text-white/80 text-sm mt-1;
+ }
 
-.pms-hero-btn-primary {
-    @apply bg-white text-pms-primary-dark px-4 py-2 rounded-lg font-medium text-sm hover:bg-white/90 transition;
-}
+ .pms-hero-btn-primary {
+     @apply bg-white text-pms-primary-dark px-4 py-2 rounded-lg font-medium text-sm hover:bg-white/90 transition;
+ }
 
-.pms-hero-btn-outline {
-    @apply border border-white/60 text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-white/10 transition;
-}
+ .pms-hero-btn-outline {
+     @apply border border-white/60 text-white px-4 py-2 rounded-lg font-medium text-sm hover:bg-white/10 transition;
+ }
 
-/* --------------------------------------------------------------------------
+ /* --------------------------------------------------------------------------
    5. BADGES / STATUS LABELS
    -------------------------------------------------------------------------- */
 
-.pms-badge-success {
-    @apply bg-pms-success-light text-pms-success text-xs font-medium px-2 py-1 rounded-full;
-}
+ .pms-badge-success {
+     @apply bg-pms-success-light text-pms-success text-xs font-medium px-2 py-1 rounded-full;
+ }
 
-.pms-badge-warning {
-    @apply bg-pms-warning-light text-pms-warning text-xs font-medium px-2 py-1 rounded-full;
-}
+ .pms-badge-warning {
+     @apply bg-pms-warning-light text-pms-warning text-xs font-medium px-2 py-1 rounded-full;
+ }
 
-.pms-badge-danger {
-    @apply bg-pms-danger-light text-pms-danger text-xs font-medium px-2 py-1 rounded-full;
-}
+ .pms-badge-danger {
+     @apply bg-pms-danger-light text-pms-danger text-xs font-medium px-2 py-1 rounded-full;
+ }
 
-.pms-badge-low-stock {
-    @apply bg-pms-warning-light text-pms-warning text-xs font-medium px-2 py-1 rounded-full;
-}
+ .pms-badge-low-stock {
+     @apply bg-pms-warning-light text-pms-warning text-xs font-medium px-2 py-1 rounded-full;
+ }
 
-.pms-badge-out-of-stock {
-    @apply bg-pms-danger-light text-pms-danger text-xs font-medium px-2 py-1 rounded-full;
-}
+ .pms-badge-out-of-stock {
+     @apply bg-pms-danger-light text-pms-danger text-xs font-medium px-2 py-1 rounded-full;
+ }
 
-.pms-badge-in-stock {
-    @apply bg-pms-success-light text-pms-success text-xs font-medium px-2 py-1 rounded-full;
-}
+ .pms-badge-in-stock {
+     @apply bg-pms-success-light text-pms-success text-xs font-medium px-2 py-1 rounded-full;
+ }
 
-/* --------------------------------------------------------------------------
+ /* --------------------------------------------------------------------------
    6. TABLES (Recent Sales, Low Stock Alerts, Top Selling)
    -------------------------------------------------------------------------- */
 
-.pms-table-header {
-    @apply bg-pms-bg-page text-pms-text-muted uppercase text-xs font-semibold tracking-wide;
-}
+ .pms-table-header {
+     @apply bg-pms-bg-page text-pms-text-muted uppercase text-xs font-semibold tracking-wide;
+ }
 
-.pms-table-row {
-    @apply border-b border-pms-divider hover:bg-pms-bg-page transition;
-}
+ .pms-table-row {
+     @apply border-b border-pms-divider hover:bg-pms-bg-page transition;
+ }
 
-.pms-table-cell {
-    @apply text-sm text-pms-text-secondary py-3 px-4;
-}
+ .pms-table-cell {
+     @apply text-sm text-pms-text-secondary py-3 px-4;
+ }
 
-/* --------------------------------------------------------------------------
+ /* --------------------------------------------------------------------------
    7. CHARTS (Sales Trend, Stock Status)
    -------------------------------------------------------------------------- */
 
-.pms-chart-card {
-    @apply bg-pms-bg-surface rounded-xl border border-pms-border p-4;
-    box-shadow: 0 4px 16px rgba(16, 48, 71, 0.06);
-}
+ .pms-chart-card {
+     @apply bg-pms-bg-surface rounded-xl border border-pms-border p-4;
+     box-shadow: 0 4px 16px rgba(16, 48, 71, 0.06);
+ }
 
-.pms-chart-tab-active {
-    @apply bg-pms-primary text-white text-xs font-medium px-3 py-1 rounded-full;
-}
+ .pms-chart-tab-active {
+     @apply bg-pms-primary text-white text-xs font-medium px-3 py-1 rounded-full;
+ }
 
-.pms-chart-tab {
-    @apply text-pms-text-muted text-xs font-medium px-3 py-1 rounded-full hover:bg-pms-bg-page;
-}
+ .pms-chart-tab {
+     @apply text-pms-text-muted text-xs font-medium px-3 py-1 rounded-full hover:bg-pms-bg-page;
+ }
 
-/* --------------------------------------------------------------------------
+ /* --------------------------------------------------------------------------
    8. ALERT / TRACKER LIST ITEMS (Low Stock, Expiry Tracker)
    -------------------------------------------------------------------------- */
 
-.pms-alert-item {
-    @apply flex items-center justify-between py-2 border-b border-pms-divider last:border-0;
-}
+ .pms-alert-item {
+     @apply flex items-center justify-between py-2 border-b border-pms-divider last:border-0;
+ }
 
-.pms-alert-item-title {
-    @apply text-sm font-medium text-pms-text-primary;
-}
+ .pms-alert-item-title {
+     @apply text-sm font-medium text-pms-text-primary;
+ }
 
-.pms-alert-item-sub {
-    @apply text-xs text-pms-danger;
-}
+ .pms-alert-item-sub {
+     @apply text-xs text-pms-danger;
+ }
 
-.pms-alert-action-btn {
-    @apply text-xs font-medium text-pms-primary hover:underline;
-}
+ .pms-alert-action-btn {
+     @apply text-xs font-medium text-pms-primary hover:underline;
+ }
 
-/* --------------------------------------------------------------------------
+ /* --------------------------------------------------------------------------
    9. BUTTONS
    -------------------------------------------------------------------------- */
 
-.pms-btn-primary {
-    @apply bg-pms-primary text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-pms-primary-dark transition;
-}
+ .pms-btn-primary {
+     @apply bg-pms-primary text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-pms-primary-dark transition;
+ }
 
-.pms-btn-outline {
-    @apply border border-pms-primary text-pms-primary text-sm font-medium px-4 py-2 rounded-lg hover:bg-pms-success-light transition;
-}
+ .pms-btn-outline {
+     @apply border border-pms-primary text-pms-primary text-sm font-medium px-4 py-2 rounded-lg hover:bg-pms-success-light transition;
+ }
 
-/* --------------------------------------------------------------------------
+ /* --------------------------------------------------------------------------
    10. NOTIFICATION DOT
    -------------------------------------------------------------------------- */
 
-.pms-notification-dot {
-    @apply bg-pms-notification-red text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center;
-}
+ .pms-notification-dot {
+     @apply bg-pms-notification-red text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center;
+ }
 
-/* --------------------------------------------------------------------------
+ /* --------------------------------------------------------------------------
    11. SIDEBAR NAVIGATION (Pill style like MediCare reference)
    -------------------------------------------------------------------------- */
 
-.fi-sidebar-nav {
-    @apply px-3;
-}
+ .fi-sidebar-nav {
+     @apply px-3;
+ }
 
-/* Hide Filament's default/auto-discovered nav items — humara custom-sidebar.blade.php
+ /* Hide Filament's default/auto-discovered nav items — humara custom-sidebar.blade.php
    inhi ki jagah render hoga. Sidebar <aside> wrapper khud zinda rehta hai. */
-.fi-sidebar-nav>ul {
-    @apply hidden;
-}
+ .fi-sidebar-nav>ul {
+     @apply hidden;
+ }
 
-.fi-sidebar-item {
-    @apply mb-1;
-}
+ .fi-sidebar-item {
+     @apply mb-1;
+ }
 
-.fi-sidebar-item-button {
-    @apply rounded-lg px-3 py-2.5 text-sm text-pms-text-secondary transition-colors relative;
-}
+ .fi-sidebar-item-button {
+     @apply rounded-lg px-3 py-2.5 text-sm text-pms-text-secondary transition-colors relative;
+ }
 
-.fi-sidebar-item-button:hover {
-    @apply bg-pms-bg-sidebar-hover text-pms-primary-dark;
-}
+ .fi-sidebar-item-button:hover {
+     @apply bg-pms-bg-sidebar-hover text-pms-primary-dark;
+ }
 
-.fi-sidebar-item.fi-active .fi-sidebar-item-button {
-    @apply bg-pms-primary text-white font-semibold shadow-sm;
-}
+ .fi-sidebar-item.fi-active .fi-sidebar-item-button {
+     @apply bg-pms-primary text-white font-semibold shadow-sm;
+ }
 
-.fi-sidebar-item.fi-active .fi-sidebar-item-icon {
-    @apply text-white;
-}
+ .fi-sidebar-item.fi-active .fi-sidebar-item-icon {
+     @apply text-white;
+ }
 
-.fi-sidebar-item-icon {
-    @apply text-pms-text-muted w-5 h-5;
-}
+ .fi-sidebar-item-icon {
+     @apply text-pms-text-muted w-5 h-5;
+ }
 
-/* Chevron arrow on the right of every nav item (decorative, like reference image) */
-.fi-sidebar-item-button::after {
-    content: '';
-    @apply ml-auto w-2 h-2 border-t-2 border-r-2 border-current opacity-40;
-    transform: rotate(45deg);
-}
+ /* Chevron arrow on the right of every nav item (decorative, like reference image) */
+ .fi-sidebar-item-button::after {
+     content: '';
+     @apply ml-auto w-2 h-2 border-t-2 border-r-2 border-current opacity-40;
+     transform: rotate(45deg);
+ }
 
-.fi-sidebar-item.fi-active .fi-sidebar-item-button::after {
-    @apply opacity-80;
-}
+ .fi-sidebar-item.fi-active .fi-sidebar-item-button::after {
+     @apply opacity-80;
+ }
 
-/* --------------------------------------------------------------------------
+ /* --------------------------------------------------------------------------
    12. SIDEBAR BRAND / LOGO AREA
    -------------------------------------------------------------------------- */
 
-.fi-logo {
-    @apply text-pms-primary-dark font-bold text-lg flex items-center gap-2;
-}
+ .fi-logo {
+     @apply text-pms-primary-dark font-bold text-lg flex items-center gap-2;
+ }
 
-/* --------------------------------------------------------------------------
+ /* --------------------------------------------------------------------------
    13. SIDEBAR FOOTER CARD (MediCare info card at bottom of sidebar)
    -------------------------------------------------------------------------- */
 
-.pms-sidebar-footer-card {
-    @apply bg-pms-bg-sidebar-active border border-pms-border rounded-xl p-3 m-3 flex items-center gap-3;
-}
+ .pms-sidebar-footer-card {
+     @apply bg-pms-bg-sidebar-active border border-pms-border rounded-xl p-3 m-3 flex items-center gap-3;
+ }
 
-.pms-sidebar-footer-icon {
-    @apply w-9 h-9 rounded-full bg-pms-primary text-white flex items-center justify-center flex-shrink-0;
-}
+ .pms-sidebar-footer-icon {
+     @apply w-9 h-9 rounded-full bg-pms-primary text-white flex items-center justify-center flex-shrink-0;
+ }
 
-.pms-sidebar-footer-title {
-    @apply text-sm font-semibold text-pms-text-primary leading-tight;
-}
+ .pms-sidebar-footer-title {
+     @apply text-sm font-semibold text-pms-text-primary leading-tight;
+ }
 
-.pms-sidebar-footer-subtitle {
-    @apply text-xs text-pms-text-muted leading-tight;
-}
+ .pms-sidebar-footer-subtitle {
+     @apply text-xs text-pms-text-muted leading-tight;
+ }
 
-/* --------------------------------------------------------------------------
+ /* --------------------------------------------------------------------------
    14. FULLY CUSTOM SIDEBAR (resources/views/filament/custom-sidebar.blade.php)
    -------------------------------------------------------------------------- */
 
-.pms-sidebar {
-    @apply flex flex-col bg-pms-bg-sidebar border-r border-pms-border;
+ .pms-sidebar {
+     @apply flex flex-col bg-pms-bg-sidebar border-r border-pms-border;
 
-    width: 100%;
-    height: 100%;
-    min-height: 0;
-}
+     width: 100%;
+     height: 100%;
+     min-height: 0;
+ }
 
-/* Brand / Logo */
-.pms-sidebar-brand {
-    @apply flex items-center gap-2 px-4 py-5;
-}
+ /* Brand / Logo */
+ .pms-sidebar-brand {
+     @apply flex items-center gap-2 px-4 py-5;
+ }
 
-.pms-sidebar-brand-icon {
-    @apply w-8 h-8 rounded-lg bg-pms-primary text-white flex items-center justify-center flex-shrink-0;
-}
+ .pms-sidebar-brand-icon {
+     @apply w-8 h-8 rounded-lg bg-pms-primary text-white flex items-center justify-center flex-shrink-0;
+ }
 
-.pms-sidebar-brand-title {
-    @apply text-base font-bold text-pms-text-primary leading-tight;
-}
+ .pms-sidebar-brand-title {
+     @apply text-base font-bold text-pms-text-primary leading-tight;
+ }
 
-.pms-sidebar-brand-subtitle {
-    @apply text-[11px] text-pms-text-muted leading-tight;
-}
+ .pms-sidebar-brand-subtitle {
+     @apply text-[11px] text-pms-text-muted leading-tight;
+ }
 
-/* Navigation */
-.pms-sidebar-nav {
-    @apply flex-1 px-3 space-y-1;
+ /* Navigation */
+ .pms-sidebar-nav {
+     @apply flex-1 px-3 space-y-1;
 
-    min-height: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
+     min-height: 0;
+     overflow-y: auto;
+     overflow-x: hidden;
+ }
 
-.pms-nav-item {
-    @apply flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-sm text-pms-text-secondary transition-colors;
-}
-.pms-nav-item:hover {
-    @apply bg-pms-bg-sidebar-hover text-pms-primary-dark;
-}
+ .pms-nav-item {
+     @apply flex items-center gap-1.5 px-3 py-2.5 rounded-lg text-sm text-pms-text-secondary transition-colors;
+ }
 
-.pms-nav-icon {
-    @apply w-5 h-5 flex-shrink-0 text-pms-text-muted;
-}
+ .pms-nav-item:hover {
+     @apply bg-pms-bg-sidebar-hover text-pms-primary-dark;
+ }
 
-.pms-nav-label {
-    @apply flex-1 font-medium;
-}
+ .pms-nav-icon {
+     @apply w-5 h-5 flex-shrink-0 text-pms-text-muted;
+ }
 
-.pms-nav-chevron {
-    @apply w-3.5 h-3.5 flex-shrink-0 opacity-40;
-}
+ .pms-nav-label {
+     @apply flex-1 font-medium;
+ }
 
-.pms-nav-badge {
-    @apply bg-pms-notification-red text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0;
-}
+ .pms-nav-chevron {
+     @apply w-3.5 h-3.5 flex-shrink-0 opacity-40;
+ }
 
-/* Active state — teal pill like reference image */
-.pms-nav-item-active {
-    @apply bg-pms-primary text-white font-semibold shadow-sm;
-}
+ .pms-nav-badge {
+     @apply bg-pms-notification-red text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0;
+ }
 
-.pms-nav-item-active .pms-nav-icon,
-.pms-nav-item-active .pms-nav-chevron {
-    @apply text-white opacity-90;
-}
+ /* Active state — teal pill like reference image */
+ .pms-nav-item-active {
+     @apply bg-pms-primary text-white font-semibold shadow-sm;
+ }
 
-.pms-nav-item-active:hover {
-    @apply bg-pms-primary text-white;
-}
+ .pms-nav-item-active .pms-nav-icon,
+ .pms-nav-item-active .pms-nav-chevron {
+     @apply text-white opacity-90;
+ }
 
-/* Footer card */
-.pms-sidebar-footer-card {
-    @apply bg-pms-bg-sidebar-active border border-pms-border rounded-xl p-3 m-3 flex items-center gap-3 flex-shrink-0;
-}
+ .pms-nav-item-active:hover {
+     @apply bg-pms-primary text-white;
+ }
 
-/* ==========================================================
+ /* Footer card */
+ .pms-sidebar-footer-card {
+     @apply bg-pms-bg-sidebar-active border border-pms-border rounded-xl p-3 m-3 flex items-center gap-3 flex-shrink-0;
+ }
+
+ /* ==========================================================
    SUPPLIERS PARENT MENU
    ========================================================== */
 
-.pms-nav-item.pms-supplier-parent-active {
-    background: #D4F3F4 !important;
-    color: #006064 !important;
-    font-weight: 600;
-}
+ .pms-nav-item.pms-supplier-parent-active {
+     background: #D4F3F4 !important;
+     color: #006064 !important;
+     font-weight: 600;
+ }
 
-.pms-nav-item.pms-supplier-parent-active .pms-nav-icon {
-    color: #00838F !important;
-    opacity: 1;
-}
+ .pms-nav-item.pms-supplier-parent-active .pms-nav-icon {
+     color: #00838F !important;
+     opacity: 1;
+ }
 
-.pms-nav-item.pms-supplier-parent-active .pms-nav-label {
-    color: #006064 !important;
-}
+ .pms-nav-item.pms-supplier-parent-active .pms-nav-label {
+     color: #006064 !important;
+ }
 
-.pms-nav-item.pms-supplier-parent-active .pms-nav-chevron {
-    color: #00838F !important;
-    opacity: 1;
-}
+ .pms-nav-item.pms-supplier-parent-active .pms-nav-chevron {
+     color: #00838F !important;
+     opacity: 1;
+ }
 
-/* Hover */
-.pms-nav-item.pms-supplier-parent-active:hover {
-    background: #E0F2F1 !important;
-    color: #006064 !important;
-}
+ /* Hover */
+ .pms-nav-item.pms-supplier-parent-active:hover {
+     background: #E0F2F1 !important;
+     color: #006064 !important;
+ }
 
 
-/* ==========================================================
+ /* ==========================================================
    SUPPLIER SUBMENU
    ========================================================== */
 
-.pms-submenu {
-    margin-left: 18px;
-    padding-left: 18px;
-    border-left: 1px solid #DCEEEE;
-    margin-top: 3px;
-    margin-bottom: 5px;
-}
+ .pms-submenu {
+     margin-left: 18px;
+     padding-left: 18px;
+     border-left: 1px solid #DCEEEE;
+     margin-top: 3px;
+     margin-bottom: 5px;
+ }
 
-.pms-submenu-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+ .pms-submenu-item {
+     display: flex;
+     align-items: center;
+     gap: 10px;
 
-    min-height: 38px;
-    padding: 8px 12px;
+     min-height: 38px;
+     padding: 8px 12px;
 
-    color: #718792;
-    font-size: 13px;
-    font-weight: 500;
+     color: #718792;
+     font-size: 13px;
+     font-weight: 500;
 
-    text-decoration: none;
-    border-radius: 8px;
+     text-decoration: none;
+     border-radius: 8px;
 
-    transition: all 0.2s ease;
-}
+     transition: all 0.2s ease;
+ }
 
-.pms-submenu-item:hover {
-    background: #E0F2F1;
-    color: #006064;
-}
+ .pms-submenu-item:hover {
+     background: #E0F2F1;
+     color: #006064;
+ }
 
-.pms-submenu-item-active {
-    background: #D4F3F4;
-    color: #006064;
-    font-weight: 600;
-}
+ .pms-submenu-item-active {
+     background: #D4F3F4;
+     color: #006064;
+     font-weight: 600;
+ }
 
-.pms-submenu-dot {
-    width: 5px;
-    height: 5px;
-    flex-shrink: 0;
-    border-radius: 50%;
-    background: #98A7AF;
-}
+ .pms-submenu-dot {
+     width: 5px;
+     height: 5px;
+     flex-shrink: 0;
+     border-radius: 50%;
+     background: #98A7AF;
+ }
 
-.pms-submenu-item-active .pms-submenu-dot {
-    background: #00838F;
-    box-shadow: 0 0 6px rgba(0, 131, 143, 0.35);
-}
+ .pms-submenu-item-active .pms-submenu-dot {
+     background: #00838F;
+     box-shadow: 0 0 6px rgba(0, 131, 143, 0.35);
+ }
 
 
 
-/* =========================================================
+ /* =========================================================
    MEDICARE SUPPLIERS PAGE
    CLEAN + COMPACT + PROPERLY ALIGNED
 ========================================================= */
 
 
-/* =========================================================
+ /* =========================================================
    1. SUPPLIER STATS OUTER WRAPPER
 ========================================================= */
 
-.supplier-stats-widget,
-.supplier-stats-widget.fi-wi,
-.supplier-stats-widget.fi-wi-widget,
-.supplier-stats-widget.fi-wi-stats-overview {
+ .supplier-stats-widget,
+ .supplier-stats-widget.fi-wi,
+ .supplier-stats-widget.fi-wi-widget,
+ .supplier-stats-widget.fi-wi-stats-overview {
 
-    background: transparent !important;
-    background-color: transparent !important;
+     background: transparent !important;
+     background-color: transparent !important;
 
-    border: 0 !important;
-    box-shadow: none !important;
+     border: 0 !important;
+     box-shadow: none !important;
 
-    padding: 0 !important;
-    margin: 0 !important;
+     padding: 0 !important;
+     margin: 0 !important;
 
-    border-radius: 0 !important;
-}
-
-
-/* Remove Filament wrappers around stats */
-
-.fi-wi:has(.supplier-stat-card),
-.fi-wi-widget:has(.supplier-stat-card),
-.fi-wi-stats-overview:has(.supplier-stat-card),
-.fi-section:has(.supplier-stat-card) {
-
-    background: transparent !important;
-    background-color: transparent !important;
-
-    border: 0 !important;
-    box-shadow: none !important;
-
-    padding: 0 !important;
-    margin: 0 !important;
-}
+     border-radius: 0 !important;
+ }
 
 
-/* =========================================================
+ /* Remove Filament wrappers around stats */
+
+ .fi-wi:has(.supplier-stat-card),
+ .fi-wi-widget:has(.supplier-stat-card),
+ .fi-wi-stats-overview:has(.supplier-stat-card),
+ .fi-section:has(.supplier-stat-card) {
+
+     background: transparent !important;
+     background-color: transparent !important;
+
+     border: 0 !important;
+     box-shadow: none !important;
+
+     padding: 0 !important;
+     margin: 0 !important;
+ }
+
+
+ /* =========================================================
    2. PAGE HEADER WIDGET AREA
    REDUCE LARGE FILAMENT SPACING
 ========================================================= */
 
-.fi-page:has(.supplier-stats-widget) .fi-wi {
+ .fi-page:has(.supplier-stats-widget) .fi-wi {
 
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-}
-
-
-/* Header widgets main grid */
-
-.fi-page:has(.supplier-stats-widget) .fi-wi-grid {
-
-    row-gap: 12px !important;
-    column-gap: 0 !important;
-
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-}
+     margin-top: 0 !important;
+     margin-bottom: 0 !important;
+ }
 
 
-/* =========================================================
+ /* Header widgets main grid */
+
+ .fi-page:has(.supplier-stats-widget) .fi-wi-grid {
+
+     row-gap: 12px !important;
+     column-gap: 0 !important;
+
+     margin-top: 0 !important;
+     margin-bottom: 0 !important;
+ }
+
+
+ /* =========================================================
    3. STATS GRID
 ========================================================= */
 
-.supplier-stats-widget .fi-wi-stats-overview-stats-ctn {
+ .supplier-stats-widget .fi-wi-stats-overview-stats-ctn {
 
-    display: grid !important;
+     display: grid !important;
 
-    grid-template-columns:
-        repeat(4, minmax(0, 1fr)) !important;
+     grid-template-columns:
+         repeat(4, minmax(0, 1fr)) !important;
 
-    gap: 14px !important;
+     gap: 14px !important;
 
-    width: 100% !important;
+     width: 100% !important;
 
-    padding: 0 !important;
-    margin: 0 !important;
-}
+     padding: 0 !important;
+     margin: 0 !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    4. SUPPLIER STAT CARD
 ========================================================= */
 
-.supplier-stats-widget .supplier-stat-card {
+ .supplier-stats-widget .supplier-stat-card {
 
-    position: relative !important;
+     position: relative !important;
 
-    height: 88px !important;
-    min-height: 88px !important;
+     height: 88px !important;
+     min-height: 88px !important;
 
-    padding: 11px 14px !important;
+     padding: 11px 14px !important;
 
-    margin: 0 !important;
+     margin: 0 !important;
 
-    border-radius: 10px !important;
+     border-radius: 10px !important;
 
-    border: 1px solid #dfe7e8 !important;
+     border: 1px solid #dfe7e8 !important;
 
-    background: #ffffff !important;
+     background: #ffffff !important;
 
-    box-shadow:
-        0 2px 7px rgba(15, 45, 50, 0.045) !important;
+     box-shadow:
+         0 2px 7px rgba(15, 45, 50, 0.045) !important;
 
-    overflow: hidden !important;
+     overflow: hidden !important;
 
-    transition:
-        transform 0.18s ease,
-        box-shadow 0.18s ease,
-        border-color 0.18s ease !important;
+     transition:
+         transform 0.18s ease,
+         box-shadow 0.18s ease,
+         border-color 0.18s ease !important;
 
-    --tw-ring-offset-shadow: 0 0 transparent !important;
-    --tw-ring-shadow: 0 0 transparent !important;
-    --tw-shadow: none !important;
+     --tw-ring-offset-shadow: 0 0 transparent !important;
+     --tw-ring-shadow: 0 0 transparent !important;
+     --tw-shadow: none !important;
 
-    outline: none !important;
-}
+     outline: none !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    5. CARD HOVER
 ========================================================= */
 
-.supplier-stats-widget .supplier-stat-card:hover {
+ .supplier-stats-widget .supplier-stat-card:hover {
 
-    transform: translateY(-2px) !important;
+     transform: translateY(-2px) !important;
 
-    border-color: #c8dfe1 !important;
+     border-color: #c8dfe1 !important;
 
-    box-shadow:
-        0 7px 18px rgba(15, 45, 50, 0.08) !important;
-}
+     box-shadow:
+         0 7px 18px rgba(15, 45, 50, 0.08) !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    6. LEFT ACCENT LINE
 ========================================================= */
 
-.supplier-stats-widget .supplier-stat-card::before {
+ .supplier-stats-widget .supplier-stat-card::before {
 
-    content: "";
+     content: "";
 
-    position: absolute;
+     position: absolute;
 
-    left: 0;
-    top: 10px;
-    bottom: 10px;
+     left: 0;
+     top: 10px;
+     bottom: 10px;
 
-    width: 3px;
+     width: 3px;
 
-    border-radius:
-        0 4px 4px 0;
-}
-
-
-/* Total */
-
-.supplier-stats-widget .supplier-stat-total::before {
-    background: #008892;
-}
+     border-radius:
+         0 4px 4px 0;
+ }
 
 
-/* Active */
+ /* Total */
 
-.supplier-stats-widget .supplier-stat-active::before {
-    background: #16a36a;
-}
-
-
-/* Payable */
-
-.supplier-stats-widget .supplier-stat-payable::before {
-    background: #df941d;
-}
+ .supplier-stats-widget .supplier-stat-total::before {
+     background: #008892;
+ }
 
 
-/* Inactive */
+ /* Active */
 
-.supplier-stats-widget .supplier-stat-inactive::before {
-    background: #d75b64;
-}
+ .supplier-stats-widget .supplier-stat-active::before {
+     background: #16a36a;
+ }
 
 
-/* =========================================================
+ /* Payable */
+
+ .supplier-stats-widget .supplier-stat-payable::before {
+     background: #df941d;
+ }
+
+
+ /* Inactive */
+
+ .supplier-stats-widget .supplier-stat-inactive::before {
+     background: #d75b64;
+ }
+
+
+ /* =========================================================
    7. LABEL
 ========================================================= */
 
-.supplier-stats-widget .supplier-stat-card .fi-wi-stats-overview-stat-label {
+ .supplier-stats-widget .supplier-stat-card .fi-wi-stats-overview-stat-label {
 
-    font-size: 11px !important;
+     font-size: 11px !important;
 
-    line-height: 1.15 !important;
+     line-height: 1.15 !important;
 
-    font-weight: 500 !important;
+     font-weight: 500 !important;
 
-    color: #64748b !important;
+     color: #64748b !important;
 
-    margin: 0 !important;
-}
+     margin: 0 !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    8. VALUE
 ========================================================= */
 
-.supplier-stats-widget .supplier-stat-card .fi-wi-stats-overview-stat-value {
+ .supplier-stats-widget .supplier-stat-card .fi-wi-stats-overview-stat-value {
 
-    margin-top: 4px !important;
+     margin-top: 4px !important;
 
-    font-size: 21px !important;
+     font-size: 21px !important;
 
-    line-height: 1 !important;
+     line-height: 1 !important;
 
-    font-weight: 700 !important;
+     font-weight: 700 !important;
 
-    color: #0f172a !important;
-}
+     color: #0f172a !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    9. DESCRIPTION
 ========================================================= */
 
-.supplier-stats-widget .supplier-stat-card .fi-wi-stats-overview-stat-description {
+ .supplier-stats-widget .supplier-stat-card .fi-wi-stats-overview-stat-description {
 
-    margin-top: 4px !important;
+     margin-top: 4px !important;
 
-    font-size: 9px !important;
+     font-size: 9px !important;
 
-    line-height: 1.1 !important;
+     line-height: 1.1 !important;
 
-    color: #64748b !important;
-}
+     color: #64748b !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    10. MAIN ICON
 ========================================================= */
 
-.supplier-stats-widget .supplier-stat-card .fi-wi-stats-overview-stat-icon {
+ .supplier-stats-widget .supplier-stat-card .fi-wi-stats-overview-stat-icon {
 
-    width: 30px !important;
-    height: 30px !important;
+     width: 30px !important;
+     height: 30px !important;
 
-    padding: 7px !important;
+     padding: 7px !important;
 
-    border-radius: 8px !important;
+     border-radius: 8px !important;
 
-    background: #edf8f8 !important;
+     background: #edf8f8 !important;
 
-    color: #008892 !important;
-}
-
-
-/* Total */
-
-.supplier-stat-total .fi-wi-stats-overview-stat-icon {
-
-    background: #edf8f8 !important;
-    color: #008892 !important;
-}
+     color: #008892 !important;
+ }
 
 
-/* Active */
+ /* Total */
 
-.supplier-stat-active .fi-wi-stats-overview-stat-icon {
+ .supplier-stat-total .fi-wi-stats-overview-stat-icon {
 
-    background: #edf8f2 !important;
-    color: #16a36a !important;
-}
-
-
-/* Payable */
-
-.supplier-stat-payable .fi-wi-stats-overview-stat-icon {
-
-    background: #fff7e9 !important;
-    color: #df941d !important;
-}
+     background: #edf8f8 !important;
+     color: #008892 !important;
+ }
 
 
-/* Inactive */
+ /* Active */
 
-.supplier-stat-inactive .fi-wi-stats-overview-stat-icon {
+ .supplier-stat-active .fi-wi-stats-overview-stat-icon {
 
-    background: #fff0f1 !important;
-    color: #d75b64 !important;
-}
+     background: #edf8f2 !important;
+     color: #16a36a !important;
+ }
 
 
-/* =========================================================
+ /* Payable */
+
+ .supplier-stat-payable .fi-wi-stats-overview-stat-icon {
+
+     background: #fff7e9 !important;
+     color: #df941d !important;
+ }
+
+
+ /* Inactive */
+
+ .supplier-stat-inactive .fi-wi-stats-overview-stat-icon {
+
+     background: #fff0f1 !important;
+     color: #d75b64 !important;
+ }
+
+
+ /* =========================================================
    11. DESCRIPTION ICON
 ========================================================= */
 
-.supplier-stats-widget .fi-wi-stats-overview-stat-description-icon {
+ .supplier-stats-widget .fi-wi-stats-overview-stat-description-icon {
 
-    width: 12px !important;
-    height: 12px !important;
-}
+     width: 12px !important;
+     height: 12px !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    12. SUPPLIER ACTION BUTTON AREA
 ========================================================= */
 
-/*
+ /*
    Add Supplier widget ko right side par rakhein
 */
 
-.fi-page:has(.supplier-stats-widget) .fi-wi:has(.supplier-actions-widget) {
+ .fi-page:has(.supplier-stats-widget) .fi-wi:has(.supplier-actions-widget) {
 
-    display: flex !important;
+     display: flex !important;
 
-    justify-content: flex-end !important;
+     justify-content: flex-end !important;
 
-    width: 100% !important;
+     width: 100% !important;
 
-    margin-top: 2px !important;
-    margin-bottom: 0 !important;
-}
+     margin-top: 2px !important;
+     margin-bottom: 0 !important;
+ }
 
 
-/*
+ /*
    Agar custom widget ka class different ho
    to generic widget positioning
 */
 
-.fi-page:has(.supplier-stats-widget) .fi-header-widgets>.fi-wi:last-child {
+ .fi-page:has(.supplier-stats-widget) .fi-header-widgets>.fi-wi:last-child {
 
-    display: flex !important;
+     display: flex !important;
 
-    justify-content: flex-end !important;
+     justify-content: flex-end !important;
 
-    width: 100% !important;
+     width: 100% !important;
 
-    margin-top: 0 !important;
-}
+     margin-top: 0 !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    13. ADD SUPPLIER BUTTON
 ========================================================= */
 
-.fi-page:has(.supplier-stats-widget) .fi-wi:last-child .fi-btn {
+ .fi-page:has(.supplier-stats-widget) .fi-wi:last-child .fi-btn {
 
-    min-height: 42px !important;
+     min-height: 42px !important;
 
-    padding:
-        0 18px !important;
+     padding:
+         0 18px !important;
 
-    border-radius: 10px !important;
+     border-radius: 10px !important;
 
-    font-size: 13px !important;
+     font-size: 13px !important;
 
-    font-weight: 600 !important;
+     font-weight: 600 !important;
 
-    box-shadow:
-        0 3px 8px rgba(0, 136, 146, 0.12) !important;
+     box-shadow:
+         0 3px 8px rgba(0, 136, 146, 0.12) !important;
 
-    margin: 0 !important;
-}
+     margin: 0 !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    14. TABLE TOP SPACING
 ========================================================= */
 
-.fi-page:has(.supplier-stats-widget) .fi-ta-ctn {
+ .fi-page:has(.supplier-stats-widget) .fi-ta-ctn {
 
-    margin-top: 12px !important;
-}
+     margin-top: 12px !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    15. HIDE EMPTY SUPPLIER TABLE
    WHEN THERE ARE NO SUPPLIERS
 ========================================================= */
 
-/*
+ /*
    Agar supplier data = 0 ho:
    table + search + filter + table header hide.
 */
 
-.fi-page:has(.supplier-stats-widget) .fi-ta-ctn:has(.fi-ta-empty-state) {
+ .fi-page:has(.supplier-stats-widget) .fi-ta-ctn:has(.fi-ta-empty-state) {
 
-    display: none !important;
-}
+     display: none !important;
+ }
 
 
-/*
+ /*
    Fallback for Filament empty-state heading
 */
 
-.fi-page:has(.supplier-stats-widget) .fi-ta-ctn:has(.fi-ta-empty-state-heading) {
+ .fi-page:has(.supplier-stats-widget) .fi-ta-ctn:has(.fi-ta-empty-state-heading) {
 
-    display: none !important;
-}
+     display: none !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    16. WHEN TABLE HAS DATA
 ========================================================= */
 
-.fi-page:has(.supplier-stats-widget) .fi-ta-ctn:not(:has(.fi-ta-empty-state)) {
+ .fi-page:has(.supplier-stats-widget) .fi-ta-ctn:not(:has(.fi-ta-empty-state)) {
 
-    margin-top: 12px !important;
-}
+     margin-top: 12px !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    17. REMOVE UNNECESSARY PAGE HEADER SPACING
 ========================================================= */
 
-.fi-page:has(.supplier-stats-widget) .fi-header {
+ .fi-page:has(.supplier-stats-widget) .fi-header {
 
-    margin-bottom: 8px !important;
-}
+     margin-bottom: 8px !important;
+ }
 
 
-/* Breadcrumb/title area */
+ /* Breadcrumb/title area */
 
-.fi-page:has(.supplier-stats-widget) .fi-header-heading {
+ .fi-page:has(.supplier-stats-widget) .fi-header-heading {
 
-    margin-bottom: 0 !important;
-}
+     margin-bottom: 0 !important;
+ }
 
-/* =========================================================
+ /* =========================================================
    SUPPLIER TABLE PAGINATION
    Hide "Showing..." + move Per Page to right
 ========================================================= */
 
-/* Hide Showing results text */
-.supplier-table-widget .fi-pagination-records {
-    display: none !important;
-}
+ /* Hide Showing results text */
+ .supplier-table-widget .fi-pagination-records {
+     display: none !important;
+ }
 
-/* Pagination footer */
-.supplier-table-widget .fi-pagination {
-    display: flex !important;
-    justify-content: flex-end !important;
-    width: 100% !important;
-}
+ /* Pagination footer */
+ .supplier-table-widget .fi-pagination {
+     display: flex !important;
+     justify-content: flex-end !important;
+     width: 100% !important;
+ }
 
-/* Per page section */
-.supplier-table-widget .fi-pagination-items-per-page {
-    margin-left: auto !important;
-}
+ /* Per page section */
+ .supplier-table-widget .fi-pagination-items-per-page {
+     margin-left: auto !important;
+ }
 
-/* Hide "Showing 1 to 2 of 2 results" */
-.fi-pagination-records {
-    display: none !important;
-}
+ /* Hide "Showing 1 to 2 of 2 results" */
+ .fi-pagination-records {
+     display: none !important;
+ }
 
-/* Move Per Page dropdown to right */
-.fi-pagination {
-    display: flex !important;
-    justify-content: flex-end !important;
-    width: 100% !important;
-}
+ /* Move Per Page dropdown to right */
+ .fi-pagination {
+     display: flex !important;
+     justify-content: flex-end !important;
+     width: 100% !important;
+ }
 
-.fi-pagination-items-per-page {
-    margin-left: auto !important;
-}
+ .fi-pagination-items-per-page {
+     margin-left: auto !important;
+ }
 
-/* =========================================================
+ /* =========================================================
    18. DESKTOP
 ========================================================= */
 
-@media (min-width: 1051px) {
+ @media (min-width: 1051px) {
 
-    .supplier-stats-widget .fi-wi-stats-overview-stats-ctn {
+     .supplier-stats-widget .fi-wi-stats-overview-stats-ctn {
 
-        grid-template-columns:
-            repeat(4, minmax(0, 1fr)) !important;
+         grid-template-columns:
+             repeat(4, minmax(0, 1fr)) !important;
 
-        gap: 14px !important;
-    }
+         gap: 14px !important;
+     }
 
-    .supplier-stats-widget .supplier-stat-card {
+     .supplier-stats-widget .supplier-stat-card {
 
-        height: 88px !important;
-        min-height: 88px !important;
-    }
-}
+         height: 88px !important;
+         min-height: 88px !important;
+     }
+ }
 
 
-/* =========================================================
+ /* =========================================================
    19. TABLET
 ========================================================= */
 
-@media (max-width: 1050px) {
+ @media (max-width: 1050px) {
 
-    .supplier-stats-widget .fi-wi-stats-overview-stats-ctn {
+     .supplier-stats-widget .fi-wi-stats-overview-stats-ctn {
 
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr)) !important;
+         grid-template-columns:
+             repeat(2, minmax(0, 1fr)) !important;
 
-        gap: 12px !important;
-    }
+         gap: 12px !important;
+     }
 
-    .supplier-stats-widget .supplier-stat-card {
+     .supplier-stats-widget .supplier-stat-card {
 
-        height: 88px !important;
-        min-height: 88px !important;
-    }
-}
+         height: 88px !important;
+         min-height: 88px !important;
+     }
+ }
 
 
-/* =========================================================
+ /* =========================================================
    20. MOBILE
 ========================================================= */
 
-@media (max-width: 640px) {
+ @media (max-width: 640px) {
 
-    .supplier-stats-widget .fi-wi-stats-overview-stats-ctn {
+     .supplier-stats-widget .fi-wi-stats-overview-stats-ctn {
 
-        grid-template-columns: 1fr !important;
+         grid-template-columns: 1fr !important;
 
-        gap: 10px !important;
-    }
+         gap: 10px !important;
+     }
 
-    .supplier-stats-widget .supplier-stat-card {
+     .supplier-stats-widget .supplier-stat-card {
 
-        height: 82px !important;
-        min-height: 82px !important;
-    }
+         height: 82px !important;
+         min-height: 82px !important;
+     }
 
-    .fi-page:has(.supplier-stats-widget) .fi-wi:has(.supplier-actions-widget) {
+     .fi-page:has(.supplier-stats-widget) .fi-wi:has(.supplier-actions-widget) {
 
-        justify-content: stretch !important;
-    }
+         justify-content: stretch !important;
+     }
 
-    .fi-page:has(.supplier-stats-widget) .fi-wi:last-child .fi-btn {
+     .fi-page:has(.supplier-stats-widget) .fi-wi:last-child .fi-btn {
 
-        width: 100% !important;
-    }
-}
+         width: 100% !important;
+     }
+ }
 
-/* =========================================================
+ /* =========================================================
    MEDICARE MODERN TOPBAR
 ========================================================= */
 
-.pms-topbar {
-    height: 72px;
+ .pms-topbar {
+     height: 72px;
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
 
-    padding: 0 24px;
+     padding: 0 24px;
 
-    background: rgba(255, 255, 255, 0.96);
+     background: rgba(255, 255, 255, 0.96);
 
-    border-bottom: 1px solid #e4eeee;
+     border-bottom: 1px solid #e4eeee;
 
-    box-shadow:
-        0 4px 18px rgba(0, 96, 100, 0.05);
+     box-shadow:
+         0 4px 18px rgba(0, 96, 100, 0.05);
 
-    position: relative;
-    z-index: 30;
+     position: relative;
+     z-index: 30;
 
-    backdrop-filter: blur(12px);
-}
-
-
-
-
-.pms-topbar-left {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
-
-.pms-page-heading {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-
-.pms-page-title {
-    color: #263238;
-    font-size: 15px;
-    font-weight: 750;
-    letter-spacing: -0.01em;
-}
-
-
-.pms-page-subtitle {
-    color: #90a4ae;
-    font-size: 11px;
-    font-weight: 500;
-}
+     backdrop-filter: blur(12px);
+ }
 
 
 
 
-/* .pms-topbar-right {
+ .pms-topbar-left {
+     display: flex;
+     align-items: center;
+     gap: 14px;
+ }
+
+
+ .pms-page-heading {
+     display: flex;
+     flex-direction: column;
+     gap: 2px;
+ }
+
+
+ .pms-page-title {
+     color: #263238;
+     font-size: 15px;
+     font-weight: 750;
+     letter-spacing: -0.01em;
+ }
+
+
+ .pms-page-subtitle {
+     color: #90a4ae;
+     font-size: 11px;
+     font-weight: 500;
+ }
+
+
+
+
+ /* .pms-topbar-right {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1159,295 +1162,295 @@
 
 
 
-.pms-topbar-action {
-    width: 40px;
-    height: 40px;
+ .pms-topbar-action {
+     width: 40px;
+     height: 40px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+     display: flex;
+     align-items: center;
+     justify-content: center;
 
-    border: 1px solid #e4eeee;
-    border-radius: 12px;
+     border: 1px solid #e4eeee;
+     border-radius: 12px;
 
-    background: #ffffff;
+     background: #ffffff;
 
-    color: #607d83;
+     color: #607d83;
 
-    cursor: pointer;
+     cursor: pointer;
 
-    transition:
-        background 0.25s ease,
-        color 0.25s ease,
-        transform 0.25s ease,
-        box-shadow 0.25s ease;
-}
+     transition:
+         background 0.25s ease,
+         color 0.25s ease,
+         transform 0.25s ease,
+         box-shadow 0.25s ease;
+ }
 
 
-.pms-topbar-action svg {
-    width: 19px;
-    height: 19px;
-}
+ .pms-topbar-action svg {
+     width: 19px;
+     height: 19px;
+ }
 
 
-.pms-topbar-action:hover {
-    color: #00838f;
+ .pms-topbar-action:hover {
+     color: #00838f;
 
-    background: #e0f7fa;
+     background: #e0f7fa;
 
-    border-color: #b2ebf2;
+     border-color: #b2ebf2;
 
-    transform: translateY(-2px);
+     transform: translateY(-2px);
 
-    box-shadow:
-        0 6px 14px rgba(0, 131, 143, 0.10);
-}
+     box-shadow:
+         0 6px 14px rgba(0, 131, 143, 0.10);
+ }
 
 
 
 
-.pms-notification-btn {
-    position: relative;
-}
+ .pms-notification-btn {
+     position: relative;
+ }
 
 
-.pms-notification-dot {
-    position: absolute;
+ .pms-notification-dot {
+     position: absolute;
 
-    top: 7px;
-    right: 7px;
+     top: 7px;
+     right: 7px;
 
-    width: 7px;
-    height: 7px;
+     width: 7px;
+     height: 7px;
 
-    border-radius: 50%;
+     border-radius: 50%;
 
-    background: #ef5350;
+     background: #ef5350;
 
-    border: 2px solid #ffffff;
-}
+     border: 2px solid #ffffff;
+ }
 
 
 
 
-.pms-topbar-divider {
-    width: 1px;
-    height: 32px;
+ .pms-topbar-divider {
+     width: 1px;
+     height: 32px;
 
-    background: #e5eeee;
+     background: #e5eeee;
 
-    margin: 0 8px;
-}
+     margin: 0 8px;
+ }
 
 
 
 
-.pms-user {
-    display: flex;
-    align-items: center;
+ .pms-user {
+     display: flex;
+     align-items: center;
 
-    gap: 10px;
+     gap: 10px;
 
-    padding: 6px 8px 6px 6px;
+     padding: 6px 8px 6px 6px;
 
-    border-radius: 14px;
+     border-radius: 14px;
 
-    cursor: pointer;
+     cursor: pointer;
 
-    transition:
-        background 0.25s ease,
-        box-shadow 0.25s ease;
-}
+     transition:
+         background 0.25s ease,
+         box-shadow 0.25s ease;
+ }
 
 
-.pms-user:hover {
-    background: #f0fafa;
+ .pms-user:hover {
+     background: #f0fafa;
 
-    box-shadow:
-        0 5px 16px rgba(4, 128, 133, 0.07);
-}
+     box-shadow:
+         0 5px 16px rgba(4, 128, 133, 0.07);
+ }
 
 
 
-.pms-user-avatar {
-    width: 38px;
-    height: 38px;
+ .pms-user-avatar {
+     width: 38px;
+     height: 38px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+     display: flex;
+     align-items: center;
+     justify-content: center;
 
-    border-radius: 11px;
+     border-radius: 11px;
 
-    color: #ffffff;
+     color: #ffffff;
 
-    font-size: 14px;
-    font-weight: 750;
+     font-size: 14px;
+     font-weight: 750;
 
-    background:
-        linear-gradient(135deg,
-            #00838f,
-            #006064);
+     background:
+         linear-gradient(135deg,
+             #00838f,
+             #006064);
 
-    box-shadow:
-        0 5px 12px rgba(5, 143, 148, 0.18);
-}
+     box-shadow:
+         0 5px 12px rgba(5, 143, 148, 0.18);
+ }
 
 
 
-.pms-user-info {
-    display: flex;
-    flex-direction: column;
+ .pms-user-info {
+     display: flex;
+     flex-direction: column;
 
-    min-width: 100px;
-}
+     min-width: 100px;
+ }
 
 
-.pms-user-name {
-    color: #2b5f79;
+ .pms-user-name {
+     color: #2b5f79;
 
-    font-size: 13px;
-    font-weight: 700;
+     font-size: 13px;
+     font-weight: 700;
 
-    white-space: nowrap;
-}
+     white-space: nowrap;
+ }
 
 
-.pms-user-role {
-    color: #90a4ae;
+ .pms-user-role {
+     color: #90a4ae;
 
-    font-size: 10px;
-    font-weight: 500;
-}
+     font-size: 10px;
+     font-weight: 500;
+ }
 
 
 
 
-.pms-user-chevron {
-    width: 15px;
-    height: 15px;
+ .pms-user-chevron {
+     width: 15px;
+     height: 15px;
 
-    color: #90a4ae;
+     color: #90a4ae;
 
-    transition:
-        transform 0.25s ease,
-        color 0.25s ease;
-}
+     transition:
+         transform 0.25s ease,
+         color 0.25s ease;
+ }
 
 
-.pms-user:hover .pms-user-chevron {
-    color: #00838f;
+ .pms-user:hover .pms-user-chevron {
+     color: #00838f;
 
-    transform: rotate(180deg);
-}
+     transform: rotate(180deg);
+ }
 
 
 
 
-.pms-mobile-menu {
-    display: none;
-}
+ .pms-mobile-menu {
+     display: none;
+ }
 
 
-.pms-mobile-menu button {
-    width: 40px;
-    height: 40px;
+ .pms-mobile-menu button {
+     width: 40px;
+     height: 40px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+     display: flex;
+     align-items: center;
+     justify-content: center;
 
-    border: 1px solid #e4eeee;
-    border-radius: 11px;
+     border: 1px solid #e4eeee;
+     border-radius: 11px;
 
-    background: #ffffff;
+     background: #ffffff;
 
-    color: #607d83;
-}
+     color: #607d83;
+ }
 
 
-.pms-mobile-menu svg {
-    width: 20px;
-    height: 20px;
-}
+ .pms-mobile-menu svg {
+     width: 20px;
+     height: 20px;
+ }
 
 
 
 
-@media (max-width: 768px) {
+ @media (max-width: 768px) {
 
-    .pms-topbar {
-        height: 64px;
-        padding: 0 14px;
-    }
+     .pms-topbar {
+         height: 64px;
+         padding: 0 14px;
+     }
 
-    .pms-mobile-menu {
-        display: block;
-    }
+     .pms-mobile-menu {
+         display: block;
+     }
 
-    .pms-page-subtitle {
-        display: none;
-    }
+     .pms-page-subtitle {
+         display: none;
+     }
 
-    .pms-user-info {
-        display: none;
-    }
+     .pms-user-info {
+         display: none;
+     }
 
-    .pms-user-chevron {
-        display: none;
-    }
+     .pms-user-chevron {
+         display: none;
+     }
 
-    .pms-topbar-action {
-        width: 36px;
-        height: 36px;
-    }
+     .pms-topbar-action {
+         width: 36px;
+         height: 36px;
+     }
 
-    .pms-user-avatar {
-        width: 36px;
-        height: 36px;
-    }
+     .pms-user-avatar {
+         width: 36px;
+         height: 36px;
+     }
 
-    .pms-topbar-divider {
-        margin: 0 3px;
-    }
+     .pms-topbar-divider {
+         margin: 0 3px;
+     }
 
-}
+ }
 
 
-@media (max-width: 480px) {
+ @media (max-width: 480px) {
 
-    .pms-search-btn {
-        display: none;
-    }
+     .pms-search-btn {
+         display: none;
+     }
 
-    .pms-topbar {
-        padding: 0 10px;
-    }
+     .pms-topbar {
+         padding: 0 10px;
+     }
 
-}
+ }
 
-/* =========================================================
+ /* =========================================================
    HIDE FILAMENT DEFAULT TOPBAR
 ========================================================= */
 
 
-/* Remove Filament topbar spacing */
-.fi-main-ctn {
-    padding-top: 0 !important;
-}
+ /* Remove Filament topbar spacing */
+ .fi-main-ctn {
+     padding-top: 0 !important;
+ }
 
-/* Hide Filament default topbar */
-.fi-topbar {
-    display: none !important;
-}
+ /* Hide Filament default topbar */
+ .fi-topbar {
+     display: none !important;
+ }
 
-/* Remove space reserved for topbar */
-/* .fi-main {
+ /* Remove space reserved for topbar */
+ /* .fi-main {
     padding-top: 72px !important;
 } */
 
-/* Keep custom navbar visible */
-/* .pms-topbar {
+ /* Keep custom navbar visible */
+ /* .pms-topbar {
     height: 72px;
     width: 100%;
 
@@ -1469,2293 +1472,2296 @@
     z-index: 9999;
 } */
 
-/* .pms-sidebar {
+ /* .pms-sidebar {
     @apply flex flex-col h-full bg-pms-bg-sidebar border-r border-pms-border;
 } */
 
-/* =========================================================
+ /* =========================================================
    SUPPLIER FORM — COMPACT PREMIUM
 ========================================================= */
 
-.fi-section {
-    border: 1px solid #e2eeee !important;
-    border-radius: 14px !important;
-    background: #ffffff !important;
-    box-shadow: 0 3px 12px rgba(0, 96, 100, 0.04) !important;
-}
+ .fi-section {
+     border: 1px solid #e2eeee !important;
+     border-radius: 14px !important;
+     background: #ffffff !important;
+     box-shadow: 0 3px 12px rgba(0, 96, 100, 0.04) !important;
+ }
 
 
-/* Header */
+ /* Header */
 
-.fi-section-header {
-    padding: 14px 18px !important;
-    background: #fbfefe !important;
-    border-bottom: 1px solid #edf4f4 !important;
-}
+ .fi-section-header {
+     padding: 14px 18px !important;
+     background: #fbfefe !important;
+     border-bottom: 1px solid #edf4f4 !important;
+ }
 
-.fi-section-header-heading {
-    color: #006064 !important;
-    font-size: 14px !important;
-    font-weight: 700 !important;
-}
+ .fi-section-header-heading {
+     color: #006064 !important;
+     font-size: 14px !important;
+     font-weight: 700 !important;
+ }
 
-.fi-section-header-icon {
-    color: #00838f !important;
-}
-
-
-/* Body */
-
-.fi-section-content {
-    padding: 18px !important;
-}
+ .fi-section-header-icon {
+     color: #00838f !important;
+ }
 
 
-/* Labels */
+ /* Body */
 
-.fi-fo-field-wrp-label {
-    font-size: 12px !important;
-    font-weight: 600 !important;
-    color: #455a64 !important;
-}
+ .fi-section-content {
+     padding: 18px !important;
+ }
 
 
-/* Inputs */
+ /* Labels */
 
-.fi-input,
-.fi-select-input,
-.fi-fo-textarea {
-    min-height: 40px !important;
-    border-radius: 9px !important;
-    border-color: #dcebec !important;
-    font-size: 13px !important;
-}
+ .fi-fo-field-wrp-label {
+     font-size: 12px !important;
+     font-weight: 600 !important;
+     color: #455a64 !important;
+ }
 
 
-/* Focus */
+ /* Inputs */
 
-.fi-input:focus,
-.fi-select-input:focus,
-.fi-fo-textarea:focus {
-    border-color: #00838f !important;
-
-    box-shadow:
-        0 0 0 2px rgba(0, 131, 143, 0.08) !important;
-}
-
-
-/* Prefix icons */
-
-.fi-input-wrp-prefix svg {
-    color: #00838f !important;
-}
+ .fi-input,
+ .fi-select-input,
+ .fi-fo-textarea {
+     min-height: 40px !important;
+     border-radius: 9px !important;
+     border-color: #dcebec !important;
+     font-size: 13px !important;
+ }
 
 
-/* Textarea */
+ /* Focus */
 
-.fi-fo-textarea {
-    min-height: 70px !important;
-}
+ .fi-input:focus,
+ .fi-select-input:focus,
+ .fi-fo-textarea:focus {
+     border-color: #00838f !important;
+
+     box-shadow:
+         0 0 0 2px rgba(0, 131, 143, 0.08) !important;
+ }
 
 
-/* Form spacing */
+ /* Prefix icons */
 
-.fi-fo-component-ct {
-    gap: 14px !important;
-}
+ .fi-input-wrp-prefix svg {
+     color: #00838f !important;
+ }
 
-/* =========================================================
+
+ /* Textarea */
+
+ .fi-fo-textarea {
+     min-height: 70px !important;
+ }
+
+
+ /* Form spacing */
+
+ .fi-fo-component-ct {
+     gap: 14px !important;
+ }
+
+ /* =========================================================
    MEDICARE SUPPLIER VIEW
    CLEAN MODERN ERP DESIGN
 ========================================================= */
 
 
 
-.fi-page {
-    background: #f7fbfb !important;
-}
+ .fi-page {
+     background: #f7fbfb !important;
+ }
 
-/* =========================================================
+ /* =========================================================
    MEDICARE SUPPLIER VIEW
    MODERN PROFESSIONAL ERP DESIGN
 ========================================================= */
 
 
-/* =========================================================
+ /* =========================================================
    PAGE
 ========================================================= */
 
-.fi-main {
-    background: #f5f8fa !important;
-}
+ .fi-main {
+     background: #f5f8fa !important;
+ }
 
-.fi-in {
-    max-width: 1280px !important;
-    margin-inline: auto !important;
-    padding-bottom: 50px !important;
-}
+ .fi-in {
+     max-width: 1280px !important;
+     margin-inline: auto !important;
+     padding-bottom: 50px !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    PAGE HEADER
 ========================================================= */
 
-.fi-header {
-    margin-bottom: 24px !important;
-}
+ .fi-header {
+     margin-bottom: 24px !important;
+ }
 
-.fi-header-heading {
-    color: #102a36 !important;
-    font-size: 27px !important;
-    font-weight: 750 !important;
-    letter-spacing: -0.035em !important;
-}
+ .fi-header-heading {
+     color: #102a36 !important;
+     font-size: 27px !important;
+     font-weight: 750 !important;
+     letter-spacing: -0.035em !important;
+ }
 
-.fi-header-subheading {
-    color: #80929a !important;
-    font-size: 13px !important;
-    margin-top: 4px !important;
-}
+ .fi-header-subheading {
+     color: #80929a !important;
+     font-size: 13px !important;
+     margin-top: 4px !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    HEADER BUTTON
 ========================================================= */
 
-.fi-page-header-actions .fi-btn {
-    min-height: 40px !important;
-    padding: 0 18px !important;
+ .fi-page-header-actions .fi-btn {
+     min-height: 40px !important;
+     padding: 0 18px !important;
 
-    border-radius: 10px !important;
+     border-radius: 10px !important;
 
-    font-size: 13px !important;
-    font-weight: 700 !important;
+     font-size: 13px !important;
+     font-weight: 700 !important;
 
-    box-shadow:
-        0 5px 14px rgba(0, 125, 135, .14) !important;
+     box-shadow:
+         0 5px 14px rgba(0, 125, 135, .14) !important;
 
-    transition:
-        transform .2s ease,
-        box-shadow .2s ease !important;
-}
+     transition:
+         transform .2s ease,
+         box-shadow .2s ease !important;
+ }
 
-.fi-page-header-actions .fi-btn:hover {
-    transform: translateY(-2px) !important;
+ .fi-page-header-actions .fi-btn:hover {
+     transform: translateY(-2px) !important;
 
-    box-shadow:
-        0 9px 20px rgba(0, 125, 135, .18) !important;
-}
+     box-shadow:
+         0 9px 20px rgba(0, 125, 135, .18) !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    SUPPLIER OVERVIEW
 ========================================================= */
 
-.supplier-overview {
+ .supplier-overview {
 
-    position: relative !important;
+     position: relative !important;
 
-    background: #ffffff !important;
+     background: #ffffff !important;
 
-    border: 1px solid #e3ecef !important;
+     border: 1px solid #e3ecef !important;
 
-    border-radius: 18px !important;
+     border-radius: 18px !important;
 
-    overflow: hidden !important;
+     overflow: hidden !important;
 
-    box-shadow:
-        0 8px 25px rgba(25, 65, 75, .055) !important;
+     box-shadow:
+         0 8px 25px rgba(25, 65, 75, .055) !important;
 
-    margin-bottom: 20px !important;
-}
-
-
-/* top line */
-
-.supplier-overview::before {
-
-    content: "";
-
-    position: absolute;
-
-    top: 0;
-    left: 0;
-    right: 0;
-
-    height: 4px;
-
-    background:
-        linear-gradient(90deg,
-            #007f89,
-            #16a6a6,
-            #7bd1c9);
-
-    z-index: 2;
-}
+     margin-bottom: 20px !important;
+ }
 
 
-/* =========================================================
+ /* top line */
+
+ .supplier-overview::before {
+
+     content: "";
+
+     position: absolute;
+
+     top: 0;
+     left: 0;
+     right: 0;
+
+     height: 4px;
+
+     background:
+         linear-gradient(90deg,
+             #007f89,
+             #16a6a6,
+             #7bd1c9);
+
+     z-index: 2;
+ }
+
+
+ /* =========================================================
    OVERVIEW CONTENT
 ========================================================= */
 
-.supplier-overview .fi-section-content {
+ .supplier-overview .fi-section-content {
 
-    padding: 28px !important;
+     padding: 28px !important;
 
-    background:
-        linear-gradient(135deg,
-            #ffffff 0%,
-            #fbfefe 100%) !important;
-}
+     background:
+         linear-gradient(135deg,
+             #ffffff 0%,
+             #fbfefe 100%) !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    OVERVIEW ENTRIES
 ========================================================= */
 
-.supplier-overview .fi-in-entry {
+ .supplier-overview .fi-in-entry {
 
-    min-width: 0 !important;
+     min-width: 0 !important;
 
-    padding: 3px 4px !important;
+     padding: 3px 4px !important;
 
-    transition: transform .2s ease;
-}
+     transition: transform .2s ease;
+ }
 
-.supplier-overview .fi-in-entry:hover {
+ .supplier-overview .fi-in-entry:hover {
 
-    transform: translateY(-1px);
-}
+     transform: translateY(-1px);
+ }
 
 
-/* =========================================================
+ /* =========================================================
    OVERVIEW LABEL
 ========================================================= */
 
-.supplier-overview .fi-in-entry-label {
+ .supplier-overview .fi-in-entry-label {
 
-    color: #8b9ba1 !important;
+     color: #8b9ba1 !important;
 
-    font-size: 9px !important;
+     font-size: 9px !important;
 
-    font-weight: 750 !important;
+     font-weight: 750 !important;
 
-    text-transform: uppercase;
+     text-transform: uppercase;
 
-    letter-spacing: .10em !important;
+     letter-spacing: .10em !important;
 
-    margin-bottom: 6px !important;
-}
+     margin-bottom: 6px !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    OVERVIEW VALUE
 ========================================================= */
 
-.supplier-overview .fi-in-entry-content {
+ .supplier-overview .fi-in-entry-content {
 
-    color: #253d46 !important;
+     color: #253d46 !important;
 
-    font-size: 13px !important;
+     font-size: 13px !important;
 
-    font-weight: 650 !important;
+     font-weight: 650 !important;
 
-    line-height: 1.5 !important;
-}
+     line-height: 1.5 !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    SUPPLIER NAME
 ========================================================= */
 
-.supplier-overview-name .fi-in-entry-content {
+ .supplier-overview-name .fi-in-entry-content {
 
-    color: #073b44 !important;
+     color: #073b44 !important;
 
-    font-size: 22px !important;
+     font-size: 22px !important;
 
-    font-weight: 800 !important;
+     font-weight: 800 !important;
 
-    letter-spacing: -.035em !important;
-}
+     letter-spacing: -.035em !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    COMPANY
 ========================================================= */
 
-.supplier-overview-company .fi-in-entry-content {
+ .supplier-overview-company .fi-in-entry-content {
 
-    color: #49636b !important;
+     color: #49636b !important;
 
-    font-size: 14px !important;
+     font-size: 14px !important;
 
-    font-weight: 600 !important;
-}
+     font-weight: 600 !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    ICONS
 ========================================================= */
 
-.supplier-overview .fi-in-entry-icon {
+ .supplier-overview .fi-in-entry-icon {
 
-    width: 15px !important;
+     width: 15px !important;
 
-    height: 15px !important;
+     height: 15px !important;
 
-    color: #008b95 !important;
+     color: #008b95 !important;
 
-    opacity: .85 !important;
-}
+     opacity: .85 !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    STATUS
 ========================================================= */
 
-.supplier-overview-status .fi-badge {
+ .supplier-overview-status .fi-badge {
 
-    border-radius: 999px !important;
+     border-radius: 999px !important;
 
-    padding: 5px 11px !important;
+     padding: 5px 11px !important;
 
-    font-size: 10px !important;
+     font-size: 10px !important;
 
-    font-weight: 750 !important;
+     font-weight: 750 !important;
 
-    letter-spacing: .02em !important;
-}
+     letter-spacing: .02em !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    MODERN INFORMATION CARDS
 ========================================================= */
 
-.supplier-modern-card {
+ .supplier-modern-card {
 
-    background: #ffffff !important;
+     background: #ffffff !important;
 
-    border: 1px solid #e2eaed !important;
+     border: 1px solid #e2eaed !important;
 
-    border-radius: 16px !important;
+     border-radius: 16px !important;
 
-    overflow: hidden !important;
+     overflow: hidden !important;
 
-    box-shadow:
-        0 5px 20px rgba(26, 62, 71, .045) !important;
+     box-shadow:
+         0 5px 20px rgba(26, 62, 71, .045) !important;
 
-    transition:
-        transform .2s ease,
-        box-shadow .2s ease,
-        border-color .2s ease !important;
-}
-
-
-.supplier-modern-card:hover {
-
-    transform: translateY(-2px) !important;
-
-    border-color: #cbdde0 !important;
-
-    box-shadow:
-        0 12px 28px rgba(26, 62, 71, .075) !important;
-}
+     transition:
+         transform .2s ease,
+         box-shadow .2s ease,
+         border-color .2s ease !important;
+ }
 
 
-/* =========================================================
+ .supplier-modern-card:hover {
+
+     transform: translateY(-2px) !important;
+
+     border-color: #cbdde0 !important;
+
+     box-shadow:
+         0 12px 28px rgba(26, 62, 71, .075) !important;
+ }
+
+
+ /* =========================================================
    CARD HEADER
 ========================================================= */
 
-.supplier-modern-card .fi-section-header {
+ .supplier-modern-card .fi-section-header {
 
-    min-height: 62px !important;
+     min-height: 62px !important;
 
-    padding:
-        13px 20px !important;
+     padding:
+         13px 20px !important;
 
-    background: #ffffff !important;
+     background: #ffffff !important;
 
-    border-bottom:
-        1px solid #edf2f3 !important;
-}
+     border-bottom:
+         1px solid #edf2f3 !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    CARD TITLE
 ========================================================= */
 
-.supplier-modern-card .fi-section-header-heading {
+ .supplier-modern-card .fi-section-header-heading {
 
-    color: #263f47 !important;
+     color: #263f47 !important;
 
-    font-size: 13px !important;
+     font-size: 13px !important;
 
-    font-weight: 750 !important;
+     font-weight: 750 !important;
 
-    letter-spacing: -.01em !important;
-}
+     letter-spacing: -.01em !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    CARD DESCRIPTION
 ========================================================= */
 
-.supplier-modern-card .fi-section-header-description {
+ .supplier-modern-card .fi-section-header-description {
 
-    color: #96a5aa !important;
+     color: #96a5aa !important;
 
-    font-size: 10px !important;
+     font-size: 10px !important;
 
-    margin-top: 2px !important;
-}
+     margin-top: 2px !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    CARD ICON
 ========================================================= */
 
-.supplier-modern-card .fi-section-header-icon {
+ .supplier-modern-card .fi-section-header-icon {
 
-    width: 18px !important;
+     width: 18px !important;
 
-    height: 18px !important;
+     height: 18px !important;
 
-    padding: 8px !important;
+     padding: 8px !important;
 
-    box-sizing: content-box !important;
+     box-sizing: content-box !important;
 
-    border-radius: 9px !important;
+     border-radius: 9px !important;
 
-    background: #edf8f8 !important;
+     background: #edf8f8 !important;
 
-    color: #008792 !important;
-}
+     color: #008792 !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    CARD BODY
 ========================================================= */
 
-.supplier-modern-card .fi-section-content {
+ .supplier-modern-card .fi-section-content {
 
-    padding: 22px !important;
+     padding: 22px !important;
 
-    background: #ffffff !important;
-}
+     background: #ffffff !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    CARD LABEL
 ========================================================= */
 
-.supplier-modern-card .fi-in-entry-label {
+ .supplier-modern-card .fi-in-entry-label {
 
-    color: #93a1a6 !important;
+     color: #93a1a6 !important;
 
-    font-size: 9px !important;
+     font-size: 9px !important;
 
-    font-weight: 750 !important;
+     font-weight: 750 !important;
 
-    text-transform: uppercase;
+     text-transform: uppercase;
 
-    letter-spacing: .08em !important;
+     letter-spacing: .08em !important;
 
-    margin-bottom: 5px !important;
-}
+     margin-bottom: 5px !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    CARD VALUE
 ========================================================= */
 
-.supplier-modern-card .fi-in-entry-content {
+ .supplier-modern-card .fi-in-entry-content {
 
-    color: #30474e !important;
+     color: #30474e !important;
 
-    font-size: 13px !important;
+     font-size: 13px !important;
 
-    font-weight: 600 !important;
+     font-weight: 600 !important;
 
-    line-height: 1.5 !important;
-}
+     line-height: 1.5 !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    CARD ENTRY ICON
 ========================================================= */
 
-.supplier-modern-card .fi-in-entry-icon {
+ .supplier-modern-card .fi-in-entry-icon {
 
-    width: 15px !important;
+     width: 15px !important;
 
-    height: 15px !important;
+     height: 15px !important;
 
-    color: #81979d !important;
+     color: #81979d !important;
 
-    opacity: .8 !important;
-}
+     opacity: .8 !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    CONTACT CARD
 ========================================================= */
 
-.supplier-contact-card {
+ .supplier-contact-card {
 
-    border-top: 3px solid #008b95 !important;
-}
+     border-top: 3px solid #008b95 !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    FINANCIAL CARD
 ========================================================= */
 
-.supplier-financial-card {
+ .supplier-financial-card {
 
-    border-top: 3px solid #008892 !important;
+     border-top: 3px solid #008892 !important;
 
-    background:
-        linear-gradient(145deg,
-            #ffffff 0%,
-            #fffdfa 100%) !important;
-}
-
-
-/* financial icon */
-
-.supplier-financial-card .fi-section-header-icon {
-
-    background: #fff6e6 !important;
-
-    color: #dc921e !important;
-}
+     background:
+         linear-gradient(145deg,
+             #ffffff 0%,
+             #fffdfa 100%) !important;
+ }
 
 
-/* financial values */
+ /* financial icon */
 
-.supplier-financial-card .fi-in-entry-content {
+ .supplier-financial-card .fi-section-header-icon {
 
-    color: #8a5b13 !important;
+     background: #fff6e6 !important;
 
-    font-size: 15px !important;
-
-    font-weight: 750 !important;
-}
+     color: #dc921e !important;
+ }
 
 
-/* financial labels */
+ /* financial values */
 
-.supplier-financial-card .fi-in-entry-label {
+ .supplier-financial-card .fi-in-entry-content {
 
-    color: #a28d6c !important;
-}
+     color: #8a5b13 !important;
+
+     font-size: 15px !important;
+
+     font-weight: 750 !important;
+ }
 
 
-/* =========================================================
+ /* financial labels */
+
+ .supplier-financial-card .fi-in-entry-label {
+
+     color: #a28d6c !important;
+ }
+
+
+ /* =========================================================
    FINANCIAL DIVIDERS
 ========================================================= */
 
-.supplier-financial-card .fi-in-entry {
+ .supplier-financial-card .fi-in-entry {
 
-    padding-bottom: 14px !important;
+     padding-bottom: 14px !important;
 
-    margin-bottom: 14px !important;
+     margin-bottom: 14px !important;
 
-    border-bottom:
-        1px solid #f0e8da !important;
-}
+     border-bottom:
+         1px solid #f0e8da !important;
+ }
 
-.supplier-financial-card .fi-in-entry:last-child {
+ .supplier-financial-card .fi-in-entry:last-child {
 
-    padding-bottom: 0 !important;
+     padding-bottom: 0 !important;
 
-    margin-bottom: 0 !important;
+     margin-bottom: 0 !important;
 
-    border-bottom: 0 !important;
-}
+     border-bottom: 0 !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    NOTES CARD
 ========================================================= */
 
-.supplier-notes-card {
+ .supplier-notes-card {
 
-    border-top: 3px solid #607d8b !important;
-}
-
-
-/* notes icon */
-
-.supplier-notes-card .fi-section-header-icon {
-
-    background: #f0f4f5 !important;
-
-    color: #607d8b !important;
-}
+     border-top: 3px solid #607d8b !important;
+ }
 
 
-/* notes body */
+ /* notes icon */
 
-.supplier-notes-card .fi-section-content {
+ .supplier-notes-card .fi-section-header-icon {
 
-    min-height: 85px !important;
+     background: #f0f4f5 !important;
 
-    display: flex !important;
-
-    align-items: center !important;
-}
+     color: #607d8b !important;
+ }
 
 
-/* notes text */
+ /* notes body */
 
-.supplier-notes-card .fi-in-entry-content {
+ .supplier-notes-card .fi-section-content {
 
-    color: #687b82 !important;
+     min-height: 85px !important;
 
-    font-size: 13px !important;
+     display: flex !important;
 
-    font-weight: 500 !important;
-
-    line-height: 1.7 !important;
-}
+     align-items: center !important;
+ }
 
 
-/* =========================================================
+ /* notes text */
+
+ .supplier-notes-card .fi-in-entry-content {
+
+     color: #687b82 !important;
+
+     font-size: 13px !important;
+
+     font-weight: 500 !important;
+
+     line-height: 1.7 !important;
+ }
+
+
+ /* =========================================================
    GRID
 ========================================================= */
 
-.fi-infolist {
+ .fi-infolist {
 
-    row-gap: 20px !important;
-}
+     row-gap: 20px !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    REMOVE DEFAULT FILAMENT SECTION STYLING
 ========================================================= */
 
-.supplier-overview,
-.supplier-modern-card {
+ .supplier-overview,
+ .supplier-modern-card {
 
-    --tw-ring-shadow: 0 0 transparent !important;
+     --tw-ring-shadow: 0 0 transparent !important;
 
-    --tw-shadow: 0 0 transparent !important;
-}
+     --tw-shadow: 0 0 transparent !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    MOBILE
 ========================================================= */
 
-@media (max-width: 1024px) {
+ @media (max-width: 1024px) {
 
-    .supplier-overview .fi-section-content {
+     .supplier-overview .fi-section-content {
 
-        padding: 23px !important;
-    }
+         padding: 23px !important;
+     }
 
-    .supplier-modern-card .fi-section-content {
+     .supplier-modern-card .fi-section-content {
 
-        padding: 19px !important;
-    }
-}
+         padding: 19px !important;
+     }
+ }
 
 
-@media (max-width: 768px) {
+ @media (max-width: 768px) {
 
-    .fi-in {
+     .fi-in {
 
-        padding-inline: 14px !important;
-    }
+         padding-inline: 14px !important;
+     }
 
-    .fi-header-heading {
+     .fi-header-heading {
 
-        font-size: 23px !important;
-    }
+         font-size: 23px !important;
+     }
 
-    .supplier-overview {
+     .supplier-overview {
 
-        border-radius: 14px !important;
-    }
+         border-radius: 14px !important;
+     }
 
-    .supplier-overview .fi-section-content {
+     .supplier-overview .fi-section-content {
 
-        padding: 20px !important;
-    }
+         padding: 20px !important;
+     }
 
-    .supplier-overview-name .fi-in-entry-content {
+     .supplier-overview-name .fi-in-entry-content {
 
-        font-size: 19px !important;
-    }
+         font-size: 19px !important;
+     }
 
-    .supplier-modern-card {
+     .supplier-modern-card {
 
-        border-radius: 13px !important;
-    }
+         border-radius: 13px !important;
+     }
 
-    .supplier-modern-card .fi-section-header {
+     .supplier-modern-card .fi-section-header {
 
-        min-height: 55px !important;
+         min-height: 55px !important;
 
-        padding-inline: 16px !important;
-    }
+         padding-inline: 16px !important;
+     }
 
-    .supplier-modern-card .fi-section-content {
+     .supplier-modern-card .fi-section-content {
 
-        padding: 17px !important;
-    }
+         padding: 17px !important;
+     }
 
-    .supplier-financial-card .fi-in-entry {
+     .supplier-financial-card .fi-in-entry {
 
-        padding-bottom: 13px !important;
+         padding-bottom: 13px !important;
 
-        margin-bottom: 13px !important;
-    }
-}
+         margin-bottom: 13px !important;
+     }
+ }
 
-/* =========================================================
+ /* =========================================================
    DARK MODE SUPPORT
 ========================================================= */
 
-.dark .fi-main {
+ .dark .fi-main {
 
-    background:
-        #0c171a !important;
-}
+     background:
+         #0c171a !important;
+ }
 
-.dark .supplier-profile-header,
-.dark .supplier-modern-section {
+ .dark .supplier-profile-header,
+ .dark .supplier-modern-section {
 
-    background:
-        #101e22 !important;
+     background:
+         #101e22 !important;
 
-    border-color:
-        #203337 !important;
-}
+     border-color:
+         #203337 !important;
+ }
 
-.dark .supplier-modern-section .fi-section-header {
+ .dark .supplier-modern-section .fi-section-header {
 
-    background:
-        #101e22 !important;
+     background:
+         #101e22 !important;
 
-    border-color:
-        #203337 !important;
-}
+     border-color:
+         #203337 !important;
+ }
 
-.dark .supplier-profile-header .fi-in-entry-content,
-.dark .supplier-modern-section .fi-in-entry-content {
+ .dark .supplier-profile-header .fi-in-entry-content,
+ .dark .supplier-modern-section .fi-in-entry-content {
 
-    color: #d8e5e7 !important;
-}
+     color: #d8e5e7 !important;
+ }
 
-.dark .supplier-profile-header .fi-in-entry-label,
-.dark .supplier-modern-section .fi-in-entry-label {
+ .dark .supplier-profile-header .fi-in-entry-label,
+ .dark .supplier-modern-section .fi-in-entry-label {
 
-    color: #758a8f !important;
-}
+     color: #758a8f !important;
+ }
 
-.dark .supplier-modern-section .fi-section-header-heading {
+ .dark .supplier-modern-section .fi-section-header-heading {
 
-    color: #d5e2e4 !important;
-}
+     color: #d5e2e4 !important;
+ }
 
-/* =========================================================
+ /* =========================================================
    SUPPLIER PAYMENT STATS
    CLEAN 4 CARD LAYOUT
    NO OUTER WHITE CONTAINER
 ========================================================= */
 
 
-/* ---------------------------------------------------------
+ /* ---------------------------------------------------------
    OUTER WIDGET
 --------------------------------------------------------- */
 
-.supplier-payment-stats-widget,
-.supplier-payment-stats-widget.fi-wi,
-.supplier-payment-stats-widget.fi-wi-widget,
-.supplier-payment-stats-widget.fi-wi-stats-overview {
+ .supplier-payment-stats-widget,
+ .supplier-payment-stats-widget.fi-wi,
+ .supplier-payment-stats-widget.fi-wi-widget,
+ .supplier-payment-stats-widget.fi-wi-stats-overview {
 
-    background: transparent !important;
-    background-color: transparent !important;
+     background: transparent !important;
+     background-color: transparent !important;
 
-    border: 0 !important;
-    border-width: 0 !important;
+     border: 0 !important;
+     border-width: 0 !important;
 
-    box-shadow: none !important;
+     box-shadow: none !important;
 
-    padding: 0 !important;
-    margin: 0 !important;
+     padding: 0 !important;
+     margin: 0 !important;
 
-    border-radius: 0 !important;
-}
+     border-radius: 0 !important;
+ }
 
 
-/* ---------------------------------------------------------
+ /* ---------------------------------------------------------
    REMOVE FILAMENT PARENT CONTAINER
 --------------------------------------------------------- */
 
-.fi-wi:has(.supplier-payment-stat-card),
-.fi-wi-widget:has(.supplier-payment-stat-card),
-.fi-wi-stats-overview:has(.supplier-payment-stat-card),
-.fi-section:has(.supplier-payment-stat-card) {
+ .fi-wi:has(.supplier-payment-stat-card),
+ .fi-wi-widget:has(.supplier-payment-stat-card),
+ .fi-wi-stats-overview:has(.supplier-payment-stat-card),
+ .fi-section:has(.supplier-payment-stat-card) {
 
-    background: transparent !important;
-    background-color: transparent !important;
+     background: transparent !important;
+     background-color: transparent !important;
 
-    border: 0 !important;
-    border-width: 0 !important;
+     border: 0 !important;
+     border-width: 0 !important;
 
-    box-shadow: none !important;
+     box-shadow: none !important;
 
-    padding: 0 !important;
-}
+     padding: 0 !important;
+ }
 
 
-/* ---------------------------------------------------------
+ /* ---------------------------------------------------------
    STATS GRID
 --------------------------------------------------------- */
 
-.supplier-payment-stats-widget .fi-wi-stats-overview-stats-ctn {
+ .supplier-payment-stats-widget .fi-wi-stats-overview-stats-ctn {
 
-    display: grid !important;
+     display: grid !important;
 
-    grid-template-columns:
-        repeat(4, minmax(0, 1fr)) !important;
+     grid-template-columns:
+         repeat(4, minmax(0, 1fr)) !important;
 
-    gap: 18px !important;
+     gap: 18px !important;
 
-    width: 100% !important;
+     width: 100% !important;
 
-    padding: 0 !important;
-    margin: 0 !important;
+     padding: 0 !important;
+     margin: 0 !important;
 
-    background: transparent !important;
-    background-color: transparent !important;
+     background: transparent !important;
+     background-color: transparent !important;
 
-    border: 0 !important;
-    box-shadow: none !important;
-}
+     border: 0 !important;
+     box-shadow: none !important;
+ }
 
 
-/* ---------------------------------------------------------
+ /* ---------------------------------------------------------
    INDIVIDUAL PAYMENT CARD
 --------------------------------------------------------- */
 
-.supplier-payment-stats-widget .supplier-payment-stat-card {
+ .supplier-payment-stats-widget .supplier-payment-stat-card {
 
-    position: relative !important;
+     position: relative !important;
 
-    min-height: 145px !important;
+     min-height: 145px !important;
 
-    padding: 20px 20px 18px !important;
+     padding: 20px 20px 18px !important;
 
-    background: #ffffff !important;
-    background-color: #ffffff !important;
+     background: #ffffff !important;
+     background-color: #ffffff !important;
 
-    border: 1px solid #e1e8e9 !important;
+     border: 1px solid #e1e8e9 !important;
 
-    border-radius: 14px !important;
+     border-radius: 14px !important;
 
-    box-shadow:
-        0 2px 8px rgba(15, 45, 50, 0.045) !important;
+     box-shadow:
+         0 2px 8px rgba(15, 45, 50, 0.045) !important;
 
-    overflow: hidden !important;
+     overflow: hidden !important;
 
-    transition:
-        transform .18s ease,
-        box-shadow .18s ease,
-        border-color .18s ease !important;
-}
+     transition:
+         transform .18s ease,
+         box-shadow .18s ease,
+         border-color .18s ease !important;
+ }
 
 
-/* ---------------------------------------------------------
+ /* ---------------------------------------------------------
    HOVER
 --------------------------------------------------------- */
 
-.supplier-payment-stats-widget .supplier-payment-stat-card:hover {
+ .supplier-payment-stats-widget .supplier-payment-stat-card:hover {
 
-    transform: translateY(-2px) !important;
+     transform: translateY(-2px) !important;
 
-    border-color: #cbdcde !important;
+     border-color: #cbdcde !important;
 
-    box-shadow:
-        0 8px 22px rgba(15, 45, 50, 0.08) !important;
-}
+     box-shadow:
+         0 8px 22px rgba(15, 45, 50, 0.08) !important;
+ }
 
 
-/* ---------------------------------------------------------
+ /* ---------------------------------------------------------
    LEFT ACCENT LINE
 --------------------------------------------------------- */
 
-.supplier-payment-stat-card::before {
+ .supplier-payment-stat-card::before {
 
-    content: "";
+     content: "";
 
-    position: absolute;
+     position: absolute;
 
-    left: 0;
-    top: 18px;
-    bottom: 18px;
+     left: 0;
+     top: 18px;
+     bottom: 18px;
 
-    width: 3px;
+     width: 3px;
 
-    border-radius:
-        0 4px 4px 0;
-}
-
-
-/* Total Paid */
-
-.supplier-payment-total::before {
-    background: #008892;
-}
+     border-radius:
+         0 4px 4px 0;
+ }
 
 
-/* This Month */
+ /* Total Paid */
 
-.supplier-payment-month::before {
-    background: #008892;
-}
-
-
-/* Today */
-
-.supplier-payment-today::before {
-    background: #008892;
-}
+ .supplier-payment-total::before {
+     background: #008892;
+ }
 
 
-/* Transactions */
+ /* This Month */
 
-.supplier-payment-transactions::before {
-    background: #4f7cff;
-}
+ .supplier-payment-month::before {
+     background: #008892;
+ }
 
 
-/* ---------------------------------------------------------
+ /* Today */
+
+ .supplier-payment-today::before {
+     background: #008892;
+ }
+
+
+ /* Transactions */
+
+ .supplier-payment-transactions::before {
+     background: #4f7cff;
+ }
+
+
+ /* ---------------------------------------------------------
    LABEL
 --------------------------------------------------------- */
 
-.supplier-payment-stats-widget .supplier-payment-stat-card .fi-wi-stats-overview-stat-label {
+ .supplier-payment-stats-widget .supplier-payment-stat-card .fi-wi-stats-overview-stat-label {
 
-    color: #718186 !important;
+     color: #718186 !important;
 
-    font-size: 12px !important;
+     font-size: 12px !important;
 
-    font-weight: 600 !important;
+     font-weight: 600 !important;
 
-    line-height: 1.4 !important;
-}
+     line-height: 1.4 !important;
+ }
 
 
-/* ---------------------------------------------------------
+ /* ---------------------------------------------------------
    VALUE
 --------------------------------------------------------- */
 
-.supplier-payment-stats-widget .supplier-payment-stat-card .fi-wi-stats-overview-stat-value {
+ .supplier-payment-stats-widget .supplier-payment-stat-card .fi-wi-stats-overview-stat-value {
 
-    margin-top: 6px !important;
+     margin-top: 6px !important;
 
-    color: #152a30 !important;
+     color: #152a30 !important;
 
-    font-size: 27px !important;
+     font-size: 27px !important;
 
-    font-weight: 800 !important;
+     font-weight: 800 !important;
 
-    letter-spacing: -0.04em !important;
+     letter-spacing: -0.04em !important;
 
-    line-height: 1.15 !important;
-}
+     line-height: 1.15 !important;
+ }
 
 
-/* ---------------------------------------------------------
+ /* ---------------------------------------------------------
    DESCRIPTION
 --------------------------------------------------------- */
 
-.supplier-payment-stats-widget .supplier-payment-stat-card .fi-wi-stats-overview-stat-description {
+ .supplier-payment-stats-widget .supplier-payment-stat-card .fi-wi-stats-overview-stat-description {
 
-    margin-top: 7px !important;
+     margin-top: 7px !important;
 
-    color: #89979a !important;
+     color: #89979a !important;
 
-    font-size: 11px !important;
+     font-size: 11px !important;
 
-    font-weight: 500 !important;
+     font-weight: 500 !important;
 
-    line-height: 1.45 !important;
-}
+     line-height: 1.45 !important;
+ }
 
 
-/* ---------------------------------------------------------
+ /* ---------------------------------------------------------
    MAIN ICON
 --------------------------------------------------------- */
 
-.supplier-payment-stats-widget .supplier-payment-stat-card .fi-wi-stats-overview-stat-icon {
+ .supplier-payment-stats-widget .supplier-payment-stat-card .fi-wi-stats-overview-stat-icon {
 
-    width: 34px !important;
-    height: 34px !important;
+     width: 34px !important;
+     height: 34px !important;
 
-    padding: 8px !important;
+     padding: 8px !important;
 
-    border-radius: 9px !important;
+     border-radius: 9px !important;
 
-    background: #edf8f8 !important;
+     background: #edf8f8 !important;
 
-    color: #008892 !important;
-}
+     color: #008892 !important;
+ }
 
 
-/* ---------------------------------------------------------
+ /* ---------------------------------------------------------
    TOTAL PAID ICON
 --------------------------------------------------------- */
 
-.supplier-payment-total .fi-wi-stats-overview-stat-icon {
+ .supplier-payment-total .fi-wi-stats-overview-stat-icon {
 
-    background: #edf8f2 !important;
-    color: #16a36a !important;
-}
+     background: #edf8f2 !important;
+     color: #16a36a !important;
+ }
 
 
-/* ---------------------------------------------------------
+ /* ---------------------------------------------------------
    THIS MONTH ICON
 --------------------------------------------------------- */
 
-.supplier-payment-month .fi-wi-stats-overview-stat-icon {
+ .supplier-payment-month .fi-wi-stats-overview-stat-icon {
 
-    background: #edf8f8 !important;
-    color: #008892 !important;
-}
+     background: #edf8f8 !important;
+     color: #008892 !important;
+ }
 
 
-/* ---------------------------------------------------------
+ /* ---------------------------------------------------------
    TODAY ICON
 --------------------------------------------------------- */
 
-.supplier-payment-today .fi-wi-stats-overview-stat-icon {
+ .supplier-payment-today .fi-wi-stats-overview-stat-icon {
 
-    background: #fff7e9 !important;
-    color: #008892 !important;
-}
+     background: #fff7e9 !important;
+     color: #008892 !important;
+ }
 
 
-/* ---------------------------------------------------------
+ /* ---------------------------------------------------------
    TRANSACTIONS ICON
 --------------------------------------------------------- */
 
-.supplier-payment-transactions .fi-wi-stats-overview-stat-icon {
+ .supplier-payment-transactions .fi-wi-stats-overview-stat-icon {
 
-    background: #eef2ff !important;
-    color: #4f7cff !important;
-}
+     background: #eef2ff !important;
+     color: #4f7cff !important;
+ }
 
 
-/* ---------------------------------------------------------
+ /* ---------------------------------------------------------
    DESCRIPTION ICON
 --------------------------------------------------------- */
 
-.supplier-payment-stats-widget .fi-wi-stats-overview-stat-description-icon {
+ .supplier-payment-stats-widget .fi-wi-stats-overview-stat-description-icon {
 
-    width: 13px !important;
-    height: 13px !important;
-}
+     width: 13px !important;
+     height: 13px !important;
+ }
 
 
-/* ---------------------------------------------------------
+ /* ---------------------------------------------------------
    REMOVE RINGS / DEFAULT SHADOW
 --------------------------------------------------------- */
 
-.supplier-payment-stats-widget .supplier-payment-stat-card {
+ .supplier-payment-stats-widget .supplier-payment-stat-card {
 
-    --tw-ring-offset-shadow: 0 0 transparent !important;
+     --tw-ring-offset-shadow: 0 0 transparent !important;
 
-    --tw-ring-shadow: 0 0 transparent !important;
+     --tw-ring-shadow: 0 0 transparent !important;
 
-    --tw-shadow: none !important;
+     --tw-shadow: none !important;
 
-    outline: none !important;
-}
+     outline: none !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    RESPONSIVE
 ========================================================= */
 
-@media (max-width: 1050px) {
+ @media (max-width: 1050px) {
 
-    .supplier-payment-stats-widget .fi-wi-stats-overview-stats-ctn {
+     .supplier-payment-stats-widget .fi-wi-stats-overview-stats-ctn {
 
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr)) !important;
+         grid-template-columns:
+             repeat(2, minmax(0, 1fr)) !important;
 
-        gap: 14px !important;
-    }
-}
+         gap: 14px !important;
+     }
+ }
 
 
-@media (max-width: 640px) {
+ @media (max-width: 640px) {
 
-    .supplier-payment-stats-widget .fi-wi-stats-overview-stats-ctn {
+     .supplier-payment-stats-widget .fi-wi-stats-overview-stats-ctn {
 
-        grid-template-columns: 1fr !important;
+         grid-template-columns: 1fr !important;
 
-        gap: 12px !important;
-    }
+         gap: 12px !important;
+     }
 
-    .supplier-payment-stats-widget .supplier-payment-stat-card {
+     .supplier-payment-stats-widget .supplier-payment-stat-card {
 
-        min-height: 125px !important;
-    }
-}
+         min-height: 125px !important;
+     }
+ }
 
-/* =========================================================
+ /* =========================================================
    MEDICARE SUPPLIERS — COMPLETE PAGE
 ========================================================= */
 
-.supplier-page-header {
-    width: 100%;
-    min-height: 86px;
+ .supplier-page-header {
+     width: 100%;
+     min-height: 86px;
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
 
-    gap: 24px;
+     gap: 24px;
 
-    padding: 17px 20px;
+     padding: 17px 20px;
 
-    margin-bottom: 18px;
+     margin-bottom: 18px;
 
-    background: #ffffff;
+     background: #ffffff;
 
-    border: 1px solid #e3edef;
+     border: 1px solid #e3edef;
 
-    border-radius: 15px;
+     border-radius: 15px;
 
-    box-shadow: 0 4px 16px rgba(20, 65, 72, .045);
+     box-shadow: 0 4px 16px rgba(20, 65, 72, .045);
 
-    position: relative;
-    overflow: hidden;
-}
+     position: relative;
+     overflow: hidden;
+ }
 
-.supplier-page-header::before {
-    content: "";
+ .supplier-page-header::before {
+     content: "";
 
-    position: absolute;
+     position: absolute;
 
-    left: 0;
-    top: 0;
-    bottom: 0;
+     left: 0;
+     top: 0;
+     bottom: 0;
 
-    width: 4px;
+     width: 4px;
 
-    background: #008894;
-}
+     background: #008894;
+ }
 
-.supplier-page-header-left {
-    display: flex;
-    align-items: center;
-    gap: 13px;
-}
+ .supplier-page-header-left {
+     display: flex;
+     align-items: center;
+     gap: 13px;
+ }
 
-.supplier-page-icon {
-    width: 45px;
-    height: 45px;
+ .supplier-page-icon {
+     width: 45px;
+     height: 45px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+     display: flex;
+     align-items: center;
+     justify-content: center;
 
-    background: #008894;
-    color: #fff;
+     background: #008894;
+     color: #fff;
 
-    border-radius: 12px;
+     border-radius: 12px;
 
-    box-shadow: 0 5px 13px rgba(0, 136, 148, .18);
-}
+     box-shadow: 0 5px 13px rgba(0, 136, 148, .18);
+ }
 
-.supplier-page-icon svg {
-    width: 22px;
-    height: 22px;
-}
+ .supplier-page-icon svg {
+     width: 22px;
+     height: 22px;
+ }
 
-.supplier-page-title-row {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-}
+ .supplier-page-title-row {
+     display: flex;
+     align-items: center;
+     gap: 9px;
+ }
 
-.supplier-page-title {
-    margin: 0;
+ .supplier-page-title {
+     margin: 0;
 
-    color: #102f38;
+     color: #102f38;
 
-    font-size: 22px;
-    font-weight: 800;
+     font-size: 22px;
+     font-weight: 800;
 
-    letter-spacing: -.035em;
-}
+     letter-spacing: -.035em;
+ }
 
-.supplier-page-badge {
-    padding: 4px 9px;
+ .supplier-page-badge {
+     padding: 4px 9px;
 
-    border-radius: 999px;
+     border-radius: 999px;
 
-    background: #e9f7f7;
-    border: 1px solid #d5eeee;
+     background: #e9f7f7;
+     border: 1px solid #d5eeee;
 
-    color: #007d86;
+     color: #007d86;
 
-    font-size: 8px;
-    font-weight: 700;
+     font-size: 8px;
+     font-weight: 700;
 
-    text-transform: uppercase;
-    letter-spacing: .05em;
-}
+     text-transform: uppercase;
+     letter-spacing: .05em;
+ }
 
-.supplier-page-description {
-    margin: 4px 0 0;
+ .supplier-page-description {
+     margin: 4px 0 0;
 
-    color: #83979d;
+     color: #83979d;
 
-    font-size: 11px;
-    font-weight: 500;
-}
+     font-size: 11px;
+     font-weight: 500;
+ }
 
-.supplier-page-header-right {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
+ .supplier-page-header-right {
+     display: flex;
+     align-items: center;
+     gap: 12px;
+ }
 
-.supplier-total-mini {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+ .supplier-total-mini {
+     display: flex;
+     align-items: center;
+     gap: 8px;
 
-    padding: 6px 10px;
+     padding: 6px 10px;
 
-    background: #f7fbfb;
+     background: #f7fbfb;
 
-    border: 1px solid #e4eeee;
+     border: 1px solid #e4eeee;
 
-    border-radius: 10px;
-}
+     border-radius: 10px;
+ }
 
-.supplier-total-icon {
-    width: 28px;
-    height: 28px;
+ .supplier-total-icon {
+     width: 28px;
+     height: 28px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+     display: flex;
+     align-items: center;
+     justify-content: center;
 
-    border-radius: 8px;
+     border-radius: 8px;
 
-    background: #e5f5f6;
-    color: #008894;
-}
+     background: #e5f5f6;
+     color: #008894;
+ }
 
-.supplier-total-icon svg {
-    width: 15px;
-    height: 15px;
-}
+ .supplier-total-icon svg {
+     width: 15px;
+     height: 15px;
+ }
 
-.supplier-total-mini div:last-child {
-    display: flex;
-    flex-direction: column;
-}
+ .supplier-total-mini div:last-child {
+     display: flex;
+     flex-direction: column;
+ }
 
-.supplier-total-mini strong {
-    color: #16363e;
+ .supplier-total-mini strong {
+     color: #16363e;
 
-    font-size: 14px;
-    line-height: 1;
-}
+     font-size: 14px;
+     line-height: 1;
+ }
 
-.supplier-total-mini span {
-    margin-top: 3px;
+ .supplier-total-mini span {
+     margin-top: 3px;
 
-    color: #91a1a6;
+     color: #91a1a6;
 
-    font-size: 8px;
-    font-weight: 600;
+     font-size: 8px;
+     font-weight: 600;
 
-    text-transform: uppercase;
-}
+     text-transform: uppercase;
+ }
 
-.supplier-add-button {
-    min-height: 40px;
+ .supplier-add-button {
+     min-height: 40px;
 
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+     display: inline-flex;
+     align-items: center;
+     justify-content: center;
 
-    gap: 7px;
+     gap: 7px;
 
-    padding: 0 15px;
+     padding: 0 15px;
 
-    border-radius: 10px;
+     border-radius: 10px;
 
-    background: #008894;
+     background: #008894;
 
-    color: #fff !important;
+     color: #fff !important;
 
-    text-decoration: none !important;
+     text-decoration: none !important;
 
-    font-size: 11px;
-    font-weight: 700;
+     font-size: 11px;
+     font-weight: 700;
 
-    box-shadow: 0 5px 12px rgba(0, 136, 148, .15);
+     box-shadow: 0 5px 12px rgba(0, 136, 148, .15);
 
-    transition: .2s ease;
-}
+     transition: .2s ease;
+ }
 
-.supplier-add-button:hover {
-    background: #00757d;
+ .supplier-add-button:hover {
+     background: #00757d;
 
-    transform: translateY(-1px);
+     transform: translateY(-1px);
 
-    box-shadow: 0 7px 16px rgba(0, 136, 148, .2);
-}
+     box-shadow: 0 7px 16px rgba(0, 136, 148, .2);
+ }
 
-.supplier-add-button svg {
-    width: 16px;
-    height: 16px;
-}
+ .supplier-add-button svg {
+     width: 16px;
+     height: 16px;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    STATS
 ========================================================= */
 
-.supplier-stats-grid {
-    display: grid;
+ .supplier-stats-grid {
+     display: grid;
 
-    grid-template-columns:
-        repeat(4, minmax(0, 1fr));
+     grid-template-columns:
+         repeat(4, minmax(0, 1fr));
 
-    gap: 16px;
+     gap: 16px;
 
-    width: 100%;
+     width: 100%;
 
-    margin-bottom: 18px;
-}
+     margin-bottom: 18px;
+ }
 
-.supplier-stat-card {
-    min-height: 154px;
+ .supplier-stat-card {
+     min-height: 154px;
 
-    padding: 16px 18px;
+     padding: 16px 18px;
 
-    background: #fff;
+     background: #fff;
 
-    border: 1px solid #e0eaec;
+     border: 1px solid #e0eaec;
 
-    border-radius: 14px;
+     border-radius: 14px;
 
-    box-shadow:
-        0 3px 12px rgba(20, 65, 72, .035);
+     box-shadow:
+         0 3px 12px rgba(20, 65, 72, .035);
 
-    display: flex;
-    flex-direction: column;
-}
+     display: flex;
+     flex-direction: column;
+ }
 
-.supplier-stat-top {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-}
+ .supplier-stat-top {
+     display: flex;
+     align-items: center;
+     gap: 9px;
+ }
 
-.supplier-stat-icon {
-    width: 29px;
-    height: 29px;
+ .supplier-stat-icon {
+     width: 29px;
+     height: 29px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+     display: flex;
+     align-items: center;
+     justify-content: center;
 
-    border-radius: 8px;
-}
+     border-radius: 8px;
+ }
 
-.supplier-stat-icon svg {
-    width: 15px;
-    height: 15px;
-}
+ .supplier-stat-icon svg {
+     width: 15px;
+     height: 15px;
+ }
 
-.supplier-stat-icon.total {
-    background: #e9f7f8;
-    color: #008894;
-}
+ .supplier-stat-icon.total {
+     background: #e9f7f8;
+     color: #008894;
+ }
 
-.supplier-stat-icon.active {
-    background: #eaf9f1;
-    color: #00a86b;
-}
+ .supplier-stat-icon.active {
+     background: #eaf9f1;
+     color: #00a86b;
+ }
 
-.supplier-stat-icon.payable {
-    background: #fff4e7;
-    color: #f28a00;
-}
+ .supplier-stat-icon.payable {
+     background: #fff4e7;
+     color: #f28a00;
+ }
 
-.supplier-stat-icon.inactive {
-    background: #fff0f0;
-    color: #ef4444;
-}
+ .supplier-stat-icon.inactive {
+     background: #fff0f0;
+     color: #ef4444;
+ }
 
-.supplier-stat-label {
-    color: #64777d;
+ .supplier-stat-label {
+     color: #64777d;
 
-    font-size: 11px;
-    font-weight: 600;
-}
+     font-size: 11px;
+     font-weight: 600;
+ }
 
-.supplier-stat-value {
-    margin-top: 10px;
+ .supplier-stat-value {
+     margin-top: 10px;
 
-    color: #111;
+     color: #111;
 
-    font-size: 27px;
-    line-height: 1;
+     font-size: 27px;
+     line-height: 1;
 
-    font-weight: 800;
+     font-weight: 800;
 
-    letter-spacing: -.025em;
-}
+     letter-spacing: -.025em;
+ }
 
-.supplier-stat-bottom {
-    margin-top: auto;
+ .supplier-stat-bottom {
+     margin-top: auto;
 
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
+     display: flex;
+     align-items: flex-end;
+     justify-content: space-between;
 
-    gap: 10px;
-}
+     gap: 10px;
+ }
 
-.supplier-stat-description {
-    max-width: 150px;
+ .supplier-stat-description {
+     max-width: 150px;
 
-    color: #008894;
+     color: #008894;
 
-    font-size: 10px;
-    line-height: 1.45;
-}
+     font-size: 10px;
+     line-height: 1.45;
+ }
 
-.supplier-stat-description.active-text {
-    color: #00a86b;
-}
+ .supplier-stat-description.active-text {
+     color: #00a86b;
+ }
 
-.supplier-stat-description.payable-text {
-    color: #e87900;
-}
+ .supplier-stat-description.payable-text {
+     color: #e87900;
+ }
 
-.supplier-stat-description.inactive-text {
-    color: #ef4444;
-}
+ .supplier-stat-description.inactive-text {
+     color: #ef4444;
+ }
 
-.supplier-stat-corner-icon {
-    width: 17px;
-    height: 17px;
+ .supplier-stat-corner-icon {
+     width: 17px;
+     height: 17px;
 
-    color: #008894;
-}
+     color: #008894;
+ }
 
-.supplier-stat-corner-icon.active-icon {
-    color: #00a86b;
-}
+ .supplier-stat-corner-icon.active-icon {
+     color: #00a86b;
+ }
 
-.supplier-stat-corner-icon.payable-icon {
-    color: #f28a00;
-}
+ .supplier-stat-corner-icon.payable-icon {
+     color: #f28a00;
+ }
 
-.supplier-stat-corner-icon.inactive-icon {
-    color: #ef4444;
-}
+ .supplier-stat-corner-icon.inactive-icon {
+     color: #ef4444;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    TABLE CONTAINER
 ========================================================= */
 
-.supplier-table-wrapper {
-    width: 100%;
+ .supplier-table-wrapper {
+     width: 100%;
 
-    background: #fff;
+     background: #fff;
 
-    border: 1px solid #e0eaec;
+     border: 1px solid #e0eaec;
 
-    border-radius: 15px;
+     border-radius: 15px;
 
-    overflow: hidden;
+     overflow: hidden;
 
-    box-shadow:
-        0 3px 14px rgba(20, 65, 72, .035);
-}
+     box-shadow:
+         0 3px 14px rgba(20, 65, 72, .035);
+ }
 
-.supplier-table-header {
-    min-height: 65px;
+ .supplier-table-header {
+     min-height: 65px;
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
 
-    padding: 13px 20px;
+     padding: 13px 20px;
 
-    border-bottom: 1px solid #edf2f3;
-}
+     border-bottom: 1px solid #edf2f3;
+ }
 
-.supplier-table-title {
-    margin: 0;
+ .supplier-table-title {
+     margin: 0;
 
-    color: #17353d;
+     color: #17353d;
 
-    font-size: 15px;
-    font-weight: 750;
-}
+     font-size: 15px;
+     font-weight: 750;
+ }
 
-.supplier-table-subtitle {
-    margin: 3px 0 0;
+ .supplier-table-subtitle {
+     margin: 3px 0 0;
 
-    color: #92a1a6;
+     color: #92a1a6;
 
-    font-size: 9px;
-}
+     font-size: 9px;
+ }
 
-.supplier-filament-table {
-    width: 100%;
-}
+ .supplier-filament-table {
+     width: 100%;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    REMOVE OLD FILAMENT PAGE HEADER
 ========================================================= */
 
-.fi-page:has(.supplier-page-header) .fi-header,
-.fi-page:has(.supplier-page-header) .fi-breadcrumbs,
-.fi-page:has(.supplier-page-header) .fi-header-heading {
-    display: none !important;
-}
+ .fi-page:has(.supplier-page-header) .fi-header,
+ .fi-page:has(.supplier-page-header) .fi-breadcrumbs,
+ .fi-page:has(.supplier-page-header) .fi-header-heading {
+     display: none !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    REMOVE OLD HEADER WIDGET SPACE
 ========================================================= */
 
-.fi-page:has(.supplier-page-header) .fi-header-widgets {
-    display: none !important;
-}
+ .fi-page:has(.supplier-page-header) .fi-header-widgets {
+     display: none !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    RESPONSIVE
 ========================================================= */
 
-@media (max-width: 1100px) {
+ @media (max-width: 1100px) {
 
-    .supplier-stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+     .supplier-stats-grid {
+         grid-template-columns: repeat(2, 1fr);
+     }
 
-}
+ }
 
-@media (max-width: 800px) {
+ @media (max-width: 800px) {
 
-    .supplier-page-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+     .supplier-page-header {
+         flex-direction: column;
+         align-items: flex-start;
+     }
 
-    .supplier-page-header-right {
-        width: 100%;
-        justify-content: space-between;
-    }
+     .supplier-page-header-right {
+         width: 100%;
+         justify-content: space-between;
+     }
 
-}
+ }
 
-@media (max-width: 600px) {
+ @media (max-width: 600px) {
 
-    .supplier-stats-grid {
-        grid-template-columns: 1fr;
-    }
+     .supplier-stats-grid {
+         grid-template-columns: 1fr;
+     }
 
-    .supplier-page-header {
-        padding: 15px;
-    }
+     .supplier-page-header {
+         padding: 15px;
+     }
 
-    .supplier-page-title {
-        font-size: 20px;
-    }
+     .supplier-page-title {
+         font-size: 20px;
+     }
 
-    .supplier-page-badge {
-        display: none;
-    }
+     .supplier-page-badge {
+         display: none;
+     }
 
-}
+ }
 
-/* =========================================================
+ /* =========================================================
    SUPPLIER PAYMENTS — COMPLETE MODERN PAGE
 ========================================================= */
 
-.supplier-payment-page-header {
-    width: 100%;
-    min-height: 86px;
+ .supplier-payment-page-header {
+     width: 100%;
+     min-height: 86px;
 
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
 
-    gap: 24px;
+     gap: 24px;
 
-    padding: 17px 20px;
+     padding: 17px 20px;
 
-    margin-bottom: 18px;
+     margin-bottom: 18px;
 
-    background: #ffffff;
+     background: #ffffff;
 
-    border: 1px solid #e3edef;
+     border: 1px solid #e3edef;
 
-    border-radius: 15px;
+     border-radius: 15px;
 
-    box-shadow: 0 4px 16px rgba(20, 65, 72, .045);
+     box-shadow: 0 4px 16px rgba(20, 65, 72, .045);
 
-    position: relative;
-    overflow: hidden;
-}
+     position: relative;
+     overflow: hidden;
+ }
 
-.supplier-payment-page-header::before {
-    content: "";
+ .supplier-payment-page-header::before {
+     content: "";
 
-    position: absolute;
+     position: absolute;
 
-    left: 0;
-    top: 0;
-    bottom: 0;
+     left: 0;
+     top: 0;
+     bottom: 0;
 
-    width: 4px;
+     width: 4px;
 
-    background: #008894;
-}
+     background: #008894;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    HEADER LEFT
 ========================================================= */
 
-.supplier-payment-header-left {
-    display: flex;
-    align-items: center;
-    gap: 13px;
-}
+ .supplier-payment-header-left {
+     display: flex;
+     align-items: center;
+     gap: 13px;
+ }
 
-.supplier-payment-page-icon {
-    width: 45px;
-    height: 45px;
+ .supplier-payment-page-icon {
+     width: 45px;
+     height: 45px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+     display: flex;
+     align-items: center;
+     justify-content: center;
 
-    background: #008894;
-    color: #fff;
+     background: #008894;
+     color: #fff;
 
-    border-radius: 12px;
+     border-radius: 12px;
 
-    box-shadow: 0 5px 13px rgba(0, 136, 148, .18);
-}
+     box-shadow: 0 5px 13px rgba(0, 136, 148, .18);
+ }
 
-.supplier-payment-page-icon svg {
-    width: 22px;
-    height: 22px;
-}
+ .supplier-payment-page-icon svg {
+     width: 22px;
+     height: 22px;
+ }
 
-.supplier-payment-title-row {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-}
+ .supplier-payment-title-row {
+     display: flex;
+     align-items: center;
+     gap: 9px;
+ }
 
-.supplier-payment-page-title {
-    margin: 0;
+ .supplier-payment-page-title {
+     margin: 0;
 
-    color: #102f38;
+     color: #102f38;
 
-    font-size: 22px;
-    font-weight: 800;
+     font-size: 22px;
+     font-weight: 800;
 
-    letter-spacing: -.035em;
-}
+     letter-spacing: -.035em;
+ }
 
-.supplier-payment-page-badge {
-    padding: 4px 9px;
+ .supplier-payment-page-badge {
+     padding: 4px 9px;
 
-    border-radius: 999px;
+     border-radius: 999px;
 
-    background: #e9f7f7;
+     background: #e9f7f7;
 
-    border: 1px solid #d5eeee;
+     border: 1px solid #d5eeee;
 
-    color: #007d86;
+     color: #007d86;
 
-    font-size: 8px;
-    font-weight: 700;
+     font-size: 8px;
+     font-weight: 700;
 
-    text-transform: uppercase;
+     text-transform: uppercase;
 
-    letter-spacing: .05em;
-}
+     letter-spacing: .05em;
+ }
 
-.supplier-payment-page-description {
-    margin: 4px 0 0;
+ .supplier-payment-page-description {
+     margin: 4px 0 0;
 
-    color: #83979d;
+     color: #83979d;
 
-    font-size: 11px;
-    font-weight: 500;
-}
+     font-size: 11px;
+     font-weight: 500;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    HEADER RIGHT
 ========================================================= */
 
-.supplier-payment-header-right {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
+ .supplier-payment-header-right {
+     display: flex;
+     align-items: center;
+     gap: 12px;
+ }
 
-.supplier-payment-total-mini {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+ .supplier-payment-total-mini {
+     display: flex;
+     align-items: center;
+     gap: 8px;
 
-    padding: 6px 10px;
+     padding: 6px 10px;
 
-    background: #f7fbfb;
+     background: #f7fbfb;
 
-    border: 1px solid #e4eeee;
+     border: 1px solid #e4eeee;
 
-    border-radius: 10px;
-}
+     border-radius: 10px;
+ }
 
-.supplier-payment-total-icon {
-    width: 28px;
-    height: 28px;
+ .supplier-payment-total-icon {
+     width: 28px;
+     height: 28px;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+     display: flex;
+     align-items: center;
+     justify-content: center;
 
-    border-radius: 8px;
+     border-radius: 8px;
 
-    background: #e5f5f6;
+     background: #e5f5f6;
 
-    color: #008894;
-}
+     color: #008894;
+ }
 
-.supplier-payment-total-icon svg {
-    width: 15px;
-    height: 15px;
-}
+ .supplier-payment-total-icon svg {
+     width: 15px;
+     height: 15px;
+ }
 
-.supplier-payment-total-mini div:last-child {
-    display: flex;
-    flex-direction: column;
-}
+ .supplier-payment-total-mini div:last-child {
+     display: flex;
+     flex-direction: column;
+ }
 
-.supplier-payment-total-mini strong {
-    color: #16363e;
+ .supplier-payment-total-mini strong {
+     color: #16363e;
 
-    font-size: 14px;
+     font-size: 14px;
 
-    line-height: 1;
-}
+     line-height: 1;
+ }
 
-.supplier-payment-total-mini span {
-    margin-top: 3px;
+ .supplier-payment-total-mini span {
+     margin-top: 3px;
 
-    color: #91a1a6;
+     color: #91a1a6;
 
-    font-size: 8px;
-    font-weight: 600;
+     font-size: 8px;
+     font-weight: 600;
 
-    text-transform: uppercase;
-}
+     text-transform: uppercase;
+ }
 
-.supplier-payment-add-button {
-    min-height: 40px;
+ .supplier-payment-add-button {
+     min-height: 40px;
 
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+     display: inline-flex;
+     align-items: center;
+     justify-content: center;
 
-    gap: 7px;
+     gap: 7px;
 
-    padding: 0 15px;
+     padding: 0 15px;
 
-    border-radius: 10px;
+     border-radius: 10px;
 
-    background: #008894;
+     background: #008894;
 
-    color: #fff !important;
+     color: #fff !important;
 
-    text-decoration: none !important;
+     text-decoration: none !important;
 
-    font-size: 11px;
-    font-weight: 700;
+     font-size: 11px;
+     font-weight: 700;
 
-    box-shadow: 0 5px 12px rgba(0, 136, 148, .15);
+     box-shadow: 0 5px 12px rgba(0, 136, 148, .15);
 
-    transition: .2s ease;
-}
+     transition: .2s ease;
+ }
 
-.supplier-payment-add-button:hover {
-    background: #00757d;
+ .supplier-payment-add-button:hover {
+     background: #00757d;
 
-    transform: translateY(-1px);
+     transform: translateY(-1px);
 
-    box-shadow: 0 7px 16px rgba(0, 136, 148, .2);
-}
+     box-shadow: 0 7px 16px rgba(0, 136, 148, .2);
+ }
 
-.supplier-payment-add-button svg {
-    width: 16px;
-    height: 16px;
-}
+ .supplier-payment-add-button svg {
+     width: 16px;
+     height: 16px;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    STATS GRID
 ========================================================= */
 
-.supplier-payment-stats-grid {
-    display: grid;
+ .supplier-payment-stats-grid {
+     display: grid;
 
-    grid-template-columns:
-        repeat(4, minmax(0, 1fr));
+     grid-template-columns:
+         repeat(4, minmax(0, 1fr));
 
-    gap: 16px;
+     gap: 16px;
 
-    width: 100%;
+     width: 100%;
 
-    margin-bottom: 18px;
-}
+     margin-bottom: 18px;
+ }
 
-.supplier-payment-stat-card {
-    min-height: 154px;
+ .supplier-payment-stat-card {
+     min-height: 154px;
 
-    padding: 16px 18px;
+     padding: 16px 18px;
 
-    background: #fff;
+     background: #fff;
 
-    border: 1px solid #e0eaec;
+     border: 1px solid #e0eaec;
 
-    border-radius: 14px;
+     border-radius: 14px;
 
-    box-shadow:
-        0 3px 12px rgba(20, 65, 72, .035);
+     box-shadow:
+         0 3px 12px rgba(20, 65, 72, .035);
 
-    display: flex;
+     display: flex;
 
-    flex-direction: column;
-}
+     flex-direction: column;
+ }
 
-.supplier-payment-stat-top {
-    display: flex;
+ .supplier-payment-stat-top {
+     display: flex;
 
-    align-items: center;
+     align-items: center;
 
-    gap: 9px;
-}
+     gap: 9px;
+ }
 
-.supplier-payment-stat-icon {
-    width: 29px;
-    height: 29px;
+ .supplier-payment-stat-icon {
+     width: 29px;
+     height: 29px;
 
-    display: flex;
+     display: flex;
 
-    align-items: center;
-    justify-content: center;
+     align-items: center;
+     justify-content: center;
 
-    border-radius: 8px;
-}
+     border-radius: 8px;
+ }
 
-.supplier-payment-stat-icon svg {
-    width: 15px;
-    height: 15px;
-}
+ .supplier-payment-stat-icon svg {
+     width: 15px;
+     height: 15px;
+ }
 
 
-/* CARD ICONS */
+ /* CARD ICONS */
 
-.supplier-payment-stat-icon.total {
-    background: #e9f7f8;
+ .supplier-payment-stat-icon.total {
+     background: #e9f7f8;
 
-    color: #008894;
-}
+     color: #008894;
+ }
 
-.supplier-payment-stat-icon.paid {
-    background: #eaf9f1;
+ .supplier-payment-stat-icon.paid {
+     background: #eaf9f1;
 
-    color: #00a86b;
-}
+     color: #00a86b;
+ }
 
-.supplier-payment-stat-icon.month {
-    background: #fff4e7;
+ .supplier-payment-stat-icon.month {
+     background: #fff4e7;
 
-    color: #f28a00;
-}
+     color: #f28a00;
+ }
 
-.supplier-payment-stat-icon.year {
-    background: #f0edff;
+ .supplier-payment-stat-icon.year {
+     background: #f0edff;
 
-    color: #7357d9;
-}
+     color: #7357d9;
+ }
 
 
-/* LABEL */
+ /* LABEL */
 
-.supplier-payment-stat-label {
-    color: #64777d;
+ .supplier-payment-stat-label {
+     color: #64777d;
 
-    font-size: 11px;
+     font-size: 11px;
 
-    font-weight: 600;
-}
+     font-weight: 600;
+ }
 
 
-/* VALUE */
+ /* VALUE */
 
-.supplier-payment-stat-value {
-    margin-top: 10px;
+ .supplier-payment-stat-value {
+     margin-top: 10px;
 
-    color: #111;
+     color: #111;
 
-    font-size: 27px;
+     font-size: 27px;
 
-    line-height: 1;
+     line-height: 1;
 
-    font-weight: 800;
+     font-weight: 800;
 
-    letter-spacing: -.025em;
-}
+     letter-spacing: -.025em;
+ }
 
 
-/* BOTTOM */
+ /* BOTTOM */
 
-.supplier-payment-stat-bottom {
-    margin-top: auto;
+ .supplier-payment-stat-bottom {
+     margin-top: auto;
 
-    display: flex;
+     display: flex;
 
-    align-items: flex-end;
+     align-items: flex-end;
 
-    justify-content: space-between;
+     justify-content: space-between;
 
-    gap: 10px;
-}
+     gap: 10px;
+ }
 
-.supplier-payment-stat-description {
-    max-width: 150px;
+ .supplier-payment-stat-description {
+     max-width: 150px;
 
-    color: #008894;
+     color: #008894;
 
-    font-size: 10px;
+     font-size: 10px;
 
-    line-height: 1.45;
-}
+     line-height: 1.45;
+ }
 
-.supplier-payment-stat-description.paid-text {
-    color: #00a86b;
-}
+ .supplier-payment-stat-description.paid-text {
+     color: #00a86b;
+ }
 
-.supplier-payment-stat-description.month-text {
-    color: #e87900;
-}
+ .supplier-payment-stat-description.month-text {
+     color: #e87900;
+ }
 
-.supplier-payment-stat-description.year-text {
-    color: #7357d9;
-}
+ .supplier-payment-stat-description.year-text {
+     color: #7357d9;
+ }
 
 
-/* CORNER ICON */
+ /* CORNER ICON */
 
-.supplier-payment-stat-corner-icon {
-    width: 17px;
-    height: 17px;
+ .supplier-payment-stat-corner-icon {
+     width: 17px;
+     height: 17px;
 
-    color: #008894;
-}
+     color: #008894;
+ }
 
-.supplier-payment-stat-corner-icon.paid-icon {
-    color: #00a86b;
-}
+ .supplier-payment-stat-corner-icon.paid-icon {
+     color: #00a86b;
+ }
 
-.supplier-payment-stat-corner-icon.month-icon {
-    color: #f28a00;
-}
+ .supplier-payment-stat-corner-icon.month-icon {
+     color: #f28a00;
+ }
 
-.supplier-payment-stat-corner-icon.year-icon {
-    color: #7357d9;
-}
+ .supplier-payment-stat-corner-icon.year-icon {
+     color: #7357d9;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    TABLE
 ========================================================= */
 
-.supplier-payment-table-wrapper {
-    width: 100%;
+ .supplier-payment-table-wrapper {
+     width: 100%;
 
-    background: #fff;
+     background: #fff;
 
-    border: 1px solid #e0eaec;
+     border: 1px solid #e0eaec;
 
-    border-radius: 15px;
+     border-radius: 15px;
 
-    overflow: hidden;
+     overflow: hidden;
 
-    box-shadow:
-        0 3px 14px rgba(20, 65, 72, .035);
-}
+     box-shadow:
+         0 3px 14px rgba(20, 65, 72, .035);
+ }
 
-.supplier-payment-table-header {
-    min-height: 65px;
+ .supplier-payment-table-header {
+     min-height: 65px;
 
-    display: flex;
+     display: flex;
 
-    align-items: center;
+     align-items: center;
 
-    justify-content: space-between;
+     justify-content: space-between;
 
-    padding: 13px 20px;
+     padding: 13px 20px;
 
-    border-bottom: 1px solid #edf2f3;
-}
+     border-bottom: 1px solid #edf2f3;
+ }
 
-.supplier-payment-table-title {
-    margin: 0;
+ .supplier-payment-table-title {
+     margin: 0;
 
-    color: #17353d;
+     color: #17353d;
 
-    font-size: 15px;
+     font-size: 15px;
 
-    font-weight: 750;
-}
+     font-weight: 750;
+ }
 
-.supplier-payment-table-subtitle {
-    margin: 3px 0 0;
+ .supplier-payment-table-subtitle {
+     margin: 3px 0 0;
 
-    color: #92a1a6;
+     color: #92a1a6;
 
-    font-size: 9px;
-}
+     font-size: 9px;
+ }
 
-.supplier-payment-filament-table {
-    width: 100%;
-}
+ .supplier-payment-filament-table {
+     width: 100%;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    REMOVE DEFAULT FILAMENT HEADER
 ========================================================= */
 
-.fi-page:has(.supplier-payment-page-header) .fi-header,
-.fi-page:has(.supplier-payment-page-header) .fi-breadcrumbs,
-.fi-page:has(.supplier-payment-page-header) .fi-header-heading {
-    display: none !important;
-}
+ .fi-page:has(.supplier-payment-page-header) .fi-header,
+ .fi-page:has(.supplier-payment-page-header) .fi-breadcrumbs,
+ .fi-page:has(.supplier-payment-page-header) .fi-header-heading {
+     display: none !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    REMOVE OLD WIDGET SPACE
 ========================================================= */
 
-.fi-page:has(.supplier-payment-page-header) .fi-header-widgets {
-    display: none !important;
-}
+ .fi-page:has(.supplier-payment-page-header) .fi-header-widgets {
+     display: none !important;
+ }
 
 
-/* =========================================================
+ /* =========================================================
    RESPONSIVE
 ========================================================= */
 
-@media (max-width: 1100px) {
+ @media (max-width: 1100px) {
 
-    .supplier-payment-stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+     .supplier-payment-stats-grid {
+         grid-template-columns: repeat(2, 1fr);
+     }
 
-}
+ }
 
-@media (max-width: 800px) {
+ @media (max-width: 800px) {
 
-    .supplier-payment-page-header {
-        flex-direction: column;
+     .supplier-payment-page-header {
+         flex-direction: column;
 
-        align-items: flex-start;
-    }
+         align-items: flex-start;
+     }
 
-    .supplier-payment-header-right {
-        width: 100%;
+     .supplier-payment-header-right {
+         width: 100%;
 
-        justify-content: space-between;
-    }
+         justify-content: space-between;
+     }
 
-}
+ }
 
-@media (max-width: 600px) {
+ @media (max-width: 600px) {
 
-    .supplier-payment-stats-grid {
-        grid-template-columns: 1fr;
-    }
+     .supplier-payment-stats-grid {
+         grid-template-columns: 1fr;
+     }
 
-    .supplier-payment-page-header {
-        padding: 15px;
-    }
+     .supplier-payment-page-header {
+         padding: 15px;
+     }
 
-    .supplier-payment-page-title {
-        font-size: 20px;
-    }
+     .supplier-payment-page-title {
+         font-size: 20px;
+     }
 
-    .supplier-payment-page-badge {
-        display: none;
-    }
-
-
-}
+     .supplier-payment-page-badge {
+         display: none;
+     }
 
 
+ }
 
 
 
-.pms-hide-header-action {
-    display: none !important;
-
-}
 
 
+ .pms-hide-header-action {
+     display: none !important;
 
-/* =========================================================
+ }
+
+
+
+ /* =========================================================
 <<<<<<< HEAD
    FORCE-FIX TOPBAR LAYOUT (must stay at very end of file)
    ========================================================= */
 
-.pms-topbar {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    flex-wrap: nowrap !important;
-    height: 72px !important;
-}
+ .pms-topbar {
+     display: flex !important;
+     align-items: center !important;
+     justify-content: space-between !important;
+     flex-wrap: nowrap !important;
+     height: 72px !important;
+ }
 
-.pms-topbar-left {
-    display: flex !important;
-    align-items: center !important;
-    gap: 14px !important;
-    flex-shrink: 0 !important;
-}
+ .pms-topbar-left {
+     display: flex !important;
+     align-items: center !important;
+     gap: 14px !important;
+     flex-shrink: 0 !important;
+ }
 
-.pms-topbar-search {
-    display: flex !important;
-    align-items: center !important;
-    flex: 1 1 auto !important;
-    max-width: 420px !important;
-}
+ .pms-topbar-search {
+     display: flex !important;
+     align-items: center !important;
+     flex: 1 1 auto !important;
+     max-width: 420px !important;
+ }
 
-.pms-topbar-right {
-    display: flex !important;
-    align-items: center !important;
-    gap: 8px !important;
-    flex-shrink: 0 !important;
-    position: relative !important;
-    top: auto !important;
-    right: auto !important;
-}
+ .pms-topbar-right {
+     display: flex !important;
+     align-items: center !important;
+     gap: 8px !important;
+     flex-shrink: 0 !important;
+     position: relative !important;
+     top: auto !important;
+     right: auto !important;
+ }
 
-.pms-user {
-    position: relative !important;
-}
-
-
+ .pms-user {
+     position: relative !important;
+ }
 
 
-.fi-page-main {
-    padding-top: 0 !important;
-}
-
-.fi-header {
-    padding-top: 0.5rem !important;
-    padding-bottom: 0 !important;
-    margin: 0 !important;
-}
-
-.fi-page-header-main-ctn {
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-.fi-page-content {
-    padding-top: 0.25rem !important;
-}
-html, body {
-    background-color: #eefafb !important;
-}
 
 
-/* =========================================================
+ .fi-page-main {
+     padding-top: 0 !important;
+ }
+
+ .fi-header {
+     padding-top: 0.5rem !important;
+     padding-bottom: 0 !important;
+     margin: 0 !important;
+ }
+
+ .fi-page-header-main-ctn {
+     margin: 0 !important;
+     padding: 0 !important;
+ }
+
+ .fi-page-content {
+     padding-top: 0.25rem !important;
+ }
+
+ html,
+ body {
+     background-color: #eefafb !important;
+ }
+
+
+ /* =========================================================
    FIX: Dropdown parent buttons — reset browser button
    defaults so icon/label gap matches Dashboard <a> link
 ========================================================= */
 
-button.pms-nav-item {
-    appearance: none !important;
-    -webkit-appearance: none !important;
-    font: inherit !important;
-    font-size: 0.875rem !important;
-    font-weight: 500 !important;
-    line-height: inherit !important;
-    margin: 0 !important;
-    text-align: left !important;
+ button.pms-nav-item {
+     appearance: none !important;
+     -webkit-appearance: none !important;
+     font: inherit !important;
+     font-size: 0.875rem !important;
+     font-weight: 500 !important;
+     line-height: inherit !important;
+     margin: 0 !important;
+     text-align: left !important;
 
-    display: flex !important;
-    align-items: center !important;
-    gap: 0.75rem !important;
-}
+     display: flex !important;
+     align-items: center !important;
+     gap: 0.75rem !important;
+ }
 
-button.pms-nav-item .pms-nav-label {
-    flex: 1 1 auto !important;
-    text-align: left !important;
-    font-size: 0.875rem !important;
-    font-weight: 500 !important;
-}
-button.pms-nav-item .pms-nav-icon {
-    flex-shrink: 0 !important;
-    width: 1.25rem !important;
-    height: 1.25rem !important;
-}
+ button.pms-nav-item .pms-nav-label {
+     flex: 1 1 auto !important;
+     text-align: left !important;
+     font-size: 0.875rem !important;
+     font-weight: 500 !important;
+ }
 
-
-
-button.pms-nav-item .pms-nav-chevron {
-    flex-shrink: 0 !important;
-}
+ button.pms-nav-item .pms-nav-icon {
+     flex-shrink: 0 !important;
+     width: 1.25rem !important;
+     height: 1.25rem !important;
+ }
 
 
 
+ button.pms-nav-item .pms-nav-chevron {
+     flex-shrink: 0 !important;
+ }
 
-/* =========================================================
+
+
+
+ /* =========================================================
    FIX: Center "Actions" header + limit column width so gap
    between columns matches the rest of the table
 ========================================================= */
 
-th.fi-align-end {
-    text-align: center !important;
-    width: 1% !important;
-    white-space: nowrap !important;
-}
+ th.fi-align-end {
+     text-align: center !important;
+     width: 1% !important;
+     white-space: nowrap !important;
+ }
 
-td.fi-ta-cell:last-child {
-    width: 1% !important;
-    white-space: nowrap !important;
-}
+ td.fi-ta-cell:last-child {
+     width: 1% !important;
+     white-space: nowrap !important;
+ }

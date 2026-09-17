@@ -3,21 +3,25 @@
 namespace App\Filament\Resources\Users\Pages;
 
 use App\Filament\Resources\Users\UserResource;
-use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
 class EditUser extends EditRecord
 {
     protected static string $resource = UserResource::class;
 
-    protected function getHeaderActions(): array
+    protected function mutateFormDataBeforeFill(array $data): array
     {
-        return [
-            DeleteAction::make(),
-        ];
+        $data['role'] = $this->record->roles->first()?->name;
+
+        return $data;
     }
-    protected function getRedirectUrl(): string
+
+    protected function afterSave(): void
     {
-        return $this->getResource()::getUrl('index');
+        $role = $this->data['role'] ?? null;
+
+        if ($role) {
+            $this->record->syncRoles([$role]);
+        }
     }
 }

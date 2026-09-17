@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Carbon\Carbon;
 
 class MedicineBatch extends Model
@@ -46,4 +47,11 @@ class MedicineBatch extends Model
 
         return 'active';
     }
+    public function batchPackagings(): HasMany
+{
+    return $this->hasMany(
+        MedicineBatchPackaging::class,
+        'medicine_batch_id'
+    )->orderBy('sort_order');
+}
 }

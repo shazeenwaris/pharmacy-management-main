@@ -25,6 +25,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Forms\Components\Repeater;
 use Illuminate\Database\Eloquent\Model;
 use UnitEnum;
 
@@ -109,7 +110,42 @@ class MedicineBatchResource extends Resource
                             ->prefix(fn () => currency_symbol()),
                     ]),
 
-               
+               Repeater::make('batchPackagings')
+    ->relationship('batchPackagings')
+    ->label('Sale Units')
+    ->addActionLabel('Add Sale Unit')
+    ->defaultItems(1)
+    ->reorderable('sort_order')
+    ->columns(3)
+    ->schema([
+        Select::make('unit_id')
+            ->label('Unit')
+            ->relationship('unit', 'name')
+            ->searchable()
+            ->preload()
+            ->required(),
+
+      TextInput::make('conversion_factor')
+    ->label('Conversion Factor')
+    ->numeric()
+    ->minValue(0.0001)
+    ->required()
+    ->helperText('How many base units are consumed when 1 sale unit is sold.'
+            ),
+
+        Toggle::make('can_sell')
+            ->label('Can Sell')
+            ->default(true)
+            ->onColor('success')
+            ->offColor('danger'),
+    ])
+    ->itemLabel(
+        fn (array $state): ?string =>
+            $state['unit_id'] ?? null
+                ? 'Sale Unit'
+                : 'New Sale Unit'
+    )
+    ->columnSpanFull(),
 
                 Section::make('Status & Notes')
                     ->icon(Heroicon::OutlinedCheckCircle)

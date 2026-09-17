@@ -8,9 +8,13 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateUser extends CreateRecord
 {
     protected static string $resource = UserResource::class;
-    
-     protected function getRedirectUrl(): string
+
+    protected function afterCreate(): void
     {
-        return $this->getResource()::getUrl('index');
+        $role = $this->data['role'] ?? null;
+
+        if ($role) {
+            $this->record->syncRoles([$role]);
+        }
     }
 }

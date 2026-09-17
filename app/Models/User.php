@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
-
+use Filament\Panel;
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -52,4 +52,16 @@ class User extends Authenticatable
     {
         return $this->avatar ? Storage::url($this->avatar) : null;
     }
+    public function canAccessPanel(Panel $panel): bool
+{
+    if (! $this->is_active) {
+        return false;
+    }
+
+    return match ($panel->getId()) {
+        'admin' => $this->hasRole('Admin'),
+        'cashier' => $this->hasRole('Cashier'),
+        default => false,
+    };
+}
 }
