@@ -55,21 +55,40 @@
     {{-- RIGHT: notifications, messages, user --}}
     <div class="pms-topbar-right">
 
-        <a href="/admin/app-notifications" class="pms-topbar-action pms-notification-btn" title="Notifications">
+        <!-- <a href="/admin/app-notifications" class="pms-topbar-action pms-notification-btn" title="Notifications">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
             </svg>
-            @php $unread = \App\Models\AppNotification::unread()->count(); @endphp
+             @php $unread = \App\Models\AppNotification::unread()->count(); @endphp
             @if ($unread > 0)
                 <span class="pms-notification-count">{{ $unread }}</span>
-            @endif
-        </a>
+            @endif 
+        
+        </a> -->        
+        <!-- <a href="/admin/app-notifications" class="pms-topbar-action pms-notification-btn" title="Notifications"> -->
+            <a href="{{ \Filament\Facades\Filament::getCurrentPanel()->getId() === 'admin' ? '/admin/app-notifications' : '/pharmacist/alerts' }}" class="pms-topbar-action pms-notification-btn" title="Notifications">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+    </svg>
 
-        <button type="button" class="pms-topbar-action" title="Messages">
+    @php
+        $unread = \App\Models\AppNotification::query()
+            ->where('notifiable_type', \App\Models\User::class)
+            ->where('notifiable_id', auth()->id())
+            ->whereNull('read_at')
+            ->count();
+    @endphp
+
+    @if ($unread > 0)
+        <span class="pms-notification-count">{{ $unread }}</span>
+    @endif
+</a>
+
+        <!-- <button type="button" class="pms-topbar-action" title="Messages">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
             </svg>
-        </button>
+        </button> -->
 
         <div class="pms-topbar-divider"></div>
 
@@ -83,6 +102,7 @@
                     @endif
                     <span class="pms-online-dot"></span>
                 </div>
+               
 
                 <div class="pms-user-info">
                     <span class="pms-user-name">{{ auth()->user()->name ?? 'Admin' }}</span>
@@ -103,12 +123,18 @@
                 style="position: absolute; right: 0; top: calc(100% + 8px); width: 200px; background: #fff; border: 1px solid #e4eeee; border-radius: 12px; box-shadow: 0 12px 28px rgba(0,60,65,0.12); overflow: hidden; z-index: 50;"
                 x-cloak
             >
-                <a href="{{ \App\Filament\Pages\EditProfile::getUrl() }}" style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; font-size: 13px; color: #2b5f79; text-decoration: none;">
+                <!-- <a href="{{ \App\Filament\Pages\EditProfile::getUrl() }}" style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; font-size: 13px; color: #2b5f79; text-decoration: none;">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                     </svg>
                     My Profile
-                </a>
+                </a> -->
+                <a href="{{ \Filament\Facades\Filament::getCurrentPanel()->getId() === 'admin' ? \App\Filament\Pages\EditProfile::getUrl() : \App\Filament\Pharmacist\Pages\MyProfile::getUrl() }}" style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; font-size: 13px; color: #2b5f79; text-decoration: none;">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+    </svg>
+    My Profile
+</a>
 
                 <form method="POST" action="{{ route('filament.admin.auth.logout') }}">
                     @csrf

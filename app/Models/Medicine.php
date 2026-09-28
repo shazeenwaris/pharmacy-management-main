@@ -12,22 +12,16 @@ class Medicine extends Model
 {
     use LogsActivity;
 
-    // protected $fillable = [
-    //     'name', 'generic_name', 'medicine_type', 'brand_name', 'sku', 'barcode',
-    //     'category_id', 'manufacturer_id', 'dosage_form_id', 'unit_id', 'strength', 'pack_size',
-    //     'purchase_price', 'sale_price', 'wholesale_price', 'minimum_sale_price',
-    //     'tax_percent', 'discount_percent',
-    //     'minimum_stock_level', 'maximum_stock_level', 'reorder_level', 'opening_stock',
-    //     'prescription_required', 'status', 'description', 'notes',
-    // ];
     protected $fillable = [
-    'image', 'name', 'generic_name', 'medicine_type', 'brand_name', 'sku', 'barcode',
-    'category_id', 'manufacturer_id', 'supplier_id', 'dosage_form_id', 'unit_id', 'strength', 'pack_size',
-    'purchase_price', 'sale_price', 'wholesale_price', 'minimum_sale_price',
-    'tax_percent', 'discount_percent',
-    'minimum_stock_level', 'maximum_stock_level', 'reorder_level', 'opening_stock',
-    'prescription_required', 'status', 'description', 'notes',
-];
+        'image', 'name', 'generic_name', 'medicine_type', 'brand_name', 'sku', 'barcode',
+        'category_id', 'manufacturer_id', 'supplier_id', 'dosage_form_id', 'unit_id', 'strength', 'pack_size',
+        'purchase_price', 'sale_price', 'wholesale_price', 'minimum_sale_price',
+        'tax_percent', 'discount_percent',
+        'minimum_stock_level', 'maximum_stock_level', 'reorder_level',
+        'prescription_required', 'status', 'description', 'notes','product_type',
+    'packaging_type',
+    'has_expiry',
+    ];
 
     protected $casts = [
         'prescription_required' => 'boolean',
@@ -38,6 +32,7 @@ class Medicine extends Model
         'minimum_sale_price' => 'decimal:2',
         'tax_percent' => 'decimal:2',
         'discount_percent' => 'decimal:2',
+        'has_expiry' => 'boolean',
     ];
 
     public function category(): BelongsTo
@@ -68,6 +63,12 @@ class Medicine extends Model
     public function supplier(): BelongsTo
     {
         return $this->belongsTo(Supplier::class);
+    }
+
+    // Current stock = sum of quantity across all batches of this medicine
+    public function getCurrentStockAttribute(): int
+    {
+        return $this->batches()->sum('quantity');
     }
 
     public function getActivitylogOptions(): LogOptions

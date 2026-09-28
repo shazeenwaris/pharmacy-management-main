@@ -1,3 +1,5 @@
+
+
 <div x-data="{}" x-on:focus-search.window="$refs.searchInput.focus()">
 
     {{-- Find Medicine (full width) --}}
@@ -141,7 +143,9 @@
                 <div style="color: #123047; font-weight: 500;">{{ currency_symbol() }} {{ number_format($this->change, 2) }}</div>
             </div>
         </div>
-
+    <button wire:click="holdSale" style="width: 100%; margin-top: 1.25rem; padding: 0.65rem; background: white; color: #C8791B; border: 1px solid #E8A23D; border-radius: 0.5rem; font-weight: 600; font-size: 0.9rem; cursor: pointer;">
+    ⏸ Hold Sale
+</button>
         <button wire:click="completeSale" style="width: 100%; margin-top: 1.25rem; padding: 0.75rem; background: #00707A; color: white; border: none; border-radius: 0.5rem; font-weight: 600; font-size: 0.95rem; cursor: pointer;">
             Complete Sale
         </button>

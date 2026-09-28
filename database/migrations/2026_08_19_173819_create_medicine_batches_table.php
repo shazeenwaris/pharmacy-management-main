@@ -1,8 +1,10 @@
 <?php
 
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+
 
 return new class extends Migration
 {
@@ -21,15 +23,18 @@ return new class extends Migration
         $table->decimal('sale_price', 10, 2)->nullable();
         $table->integer('quantity')->default(0);
 
+
         // Supplier + purchase reference (purchases module abhi nahi bana, isliye simple text/nullable rakha hai)
         $table->string('supplier_name')->nullable();
         $table->string('purchase_reference')->nullable();
+
 
         $table->boolean('status')->default(true);
         $table->text('notes')->nullable();
         $table->timestamps();
     });
 }
+
 
     /**
      * Reverse the migrations.
@@ -39,3 +44,5 @@ return new class extends Migration
         Schema::dropIfExists('medicine_batches');
     }
 };
+
+

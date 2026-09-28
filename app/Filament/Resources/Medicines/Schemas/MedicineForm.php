@@ -1,6 +1,8 @@
 <?php
 
+
 namespace App\Filament\Resources\Medicines\Schemas;
+
 
 use App\Models\Category;
 use App\Models\DosageForm;
@@ -15,6 +17,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+
 
 class MedicineForm
 {
@@ -33,18 +36,22 @@ class MedicineForm
                             ->required()
                             ->maxLength(255),
 
+
                         TextInput::make('generic_name')
                             ->label('Generic Name')
                             ->required()
                             ->maxLength(255),
 
+
                         TextInput::make('medicine_type')
                             ->label('Medicine Type')
                             ->maxLength(255),
 
+
                         TextInput::make('brand_name')
                             ->label('Brand Name')
                             ->maxLength(255),
+
 
                         TextInput::make('sku')
                             ->label('Medicine Code / SKU')
@@ -52,19 +59,23 @@ class MedicineForm
                             ->unique(ignoreRecord: true)
                             ->maxLength(255),
 
+
                         TextInput::make('barcode')
                             ->label('Barcode')
                             ->maxLength(255),
+
 
                         TextInput::make('strength')
                             ->label('Strength')
                             ->placeholder('e.g. 500mg')
                             ->maxLength(255),
 
+
                         TextInput::make('pack_size')
                             ->label('Pack Size')
                             ->maxLength(255),
                     ]),
+
 
                 Section::make('Classification')
                     ->description('Category, manufacturer and supplier links')
@@ -80,6 +91,7 @@ class MedicineForm
                             ->preload()
                             ->required(),
 
+
                         Select::make('manufacturer_id')
                             ->label('Manufacturer')
                             ->relationship('manufacturer', 'name')
@@ -88,12 +100,14 @@ class MedicineForm
                             ->preload()
                             ->required(),
 
+
                         Select::make('supplier_id')
                             ->label('Supplier')
                             ->relationship('supplier', 'supplier_name')
                             ->options(fn () => Supplier::query()->pluck('supplier_name', 'id'))
                             ->searchable()
                             ->preload(),
+
 
                         Select::make('dosage_form_id')
                             ->label('Dosage Form')
@@ -103,6 +117,7 @@ class MedicineForm
                             ->preload()
                             ->required(),
 
+
                         Select::make('unit_id')
                             ->label('Unit')
                             ->relationship('unit', 'name')
@@ -111,6 +126,7 @@ class MedicineForm
                             ->preload()
                             ->required(),
                     ]),
+
 
                 Section::make('Pricing')
                     ->description('Purchase and sale pricing for this medicine')
@@ -124,21 +140,25 @@ class MedicineForm
                             ->required()
                             ->prefix(fn () => currency_symbol()),
 
+
                         TextInput::make('sale_price')
                             ->label('Sale Price')
                             ->numeric()
                             ->required()
                             ->prefix(fn () => currency_symbol()),
 
+
                         TextInput::make('wholesale_price')
                             ->label('Wholesale Price')
                             ->numeric()
                             ->prefix(fn () => currency_symbol()),
 
+
                         TextInput::make('minimum_sale_price')
                             ->label('Minimum Sale Price')
                             ->numeric()
                             ->prefix(fn () => currency_symbol()),
+
 
                         TextInput::make('tax_percent')
                             ->label('Tax Percent')
@@ -146,12 +166,14 @@ class MedicineForm
                             ->default(0)
                             ->suffix('%'),
 
+
                         TextInput::make('discount_percent')
                             ->label('Discount Percent')
                             ->numeric()
                             ->default(0)
                             ->suffix('%'),
                     ]),
+
 
                 Section::make('Stock Settings')
                     ->description('Reorder thresholds and opening stock')
@@ -165,19 +187,23 @@ class MedicineForm
                             ->default(0)
                             ->required(),
 
+
                         TextInput::make('maximum_stock_level')
                             ->label('Maximum Stock Level')
                             ->numeric(),
 
+
                         TextInput::make('reorder_level')
                             ->label('Reorder Level')
                             ->numeric(),
+
 
                         // TextInput::make('opening_stock')
                         //     ->label('Opening Stock')
                         //     ->numeric()
                         //     ->default(0),
                     ]),
+
 
                 Section::make('Additional Details')
                     ->description('Prescription requirement, description and status')
@@ -190,15 +216,18 @@ class MedicineForm
                             ->onColor('danger')
                             ->offColor('success'),
 
+
                         Toggle::make('status')
                             ->label('Active')
                             ->default(true)
                             ->onColor('success')
                             ->offColor('danger'),
 
+
                         Textarea::make('description')
                             ->rows(3)
                             ->columnSpanFull(),
+
 
                         FileUpload::make('image')
                             ->label('Medicine Image')

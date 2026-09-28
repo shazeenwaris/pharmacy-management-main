@@ -12,6 +12,8 @@ class Sale extends Model
 {
     use LogsActivity;
 
+  
+
     protected $fillable = [
         'invoice_number',
         'customer_id',

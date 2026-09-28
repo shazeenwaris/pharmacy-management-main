@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Customer;
 use App\Models\Expense;
 use App\Models\Medicine;
+use App\Models\Prescription;
 use App\Models\Purchase;
 use App\Models\PurchaseItem;
 use App\Models\PurchaseReturn;
@@ -19,27 +20,22 @@ use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         Relation::enforceMorphMap([
-            'expense'  => Expense::class,
-            'user'     => \App\Models\User::class,
-            'medicine' => Medicine::class,
-            'purchase' => Purchase::class,
-            'customer' => Customer::class,
-            'supplier' => \App\Models\Supplier::class,
-            'sale'     => Sale::class,
+            'expense'      => Expense::class,
+            'user'         => \App\Models\User::class,
+            'medicine'     => Medicine::class,
+            'purchase'     => Purchase::class,
+            'customer'     => Customer::class,
+            'supplier'     => \App\Models\Supplier::class,
+            'sale'         => Sale::class,
+            'prescription' => Prescription::class,
         ]);
 
         Gate::before(function ($user, $ability) {

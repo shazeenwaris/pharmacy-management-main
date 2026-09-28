@@ -93,6 +93,7 @@ class MedicineBatchesTable
                 EditAction::make(),
                 DeleteAction::make(),
             ])
+            
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

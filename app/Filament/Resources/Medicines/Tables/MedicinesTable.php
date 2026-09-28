@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Medicines\Tables;
 
+use App\Filament\Resources\Medicines\MedicineResource;
 use App\Models\Category;
 use App\Models\DosageForm;
 use App\Models\Manufacturer;
@@ -31,14 +32,26 @@ class MedicinesTable
                     ->size(40),
 
                 TextColumn::make('name')
-                    ->label('Medicine Name')
+                    ->label('Product Name')
                     ->searchable()
                     ->sortable()
                     ->weight('semibold')
                     ->description(fn ($record) => $record->generic_name),
 
-                TextColumn::make('sku')
-                    ->label('SKU')
+                TextColumn::make('product_type')
+                    ->label('Type')
+                    ->badge()
+                    ->color('gray')
+                    ->formatStateUsing(fn ($state) => MedicineResource::productTypes()[$state] ?? $state)
+                    ->toggleable(),
+
+                TextColumn::make('brand_name')
+                    ->label('Brand')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('barcode')
+                    ->label('Barcode')
                     ->badge()
                     ->color('gray')
                     ->searchable()
@@ -65,8 +78,17 @@ class MedicinesTable
                     ->label('Strength')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('opening_stock')
+                TextColumn::make('pack_size')
+                    ->label('Pack Size')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('unit.name')
+                    ->label('Unit')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('current_stock')
                     ->label('Stock')
+                    ->state(fn ($record) => $record->batches()->sum('quantity'))
                     ->badge()
                     ->color(fn ($state, $record) => match (true) {
                         (int) $state <= 0 => 'danger',
@@ -77,17 +99,7 @@ class MedicinesTable
                         (int) $state <= 0 => 'Out of Stock',
                         (int) $state <= $record->minimum_stock_level => (int) $state . ' (Low)',
                         default => (string) (int) $state,
-                    })
-                    ->sortable(),
-
-                // IconColumn::make('prescription_required')
-                //     ->label('Rx')
-                //     ->boolean()
-                //     ->trueIcon('heroicon-o-exclamation-triangle')
-                //     ->falseIcon('heroicon-o-check-circle')
-                //     ->trueColor('danger')
-                //     ->falseColor('success')
-                //     ->tooltip(fn ($state) => $state ? 'Prescription Required' : 'No Prescription Needed'),
+                    }),
 
                 IconColumn::make('status')
                     ->label('Active')
@@ -102,6 +114,10 @@ class MedicinesTable
                     ->color('gray'),
             ])
             ->filters([
+                SelectFilter::make('product_type')
+                    ->label('Product Type')
+                    ->options(fn () => MedicineResource::productTypes()),
+
                 SelectFilter::make('category_id')
                     ->label('Category')
                     ->options(fn () => Category::query()->pluck('name', 'id'))
@@ -133,7 +149,7 @@ class MedicinesTable
                 Filter::make('low_stock')
                     ->label('Low / Out of Stock')
                     ->query(fn (Builder $query): Builder => $query
-                        ->whereColumn('opening_stock', '<=', 'minimum_stock_level')),
+                        ->whereRaw('(select coalesce(sum(quantity), 0) from medicine_batches where medicine_batches.medicine_id = medicines.id) <= medicines.minimum_stock_level')),
             ])
             ->recordActions([
                 EditAction::make(),

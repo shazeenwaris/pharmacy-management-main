@@ -7,17 +7,35 @@ use Filament\Widgets\Widget;
 
 class AppNotificationStats extends Widget
 {
-    protected string $view = 'filament.resources.app-notifications.widgets.app-notification-stats';
+    protected string $view =
+        'filament.resources.app-notifications.widgets.app-notification-stats';
+
     protected static bool $isLazy = false;
 
     protected int|string|array $columnSpan = 'full';
 
     public function getStatsData(): array
     {
+        $query = AppNotification::query()
+            ->where(
+                'notifiable_type',
+                \App\Models\User::class
+            )
+            ->where(
+                'notifiable_id',
+                auth()->id()
+            );
+
         return [
-            'total'  => AppNotification::count(),
-            'unread' => AppNotification::whereNull('read_at')->count(),
-            'read'   => AppNotification::whereNotNull('read_at')->count(),
+            'total' => (clone $query)->count(),
+
+            'unread' => (clone $query)
+                ->whereNull('read_at')
+                ->count(),
+
+            'read' => (clone $query)
+                ->whereNotNull('read_at')
+                ->count(),
         ];
     }
 }

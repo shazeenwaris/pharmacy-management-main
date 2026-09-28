@@ -2,1183 +2,237 @@
 
 namespace App\Livewire;
 
-use App\Models\Customer;
+use App\Models\HeldSale;
 use App\Models\Medicine;
 use App\Models\MedicineBatch;
 use App\Models\Sale;
 use App\Models\SaleItem;
-use App\Models\SalePayment;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 
 class PosScreen extends Component
 {
-    /*
-    |--------------------------------------------------------------------------
-    | POS Properties
-    |--------------------------------------------------------------------------
-    */
+    public string $search = '';
+    public array $cart = [];
+    public string $paymentMethod = 'cash';
+    public float $paidAmount = 0;
+    public float $discount = 0;
+    public float $tax = 0;
+    public ?int $customerId = null;
 
-   public string $search = '';
+    public function mount(): void
+    {
+        $resumeId = request()->query('resume');
 
-public array $cart = [];
-
-public ?int $customerId = null;
-
-public float $discount = 0;
-
-public float $tax = 0;
-
-public string $paymentMethod = 'cash';
-
-public $paidAmount = 0;
-    
-    
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Customers
-    |--------------------------------------------------------------------------
-    */
+        if ($resumeId) {
+            $this->resumeHeldSale((int) $resumeId);
+        }
+    }
 
     public function getCustomersProperty()
     {
-        return Customer::query()
-            ->where('status', true)
+        return \App\Models\Customer::where('status', true)
             ->orderBy('name')
-            ->get([
-                'id',
-                'name',
-                'phone',
-            ]);
+            ->get(['id', 'name', 'phone']);
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Medicine Search Results
-    |--------------------------------------------------------------------------
-    */
-
-    public function getMedicineSearchResults()
+    public function searchResults()
     {
-        $search = trim($this->search);
-
-        if ($search === '') {
-            return collect();
+        if (strlen($this->search) < 2) {
+            return [];
         }
 
-        return Medicine::query()
-            ->where('status', true)
-
-            ->where(function ($query) use ($search) {
-                $query
-                    ->where('name', 'like', "%{$search}%")
-                    ->orWhere('generic_name', 'like', "%{$search}%")
-                    ->orWhere('sku', 'like', "%{$search}%")
-                    ->orWhere('barcode', $search);
+        return Medicine::where('status', true)
+            ->where(function ($q) {
+                $q->where('name', 'like', "%{$this->search}%")
+                    ->orWhere('generic_name', 'like', "%{$this->search}%")
+                    ->orWhere('barcode', $this->search)
+                    ->orWhere('sku', 'like', "%{$this->search}%");
             })
-
-            ->whereHas('batches', function ($query) {
-                $query
-                    ->where('status', true)
-                    ->where('quantity', '>', 0)
-                    ->whereDate('expiry_date', '>=', today());
-            })
-
-            ->with([
-                'batches' => function ($query) {
-                    $query
-                        ->where('status', true)
-                        ->where('quantity', '>', 0)
-                        ->whereDate('expiry_date', '>=', today())
-                        ->orderBy('expiry_date', 'asc');
-                },
-            ])
-
             ->limit(10)
             ->get();
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Add Medicine To Cart
-    |--------------------------------------------------------------------------
-    |
-    | FEFO:
-    | First Expire, First Out
-    |
-    */
-
-    public function addToCart(int $medicineId): void
+    public function addToCart($medicineId)
     {
-        $medicine = Medicine::query()
-            ->where('status', true)
-            ->find($medicineId);
-
-        if (! $medicine) {
-            $this->notify(
-                'Medicine not found.',
-                'error'
-            );
-
-            return;
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Prescription Warning
-        |--------------------------------------------------------------------------
-        */
+        $medicine = Medicine::find($medicineId);
 
         if ($medicine->prescription_required) {
-            $this->notify(
-                'Prescription required for ' . $medicine->name . '.',
-                'warning'
-            );
+            $this->dispatch('notify', message: '⚠ Prescription Required for ' . $medicine->name);
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | FEFO Batch
-        |--------------------------------------------------------------------------
-        */
-
-        $batch = MedicineBatch::query()
-            ->where('medicine_id', $medicine->id)
+        $batch = MedicineBatch::where('medicine_id', $medicineId)
             ->where('status', true)
             ->where('quantity', '>', 0)
-            ->whereDate('expiry_date', '>', today())
+            ->where('expiry_date', '>', now())
             ->orderBy('expiry_date', 'asc')
             ->first();
 
         if (! $batch) {
-            $this->notify(
-                'No available non-expired stock for ' . $medicine->name . '.',
-                'error'
-            );
-
+            $this->dispatch('notify', message: 'No available stock for this medicine.');
             return;
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Existing Batch Already In Cart
-        |--------------------------------------------------------------------------
-        */
-
         if (isset($this->cart[$batch->id])) {
-
-            $newQuantity =
-                (int) $this->cart[$batch->id]['quantity'] + 1;
-
-            if ($newQuantity > (int) $batch->quantity) {
-                $this->notify(
-                    'Only ' . $batch->quantity .
-                    ' units available in this batch.',
-                    'warning'
-                );
-
-                return;
-            }
-
-            $this->cart[$batch->id]['quantity'] = $newQuantity;
-
-            $this->cart[$batch->id]['available_qty'] =
-                (int) $batch->quantity;
-
-            $this->recalculateCartItem($batch->id);
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | New Cart Item
-        |--------------------------------------------------------------------------
-        */
-
-        else {
-
-            $unitPrice = (float) $batch->sale_price;
-
+            $this->cart[$batch->id]['quantity']++;
+        } else {
             $this->cart[$batch->id] = [
-                'medicine_id' => (int) $medicine->id,
-
+                'medicine_id' => $medicine->id,
                 'medicine_name' => $medicine->name,
-
-                'batch_id' => (int) $batch->id,
-
+                'batch_id' => $batch->id,
                 'batch_number' => $batch->batch_number,
-
-                'expiry_date' => $batch->expiry_date
-                    ? $batch->expiry_date->format('d M Y')
-                    : '',
-
-                'available_qty' => (int) $batch->quantity,
-
+                'expiry_date' => $batch->expiry_date->format('d M Y'),
+                'available_qty' => $batch->quantity,
                 'quantity' => 1,
-                'unit_price' => (float) $medicine->sale_price,
+                'unit_price' => (float) ($batch->sale_price > 0 ? $batch->sale_price : $medicine->sale_price),
                 'discount' => 0,
-
-                'total' => $unitPrice,
             ];
         }
 
-
-        /*
-        |--------------------------------------------------------------------------
-        | Clear Search
-        |--------------------------------------------------------------------------
-        */
-
         $this->search = '';
-
-        $this->dispatch('focus-search');
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Barcode Scan
-    |--------------------------------------------------------------------------
-    */
-
-    public function scanBarcode(): void
+    public function scanBarcode()
     {
-        $barcode = trim($this->search);
-
-        if ($barcode === '') {
+        if (trim($this->search) === '') {
             return;
         }
 
-        $medicine = Medicine::query()
-            ->where('status', true)
-            ->where('barcode', $barcode)
+        $medicine = Medicine::where('status', true)
+            ->where('barcode', $this->search)
             ->first();
 
         if (! $medicine) {
-            $this->notify(
-                'No medicine found for barcode: ' . $barcode,
-                'error'
-            );
-
+            $this->dispatch('notify', message: '⚠ No medicine found for barcode: ' . $this->search);
             $this->search = '';
-
-            $this->dispatch('focus-search');
-
             return;
         }
 
         $this->addToCart($medicine->id);
+
+        $this->dispatch('focus-search');
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Remove Cart Item
-    |--------------------------------------------------------------------------
-    */
-
-    public function removeFromCart(int $batchId): void
+    public function removeFromCart($batchId)
     {
         unset($this->cart[$batchId]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | IMPORTANT
-        |--------------------------------------------------------------------------
-        |
-        | Do NOT use array_values() here.
-        |
-        | Cart is indexed by batch ID and other methods depend
-        | on the batch ID remaining as the array key.
-        |
-        */
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | Update Quantity
-    |--------------------------------------------------------------------------
-    */
-
-    public function updateQuantity(int $batchId, $qty): void
+    public function updateQuantity($batchId, $qty)
     {
-        if (! isset($this->cart[$batchId])) {
+        if (isset($this->cart[$batchId])) {
+            $this->cart[$batchId]['quantity'] = max(1, (int) $qty);
+        }
+    }
+
+    public function getSubtotalProperty()
+    {
+        return collect($this->cart)->sum(fn ($item) => ($item['unit_price'] * $item['quantity']) - $item['discount']);
+    }
+
+    public function getGrandTotalProperty()
+    {
+        return $this->subtotal + $this->tax - $this->discount;
+    }
+
+    public function getChangeProperty()
+    {
+        return max(0, $this->paidAmount - $this->grandTotal);
+    }
+
+    public function holdSale()
+    {
+        if (empty($this->cart)) {
+            $this->dispatch('notify', message: 'Cart is empty — nothing to hold.');
             return;
         }
 
-        $qty = (int) $qty;
+        HeldSale::create([
+            'reference' => 'HOLD-' . now()->format('Ymd') . '-' . rand(1000, 9999),
+            'customer_id' => $this->customerId ?: null,
+            'cart' => $this->cart,
+            'discount' => $this->discount,
+            'tax' => $this->tax,
+            'held_by' => auth()->id(),
+        ]);
 
-        if ($qty < 1) {
-            $qty = 1;
-        }
+        $this->cart = [];
+        $this->paidAmount = 0;
+        $this->discount = 0;
+        $this->tax = 0;
+        $this->customerId = null;
 
+        $this->dispatch('notify', message: 'Sale held successfully.');
+    }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Get Current Batch Stock
-        |--------------------------------------------------------------------------
-        */
+    public function resumeHeldSale(int $heldSaleId)
+    {
+        $held = HeldSale::find($heldSaleId);
 
-        $batch = MedicineBatch::query()
-            ->find($batchId);
-
-        if (! $batch) {
-            unset($this->cart[$batchId]);
-
-            $this->notify(
-                'Selected batch no longer exists.',
-                'error'
-            );
-
+        if (! $held) {
+            $this->dispatch('notify', message: 'Held sale not found.');
             return;
         }
 
+        $this->cart = $held->cart;
+        $this->customerId = $held->customer_id;
+        $this->discount = (float) $held->discount;
+        $this->tax = (float) $held->tax;
 
-        /*
-        |--------------------------------------------------------------------------
-        | Check Active Status
-        |--------------------------------------------------------------------------
-        */
-
-        if (! $batch->status) {
-            unset($this->cart[$batchId]);
-
-            $this->notify(
-                'This batch is inactive.',
-                'error'
-            );
-
-            return;
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Check Expiry
-        |--------------------------------------------------------------------------
-        */
-
-        if (
-            ! $batch->expiry_date ||
-            $batch->expiry_date->lte(today())
-        ) {
-            unset($this->cart[$batchId]);
-
-            $this->notify(
-                'This batch is expired.',
-                'error'
-            );
-
-            return;
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Check Stock
-        |--------------------------------------------------------------------------
-        */
-
-        if ((int) $batch->quantity <= 0) {
-            unset($this->cart[$batchId]);
-
-            $this->notify(
-                'This batch is out of stock.',
-                'error'
-            );
-
-            return;
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Quantity Cannot Exceed Available Stock
-        |--------------------------------------------------------------------------
-        */
-
-        if ($qty > (int) $batch->quantity) {
-            $qty = (int) $batch->quantity;
-
-            $this->notify(
-                'Only ' . $batch->quantity .
-                ' units available.',
-                'warning'
-            );
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Update Cart
-        |--------------------------------------------------------------------------
-        */
-
-        $this->cart[$batchId]['quantity'] = $qty;
-
-        $this->cart[$batchId]['available_qty'] =
-            (int) $batch->quantity;
-
-        $this->recalculateCartItem($batchId);
+        $held->delete();
     }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Recalculate Single Cart Item
-    |--------------------------------------------------------------------------
-    */
-
-    protected function recalculateCartItem(int $batchId): void
-    {
-        if (! isset($this->cart[$batchId])) {
-            return;
-        }
-
-        $item = $this->cart[$batchId];
-
-        $quantity = max(
-            1,
-            (int) ($item['quantity'] ?? 1)
-        );
-
-        $unitPrice = max(
-            0,
-            (float) ($item['unit_price'] ?? 0)
-        );
-
-        $gross = $unitPrice * $quantity;
-
-        $discount = min(
-            max(
-                0,
-                (float) ($item['discount'] ?? 0)
-            ),
-            $gross
-        );
-
-        $this->cart[$batchId]['quantity'] = $quantity;
-
-        $this->cart[$batchId]['discount'] = $discount;
-
-        $this->cart[$batchId]['total'] =
-            max(
-                0,
-                $gross - $discount
-            );
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Subtotal
-    |--------------------------------------------------------------------------
-    */
-
-    public function getSubtotalProperty(): float
-    {
-        $subtotal = collect($this->cart)
-            ->sum(function ($item) {
-
-                $unitPrice = max(
-                    0,
-                    (float) ($item['unit_price'] ?? 0)
-                );
-
-                $quantity = max(
-                    0,
-                    (int) ($item['quantity'] ?? 0)
-                );
-
-                $discount = max(
-                    0,
-                    (float) ($item['discount'] ?? 0)
-                );
-
-                $gross = $unitPrice * $quantity;
-
-                return max(
-                    0,
-                    $gross - min($discount, $gross)
-                );
-            });
-
-        return round(
-            max(0, $subtotal),
-            2
-        );
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Grand Total
-    |--------------------------------------------------------------------------
-    */
-
-    public function getGrandTotalProperty(): float
-    {
-        $subtotal = max(
-            0,
-            (float) $this->subtotal
-        );
-
-        $tax = max(
-            0,
-            (float) $this->tax
-        );
-
-        $discount = max(
-            0,
-            (float) $this->discount
-        );
-
-        return round(
-            max(
-                0,
-                $subtotal + $tax - $discount
-            ),
-            2
-        );
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Change
-    |--------------------------------------------------------------------------
-    */
-
-    public function getChangeProperty(): float
-    {
-        $paidAmount = max(
-            0,
-            (float) $this->paidAmount
-        );
-
-        $grandTotal = max(
-            0,
-            (float) $this->grandTotal
-        );
-
-        return round(
-            max(
-                0,
-                $paidAmount - $grandTotal
-            ),
-            2
-        );
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Due Amount
-    |--------------------------------------------------------------------------
-    */
-
-    public function getDueAmountProperty(): float
-    {
-        $paidAmount = max(
-            0,
-            (float) $this->paidAmount
-        );
-
-        $grandTotal = max(
-            0,
-            (float) $this->grandTotal
-        );
-
-        return round(
-            max(
-                0,
-                $grandTotal - $paidAmount
-            ),
-            2
-        );
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Complete Sale
-    |--------------------------------------------------------------------------
-    */
 
     public function completeSale()
     {
-        /*
-        |--------------------------------------------------------------------------
-        | Cart Validation
-        |--------------------------------------------------------------------------
-        */
-
         if (empty($this->cart)) {
-            $this->notify(
-                'Cart is empty.',
-                'error'
-            );
-
+            $this->dispatch('notify', message: 'Cart is empty.');
             return;
         }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Sanitize Financial Values
-        |--------------------------------------------------------------------------
-        */
-
-        $this->discount = max(
-            0,
-            (float) $this->discount
-        );
-
-        $this->tax = max(
-            0,
-            (float) $this->tax
-        );
-
-        $this->paidAmount = max(
-            0,
-            (float) $this->paidAmount
-        );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Calculate Final Total Before Transaction
-        |--------------------------------------------------------------------------
-        */
-
-        $grandTotal = $this->grandTotal;
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Payment Validation
-        |--------------------------------------------------------------------------
-        |
-        | Current POS requires full payment.
-        |
-        */
-
-        if ($this->paidAmount < $grandTotal) {
-            $this->notify(
-                'Paid amount is less than the grand total.',
-                'error'
-            );
-
-            return;
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Validate Payment Method
-        |--------------------------------------------------------------------------
-        */
-
-        $allowedPaymentMethods = [
-            'cash',
-            'card',
-            'bank',
-            'other',
-        ];
-
-        if (! in_array(
-            $this->paymentMethod,
-            $allowedPaymentMethods,
-            true
-        )) {
-            $this->paymentMethod = 'cash';
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Sale ID
-        |--------------------------------------------------------------------------
-        */
 
         $saleId = null;
 
+        DB::transaction(function () use (&$saleId) {
+            $sale = Sale::create([
+                'invoice_number' => 'INV-' . now()->format('Ymd') . '-' . rand(1000, 9999),
+                'customer_id' => $this->customerId ?: null,
+                'subtotal' => $this->subtotal,
+                'discount' => $this->discount,
+                'tax' => $this->tax,
+                'grand_total' => $this->grandTotal,
+                'paid_amount' => $this->paidAmount,
+                'change_amount' => $this->change,
+                'payment_method' => $this->paymentMethod,
+                'created_by' => auth()->id(),
+            ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | EVERYTHING INSIDE DATABASE TRANSACTION
-        |--------------------------------------------------------------------------
-        */
-
-        try {
-
-            DB::transaction(function () use (
-                &$saleId,
-                $grandTotal
-            ) {
-
-                /*
-                |--------------------------------------------------------------------------
-                | Generate Invoice Number
-                |--------------------------------------------------------------------------
-                */
-
-                $invoiceNumber =
-                    $this->generateInvoiceNumber();
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | Calculate Change
-                |--------------------------------------------------------------------------
-                */
-
-                $changeAmount = round(
-                    max(
-                        0,
-                        $this->paidAmount - $grandTotal
-                    ),
-                    2
-                );
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | Create Sale
-                |--------------------------------------------------------------------------
-                */
-
-                $sale = Sale::create([
-                    'invoice_number' => $invoiceNumber,
-
-                    'customer_id' =>
-                        $this->customerId ?: null,
-
-                    'subtotal' =>
-                        $this->subtotal,
-
-                    'discount' =>
-                        $this->discount,
-
-                    'tax' =>
-                        $this->tax,
-
-                    'grand_total' =>
-                        $grandTotal,
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Amount Applied To Invoice
-                    |--------------------------------------------------------------------------
-                    */
-
-                    'paid_amount' =>
-                        $grandTotal,
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Extra Money Returned To Customer
-                    |--------------------------------------------------------------------------
-                    */
-
-                    'change_amount' =>
-                        $changeAmount,
-
-                    'payment_method' =>
-                        $this->paymentMethod,
-
-                    'created_by' =>
-                        auth()->id(),
+            foreach ($this->cart as $item) {
+                SaleItem::create([
+                    'sale_id' => $sale->id,
+                    'medicine_id' => $item['medicine_id'],
+                    'medicine_batch_id' => $item['batch_id'],
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $item['unit_price'],
+                    'discount' => $item['discount'],
+                    'total' => ($item['unit_price'] * $item['quantity']) - $item['discount'],
                 ]);
+            }
 
+            $this->cart = [];
+            $this->paidAmount = 0;
+            $this->discount = 0;
+            $this->tax = 0;
+            $this->customerId = null;
 
-                /*
-                |--------------------------------------------------------------------------
-                | Sale Items + Stock Reduction
-                |--------------------------------------------------------------------------
-                */
+            $saleId = $sale->id;
+        });
 
-                foreach ($this->cart as $item) {
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Validate Cart Item Structure
-                    |--------------------------------------------------------------------------
-                    */
-
-                    if (
-                        empty($item['batch_id']) ||
-                        empty($item['medicine_id']) ||
-                        empty($item['quantity'])
-                    ) {
-                        throw new \RuntimeException(
-                            'Invalid cart item.'
-                        );
-                    }
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Lock Batch Row
-                    |--------------------------------------------------------------------------
-                    */
-
-                    $batch = MedicineBatch::query()
-                        ->whereKey($item['batch_id'])
-                        ->lockForUpdate()
-                        ->first();
-
-                    if (! $batch) {
-                        throw new \RuntimeException(
-                            'Selected batch no longer exists.'
-                        );
-                    }
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Re-check Batch Status
-                    |--------------------------------------------------------------------------
-                    */
-
-                    if (! $batch->status) {
-                        throw new \RuntimeException(
-                            'Batch ' .
-                            $batch->batch_number .
-                            ' is inactive.'
-                        );
-                    }
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Re-check Expiry
-                    |--------------------------------------------------------------------------
-                    */
-
-                    if (
-                        ! $batch->expiry_date ||
-                        $batch->expiry_date->lte(now())
-                    ) {
-                        throw new \RuntimeException(
-                            'Batch ' .
-                            $batch->batch_number .
-                            ' is expired.'
-                        );
-                    }
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Re-check Stock
-                    |--------------------------------------------------------------------------
-                    */
-
-                    $quantity = (int) $item['quantity'];
-
-                    if (
-                        $quantity < 1 ||
-                        $batch->quantity < $quantity
-                    ) {
-                        throw new \RuntimeException(
-                            $item['medicine_name'] .
-                            ' has only ' .
-                            $batch->quantity .
-                            ' units available.'
-                        );
-                    }
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Price Snapshot
-                    |--------------------------------------------------------------------------
-                    */
-
-                    $unitPrice = max(
-                        0,
-                        (float) $item['unit_price']
-                    );
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Item Gross
-                    |--------------------------------------------------------------------------
-                    */
-
-                    $gross =
-                        $unitPrice * $quantity;
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Item Discount
-                    |--------------------------------------------------------------------------
-                    */
-
-                    $itemDiscount = min(
-                        max(
-                            0,
-                            (float) ($item['discount'] ?? 0)
-                        ),
-                        $gross
-                    );
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Item Total
-                    |--------------------------------------------------------------------------
-                    */
-
-                    $itemTotal = max(
-                        0,
-                        $gross - $itemDiscount
-                    );
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Create Sale Item
-                    |--------------------------------------------------------------------------
-                    */
-
-                    SaleItem::create([
-                        'sale_id' =>
-                            $sale->id,
-
-                        'medicine_id' =>
-                            $item['medicine_id'],
-
-                        'medicine_batch_id' =>
-                            $batch->id,
-
-                        'quantity' =>
-                            $quantity,
-
-                        'unit_price' =>
-                            $unitPrice,
-
-                        'discount' =>
-                            $itemDiscount,
-
-                        'total' =>
-                            $itemTotal,
-                    ]);
-
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | Reduce Batch Stock
-                    |--------------------------------------------------------------------------
-                    */
-
-                    $batch->decrement(
-                        'quantity',
-                        $quantity
-                    );
-                }
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | Create Sale Payment
-                |--------------------------------------------------------------------------
-                |
-                | Only the invoice amount is recorded as payment.
-                |
-                | Example:
-                |
-                | Grand Total = 800
-                | Received = 1000
-                | Payment = 800
-                | Change = 200
-                |
-                */
-
-                SalePayment::create([
-                    'sale_id' =>
-                        $sale->id,
-
-                    'amount' =>
-                        $grandTotal,
-
-                    'payment_method' =>
-                        $this->paymentMethod,
-
-                    'reference_number' =>
-                        null,
-
-                    'notes' =>
-                        null,
-
-                    'received_by' =>
-                        auth()->id(),
-
-                    'paid_at' =>
-                        now(),
-                ]);
-
-
-                /*
-                |--------------------------------------------------------------------------
-                | Store Sale ID
-                |--------------------------------------------------------------------------
-                */
-
-                $saleId = $sale->id;
-            });
-
-        } catch (\Throwable $e) {
-
-            report($e);
-
-            $this->notify(
-                $e->getMessage() ?: 'Unable to complete sale.',
-                'error'
-            );
-
-            return;
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Success Message
-        |--------------------------------------------------------------------------
-        */
-
-        session()->flash(
-            'success',
-            'Sale completed successfully.'
-        );
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Reset POS
-        |--------------------------------------------------------------------------
-        */
-
-        $this->resetCart();
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Redirect To Receipt
-        |--------------------------------------------------------------------------
-        */
-
-       return redirect()->route(
-    'filament.admin.resources.sales.view',
-    [
-        'record' => $saleId,
-    ]
-);
+        $this->redirect(route('filament.admin.pages.sales.invoice.{record}', ['record' => $saleId]));
     }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Generate Invoice Number
-    |--------------------------------------------------------------------------
-    */
-
-    protected function generateInvoiceNumber(): string
-    {
-        do {
-
-            $invoice =
-                'INV-' .
-                now()->format('Ymd') .
-                '-' .
-                strtoupper(
-                    substr(
-                        bin2hex(
-                            random_bytes(4)
-                        ),
-                        0,
-                        6
-                    )
-                );
-
-        } while (
-            Sale::where(
-                'invoice_number',
-                $invoice
-            )->exists()
-        );
-
-        return $invoice;
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Reset POS
-    |--------------------------------------------------------------------------
-    */
-
-    protected function resetCart(): void
-    {
-        $this->search = '';
-
-        $this->cart = [];
-
-        $this->customerId = null;
-
-        $this->discount = 0;
-
-        $this->tax = 0;
-
-        $this->paidAmount = 0;
-
-        $this->paymentMethod = 'cash';
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Notification Helper
-    |--------------------------------------------------------------------------
-    */
-
-    protected function notify(
-        string $message,
-        string $type = 'info'
-    ): void {
-        $this->dispatch(
-            'notify',
-            message: $message,
-            type: $type
-        );
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Render
-    |--------------------------------------------------------------------------
-    */
 
     public function render()
     {
-        return view(
-            'livewire.pos-screen',
-            [
-                'results' =>
-                    $this->getMedicineSearchResults(),
-            ]
-        );
+        return view('livewire.pos-screen', [
+            'results' => $this->searchResults(),
+        ]);
     }
 }
-

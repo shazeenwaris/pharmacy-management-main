@@ -4,6 +4,10 @@ namespace App\Filament\Resources\Expenses\Tables;
 
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 
 class ExpensesTable
 {
@@ -52,6 +56,17 @@ class ExpensesTable
                     ->toggleable(isToggledHiddenByDefault: true),
 
             ])
+            ->recordActions([
+    EditAction::make(),
+    DeleteAction::make(),
+])
+->recordActionsColumnLabel('Actions')
+->toolbarActions([
+    BulkActionGroup::make([
+        DeleteBulkAction::make(),
+    ]),
+])
             ->defaultSort('expense_date', 'desc');
     }
+
 }

@@ -197,18 +197,21 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
             </div>
         </div>
 
-        @php
-            $unreadNotifications = \App\Models\AppNotification::unread()->count();
-
+       @php
+           
+             $unreadNotifications = \App\Models\AppNotification::query()
+    ->where('notifiable_type', \App\Models\User::class)
+    ->where('notifiable_id', auth()->id())
+    ->whereNull('read_at')
+    ->count(); 
+          
             $items = [
                 ['label' => 'Dashboard',      'icon' => 'home',      'route' => '/admin',                'active' => request()->is('admin'), 'section' => 'Main Menu', 'permission' => null],
                 ['label' => 'Medicines',      'icon' => 'beaker',    'route' => '/admin/medicines',       'active' => request()->is('admin/medicines*'), 'section' => 'Inventory', 'permission' => 'manage medicines'],
                 ['label' => 'Purchases',      'icon' => 'cart',      'route' => '/admin/purchases',       'active' => request()->is('admin/purchases*'), 'section' => 'Inventory', 'permission' => 'manage purchases'],
                 ['label' => 'Stock',          'icon' => 'box',       'route' => '/admin/stock',           'active' => request()->is('admin/stock*'), 'section' => 'Inventory', 'permission' => 'manage stock adjustments'],
-                ['label' => 'Sales / POS',    'icon' => 'card',      'route' => '/admin/sales',           'active' => request()->is('admin/sales*'), 'section' => 'Sales', 'permission' => 'create sales'],
-                ['label' => 'Customers',      'icon' => 'users',     'route' => '/admin/customers',       'active' => request()->is('admin/customers*'), 'section' => 'People', 'permission' => 'manage customers'],
+               
                 ['label' => 'Suppliers',      'icon' => 'truck',     'route' => '/admin/suppliers',       'active' => request()->is('admin/suppliers*'), 'section' => 'People', 'permission' => 'manage suppliers'],
-                ['label' => 'Accounting & Finance', 'icon' => 'finance', 'route' => '/admin/accounts', 'active' => request()->is('admin/accounts*') || request()->is('admin/financial-transactions*'), 'section' => 'Finance', 'permission' => 'process payments'],
                 ['label' => 'Expenses',       'icon' => 'expense',   'route' => '/admin/expenses',        'active' => request()->is('admin/expenses*') || request()->is('admin/expense-categories*'), 'section' => 'Finance', 'permission' => 'process payments'],
                 ['label' => 'Reports',        'icon' => 'chart',     'route' => '/admin/reports',         'active' => request()->is('admin/reports*'), 'section' => 'Insights', 'permission' => 'view reports'],
                 ['label' => 'Alerts',         'icon' => 'bell',      'route' => '/admin/app-notifications', 'active' => request()->is('admin/app-notifications*'), 'badge' => $unreadNotifications > 0 ? $unreadNotifications : null, 'section' => 'Insights', 'permission' => null],
@@ -234,18 +237,19 @@ html[data-pms-sidebar="collapsed"] .pms-search-box {
             ];
 
             $groups = [
-                'Medicines' => [
+            'Medicines' => [
                     'icon' => 'beaker',
                     'active' => request()->is('admin/medicines*') || request()->is('admin/categories*') || request()->is('admin/manufacturers*') || request()->is('admin/units*') || request()->is('admin/dosage-forms*') || request()->is('admin/medicine-batches*'),
                     'links' => [
                         ['url' => '/admin/medicines', 'label' => 'All Medicines', 'active' => request()->is('admin/medicines*'), 'permission' => 'manage medicines'],
-                        ['url' => '/admin/categories', 'label' => 'Categories', 'active' => request()->is('admin/categories*'), 'permission' => 'manage categories'],
+                         ['url' => '/admin/categories', 'label' => 'Categories', 'active' => request()->is('admin/categories*'), 'permission' => 'manage categories'],
                         ['url' => '/admin/manufacturers', 'label' => 'Manufacturers', 'active' => request()->is('admin/manufacturers*'), 'permission' => 'manage manufacturers'],
                         ['url' => '/admin/units', 'label' => 'Units', 'active' => request()->is('admin/units*'), 'permission' => 'manage medicines'],
                         ['url' => '/admin/dosage-forms', 'label' => 'Dosage Forms', 'active' => request()->is('admin/dosage-forms*'), 'permission' => 'manage medicines'],
                         ['url' => '/admin/medicine-batches', 'label' => 'Batches & Expiry', 'active' => request()->is('admin/medicine-batches*'), 'permission' => 'track batches'],
                     ],
-                ],
+                ],  
+               
                 'Purchases' => [
                     'icon' => 'cart',
                     'active' => request()->is('admin/purchases*') || request()->is('admin/purchase-returns*'),

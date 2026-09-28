@@ -12,6 +12,7 @@ class MedicineBatch extends Model
     protected $fillable = [
         'medicine_id', 'batch_number', 'manufacturing_date', 'expiry_date',
         'purchase_price', 'sale_price', 'quantity',
+        'boxes_received', 'strips_per_box', 'units_per_strip',
         'supplier_name', 'purchase_reference', 'status', 'notes',
     ];
 
@@ -27,23 +28,27 @@ class MedicineBatch extends Model
     {
         return $this->belongsTo(Medicine::class);
     }
-    public function supplier(): \Illuminate\Database\Eloquent\Relations\BelongsTo
-{
-    return $this->belongsTo(Supplier::class);
-}
 
-    // Expiry status calculated from date, not manually trusted (spec requirement)
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class);
+    }
+
     public function getExpiryStatusAttribute(): string
     {
+
+            if (! $this->expiry_date) {
+        return 'no_expiry';
+    }
         $daysLeft = Carbon::now()->diffInDays($this->expiry_date, false);
 
         if ($daysLeft < 0) {
             return 'expired';
         }
 
-      if ($daysLeft <= 7) {
-    return 'expiring_soon';
-}
+        if ($daysLeft <= 7) {
+            return 'expiring_soon';
+        }
 
         return 'active';
     }

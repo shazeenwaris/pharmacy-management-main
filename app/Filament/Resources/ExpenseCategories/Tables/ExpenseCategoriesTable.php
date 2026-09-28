@@ -51,12 +51,28 @@ class ExpenseCategoriesTable
             | Record Actions
             |--------------------------------------------------------------------------
             */
+            // ->recordActions([
+            //     ViewAction::make(),
+            //     EditAction::make(),
+            //     DeleteAction::make(),
+            // ])
             ->recordActions([
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
-            ])
+    EditAction::make(),
 
+    DeleteAction::make()
+        ->before(function ($record, $action) {
+            if ($record->expenses()->exists()) {
+                \Filament\Notifications\Notification::make()
+                    ->title('Category cannot be deleted')
+                    ->body('This category is already used by expenses. Please move or delete those expenses first.')
+                    ->danger()
+                    ->send();
+
+                $action->halt();
+            }
+        }),
+])
+->recordActionsColumnLabel('Actions')
             ->defaultSort('name');
     }
 }
