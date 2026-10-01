@@ -29,14 +29,18 @@ class PurchaseReports extends Page
     |--------------------------------------------------------------------------
     */
 
-    public string $dateRange = 'all';
+   public string $dateRange = 'all';
 
-    public ?string $fromDate = null;
+public ?string $fromDate = null;
+public ?string $toDate = null;
 
-    public ?string $toDate = null;
+public ?int $supplierId = null;
 
-    public ?int $supplierId = null;
-
+// Actual applied filters
+public string $appliedDateRange = 'all';
+public ?string $appliedFromDate = null;
+public ?string $appliedToDate = null;
+public ?int $appliedSupplierId = null;
 
     /*
     |--------------------------------------------------------------------------
@@ -44,11 +48,20 @@ class PurchaseReports extends Page
     |--------------------------------------------------------------------------
     */
 
-    public function applyFilters(): void
-    {
-        // The queries are generated fresh from the current filter values.
+ public function applyFilters(): void
+{
+    if ($this->dateRange === 'custom') {
+        $this->validate([
+            'fromDate' => ['required', 'date'],
+            'toDate' => ['required', 'date', 'after_or_equal:fromDate'],
+        ]);
     }
 
+    $this->appliedDateRange = $this->dateRange;
+    $this->appliedFromDate = $this->fromDate;
+    $this->appliedToDate = $this->toDate;
+    $this->appliedSupplierId = $this->supplierId;
+}
 
     public function resetFilters(): void
     {
@@ -67,67 +80,115 @@ class PurchaseReports extends Page
     | Date Filter
     |--------------------------------------------------------------------------
     */
+protected function getDateRange(): array
+{
+    $from = null;
+    $to = null;
 
-    protected function getDateRange(): array
-    {
-        $from = null;
-        $to = null;
+    switch ($this->appliedDateRange) {
 
-        switch ($this->dateRange) {
+        case 'today':
 
-            case 'today':
+            $from = Carbon::today()->startOfDay();
+            $to = Carbon::today()->endOfDay();
 
-                $from = Carbon::today();
-                $to = Carbon::today();
-
-                break;
-
-
-            case '7_days':
-
-                $from = Carbon::today()->subDays(6);
-                $to = Carbon::today();
-
-                break;
+            break;
 
 
-            case 'this_month':
+        case '7_days':
 
-                $from = Carbon::now()->startOfMonth();
-                $to = Carbon::now()->endOfMonth();
+            $from = Carbon::today()
+                ->subDays(6)
+                ->startOfDay();
 
-                break;
+            $to = Carbon::today()
+                ->endOfDay();
 
-
-            case 'last_month':
-
-                $lastMonth = Carbon::now()->subMonth();
-
-                $from = $lastMonth->copy()->startOfMonth();
-                $to = $lastMonth->copy()->endOfMonth();
-
-                break;
+            break;
 
 
-            case 'custom':
+        case 'this_month':
 
-                if ($this->fromDate) {
-                    $from = Carbon::parse($this->fromDate);
-                }
+            $from = Carbon::now()
+                ->startOfMonth()
+                ->startOfDay();
 
-                if ($this->toDate) {
-                    $to = Carbon::parse($this->toDate);
-                }
+            $to = Carbon::now()
+                ->endOfMonth()
+                ->endOfDay();
 
-                break;
-        }
+            break;
 
-        return [
-            'from' => $from,
-            'to' => $to,
-        ];
+
+        case 'last_month':
+
+            $lastMonth = Carbon::now()->subMonth();
+
+            $from = $lastMonth
+                ->copy()
+                ->startOfMonth()
+                ->startOfDay();
+
+            $to = $lastMonth
+                ->copy()
+                ->endOfMonth()
+                ->endOfDay();
+
+            break;
+
+
+        case 'this_year':
+
+            $from = Carbon::now()
+                ->startOfYear()
+                ->startOfDay();
+
+            $to = Carbon::now()
+                ->endOfYear()
+                ->endOfDay();
+
+            break;
+
+
+        case 'last_year':
+
+            $lastYear = Carbon::now()->subYear();
+
+            $from = $lastYear
+                ->copy()
+                ->startOfYear()
+                ->startOfDay();
+
+            $to = $lastYear
+                ->copy()
+                ->endOfYear()
+                ->endOfDay();
+
+            break;
+
+
+        case 'custom':
+
+            if ($this->appliedFromDate) {
+
+                $from = Carbon::parse($this->appliedFromDate)
+                    ->startOfDay();
+            }
+
+            if ($this->appliedToDate) {
+
+                $to = Carbon::parse($this->appliedToDate)
+                    ->endOfDay();
+            }
+
+            break;
     }
 
+    return [
+        'from' => $from,
+        'to' => $to,
+    ];
+}
 
     /*
     |--------------------------------------------------------------------------
@@ -136,36 +197,50 @@ class PurchaseReports extends Page
     */
 
     protected function purchaseQuery()
-    {
-        $query = Purchase::query();
+{
+    $dates = $this->getDateRange();
 
-        $dates = $this->getDateRange();
+    $query = Purchase::query();
 
-        if ($dates['from']) {
-            $query->whereDate(
-                'purchase_date',
-                '>=',
-                $dates['from']
-            );
-        }
+    /*
+    |--------------------------------------------------------------------------
+    | DATE FILTER
+    |--------------------------------------------------------------------------
+    */
 
-        if ($dates['to']) {
-            $query->whereDate(
-                'purchase_date',
-                '<=',
-                $dates['to']
-            );
-        }
-
-        if ($this->supplierId) {
-            $query->where(
-                'supplier_id',
-                $this->supplierId
-            );
-        }
-
-        return $query;
+    if ($dates['from']) {
+        $query->whereDate(
+            'purchase_date',
+            '>=',
+            $dates['from']->format('Y-m-d')
+        );
     }
+
+    if ($dates['to']) {
+        $query->whereDate(
+            'purchase_date',
+            '<=',
+            $dates['to']->format('Y-m-d')
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | SUPPLIER FILTER
+    |--------------------------------------------------------------------------
+    */
+
+    if ($this->appliedSupplierId) {
+
+        $query->where(
+            'supplier_id',
+            $this->appliedSupplierId
+        );
+    }
+
+    return $query;
+}
 
 
     /*

@@ -402,28 +402,19 @@
                 QUANTITY
             ====================================================== --}}
             <td>
-                <div class="pms-qty-control">
+    <div class="pms-qty-control">
 
-                    <button
-                        type="button"
-                        wire:click="decreaseQuantity('{{ $key }}')"
-                    >
-                        −
-                    </button>
+        <input
+            type="number"
+            min="1"
+            step="1"
+            value="{{ $item['quantity'] }}"
+            wire:change="updateQuantity('{{ $key }}', $event.target.value)"
+            class="pms-qty-input"
+        >
 
-                    <span>
-                        {{ $item['quantity'] }}
-                    </span>
-
-                    <button
-                        type="button"
-                        wire:click="increaseQuantity('{{ $key }}')"
-                    >
-                        +
-                    </button>
-
-                </div>
-            </td>
+    </div>
+</td>
 
 
             {{-- =====================================================
@@ -437,20 +428,33 @@
         >
             @foreach(($item['available_units'] ?? []) as $unit)
                 <option
-                    value="{{ $unit['unit_id'] }}"
-                   @selected((int) ($item['unit_id'] ?? 0) === (int) $unit['unit_id'])
-                >
-                    {{ $unit['name'] }}
-                </option>
+    value="{{ $unit['key'] }}"
+    @selected(
+        ($item['unit_key'] ?? 'base')
+        ===
+        $unit['key']
+    )
+>
+    {{ $unit['name'] }}
+</option>
             @endforeach
         </select>
 
-        <div class="pms-conversion-info">
-            1 {{ $item['sale_unit'] ?? 'Unit' }}
-            =
-            {{ rtrim(rtrim(number_format((float) ($item['conversion_factor'] ?? 1), 4), '0'), '.') }}
-            base
-        </div>
+       <div class="pms-conversion-info">
+    1 {{ $item['sale_unit'] ?? 'Unit' }}
+    =
+    {{ rtrim(
+        rtrim(
+            number_format(
+                (float) ($item['conversion_factor'] ?? 1),
+                4
+            ),
+            '0'
+        ),
+        '.'
+    ) }}
+    base units
+</div>
     </div>
 </td>
             {{-- =====================================================
@@ -811,7 +815,57 @@
         </div>
 
     </div>
+@if ($showPrintReceiptPrompt)
+    <div
+        class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 px-4"
+    >
+        <div
+            class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+        >
 
+            <div class="mb-5 flex items-start gap-4">
+
+                <div
+                    class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600"
+                >
+                    ✓
+                </div>
+
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">
+                        Sale Completed
+                    </h3>
+
+                    <p class="mt-1 text-sm text-gray-500">
+                        Would you like to print the receipt?
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="flex justify-end gap-3">
+
+                <button
+                    type="button"
+                    wire:click="closePrintReceiptPrompt"
+                    class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                    Not Now
+                </button>
+
+                <button
+                    type="button"
+                    wire:click="openCompletedSaleReceipt"
+                    class="rounded-lg bg-[#00838f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#006b73]"
+                >
+                    🖨 Print Receipt
+                </button>
+
+            </div>
+
+        </div>
+    </div>
+@endif
 
     {{-- ============================================================
         CSS
@@ -2045,6 +2099,39 @@
         justify-content: flex-start;
     }
 }
-    </style>
+.pms-qty-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
+.pms-qty-input {
+    width: 75px;
+    height: 38px;
+    text-align: center;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    outline: none;
+}
+
+.pms-qty-input:focus {
+    border-color: #00838f;
+    box-shadow: 0 0 0 2px rgba(0, 131, 143, 0.12);
+}
+
+/* Chrome, Edge, Safari */
+.pms-qty-input::-webkit-inner-spin-button,
+.pms-qty-input::-webkit-outer-spin-button {
+    opacity: 1;
+}
+    </style>
+@script
+<script>
+    $wire.on('open-completed-receipt', (event) => {
+        window.location.href = event.url;
+    });
+</script>
+@endscript
 </div>

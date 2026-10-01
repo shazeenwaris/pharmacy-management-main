@@ -33,96 +33,166 @@
 
         </div>
 
+{{-- ============================================================
+    REPORT PERIOD FILTER
+============================================================ --}}
 
-        {{-- =====================================================
-             DATE FILTER
-        ====================================================== --}}
-        <div class="sr-filter-card">
+<div class="sr-period-filter">
 
-            <div class="sr-section-header">
+    {{-- Header --}}
+    <div class="sr-period-filter-header">
 
-                <div class="sr-section-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         fill="none"
-                         viewBox="0 0 24 24"
-                         stroke="currentColor">
-                        <path stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="1.8"
-                              d="M8 7V3m8 4V3M4 11h16M5 5h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1z"/>
-                    </svg>
-                </div>
-
-                <div>
-                    <h3>Report Period</h3>
-                    <p>Select the date range for your sales report.</p>
-                </div>
-
+        <div class="sr-period-filter-heading">
+            <div class="sr-period-filter-heading-icon">
+                <x-heroicon-o-funnel />
             </div>
 
-
-            <div class="sr-filter-body">
-
-                <div class="sr-field">
-
-                    <label>From Date</label>
-
-                    <input
-                        type="date"
-                        wire:model="fromDate"
-                    >
-
-                </div>
-
-
-                <div class="sr-field">
-
-                    <label>To Date</label>
-
-                    <input
-                        type="date"
-                        wire:model="toDate"
-                    >
-
-                </div>
-
-
-                <div class="sr-filter-actions">
-
-                    <button
-                        type="button"
-                        wire:click="applyFilters"
-                        class="sr-btn sr-btn-primary"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                             fill="none"
-                             viewBox="0 0 24 24"
-                             stroke="currentColor">
-                            <path stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L14 12.414V19a1 1 0 01-.553.894l-4 2A1 1 0 018 21v-8.586L3.293 6.707A1 1 0 013 6V4z"/>
-                        </svg>
-
-                        Apply Filter
-                    </button>
-
-
-                    <button
-                        type="button"
-                        wire:click="resetFilters"
-                        class="sr-btn sr-btn-secondary"
-                    >
-                        Reset
-                    </button>
-
-                </div>
-
+            <div>
+                <h3>Report Period</h3>
+                <p>Select the period you want to analyze.</p>
             </div>
-
         </div>
 
+    </div>
 
+
+    {{-- Period Buttons --}}
+    <div class="sr-period-options">
+
+        {{-- This Week --}}
+        <button
+            type="button"
+            wire:click="setReportPeriod('week')"
+            class="sr-period-option {{ $reportPeriod === 'week' ? 'is-active' : '' }}"
+        >
+            <span class="sr-period-option-icon">
+                <x-heroicon-o-calendar-days />
+            </span>
+
+            <span class="sr-period-option-content">
+                <span class="sr-period-option-title">
+                    This Week
+                </span>
+
+                <span class="sr-period-option-subtitle">
+                    Daily sales
+                </span>
+            </span>
+        </button>
+
+
+        {{-- This Month --}}
+        <button
+            type="button"
+            wire:click="setReportPeriod('month')"
+            class="sr-period-option {{ $reportPeriod === 'month' ? 'is-active' : '' }}"
+        >
+            <span class="sr-period-option-icon">
+                <x-heroicon-o-calendar />
+            </span>
+
+            <span class="sr-period-option-content">
+                <span class="sr-period-option-title">
+                    This Month
+                </span>
+
+                <span class="sr-period-option-subtitle">
+                    Daily sales
+                </span>
+            </span>
+        </button>
+
+
+        {{-- This Year --}}
+        <button
+            type="button"
+            wire:click="setReportPeriod('year')"
+            class="sr-period-option {{ $reportPeriod === 'year' ? 'is-active' : '' }}"
+        >
+            <span class="sr-period-option-icon">
+                <x-heroicon-o-chart-bar />
+            </span>
+
+            <span class="sr-period-option-content">
+                <span class="sr-period-option-title">
+                    This Year
+                </span>
+
+                <span class="sr-period-option-subtitle">
+                    Monthly sales
+                </span>
+            </span>
+        </button>
+
+
+        {{-- Custom Range --}}
+        <button
+            type="button"
+            wire:click="setReportPeriod('custom')"
+            class="sr-period-option {{ $reportPeriod === 'custom' ? 'is-active' : '' }}"
+        >
+            <span class="sr-period-option-icon">
+                <x-heroicon-o-adjustments-horizontal />
+            </span>
+
+            <span class="sr-period-option-content">
+                <span class="sr-period-option-title">
+                    Custom Range
+                </span>
+
+                <span class="sr-period-option-subtitle">
+                    Select dates
+                </span>
+            </span>
+        </button>
+
+    </div>
+
+
+    {{-- Custom Date Range --}}
+    @if ($reportPeriod === 'custom')
+
+    <div class="sr-custom-range">
+
+        <div class="sr-date-field">
+            <label for="fromDate">
+                Select Date
+            </label>
+
+            <input
+                id="fromDate"
+                type="date"
+                wire:model="fromDate"
+            >
+        </div>
+
+        <div class="sr-filter-action">
+            <button
+                type="button"
+                wire:click="applyFilters"
+                class="sr-apply-btn"
+            >
+                <x-heroicon-o-check />
+                <span>Show Date</span>
+            </button>
+        </div>
+
+        <div class="sr-filter-action">
+            <button
+                type="button"
+                wire:click="resetFilters"
+                class="sr-reset-btn"
+            >
+                <x-heroicon-o-arrow-path />
+                <span>Reset</span>
+            </button>
+        </div>
+
+    </div>
+
+@endif
+
+</div>
         {{-- =====================================================
              KPI CARDS
         ====================================================== --}}
@@ -297,13 +367,14 @@
 
                     <tbody>
 
-                        @forelse($this->dailySales as $sale)
+@forelse($this->salesBreakdown as $sale)
 
-                            <tr>
 
-                                <td class="font-semibold">
-                                    {{ \Carbon\Carbon::parse($sale->sale_date)->format('d M Y') }}
-                                </td>
+
+    <tr>
+        <td class="font-semibold">
+           {{ $sale->period_label }}
+        </td>
 
                                 <td class="text-center">
                                     <span class="sr-number-badge">
@@ -716,248 +787,500 @@
 }
 
 
-/* =========================================================
-   FILTER CARD
-========================================================= */
+/* ============================================================
+   SALES REPORT
+   PERIOD FILTER
+============================================================ */
 
-.sr-filter-card {
-    width: 100%;
+.sr-period-filter {
+    width: 100% !important;
+    margin: 0 0 24px 0 !important;
+    padding: 22px !important;
 
-    overflow: hidden;
+    background: #ffffff !important;
 
-    background: #ffffff;
-
-    border: 1px solid var(--sr-border);
-    border-radius: 18px;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
 
     box-shadow:
-        0 5px 20px rgba(0, 60, 70, 0.045);
-}
+        0 2px 6px rgba(15, 23, 42, 0.04),
+        0 8px 24px rgba(15, 23, 42, 0.04) !important;
 
-.sr-section-header {
-    min-height: 76px;
-
-    display: flex;
-    align-items: center;
-
-    gap: 12px;
-
-    padding: 17px 22px;
-
-    background: #fbfcfd;
-
-    border-bottom: 1px solid #edf1f3;
-}
-
-.sr-section-icon {
-    width: 38px;
-    height: 38px;
-
-    flex: 0 0 38px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    color: var(--sr-primary);
-    background: var(--sr-primary-light);
-
-    border-radius: 10px;
-}
-
-.sr-section-icon svg {
-    width: 20px;
-    height: 20px;
-}
-
-.sr-section-header h3 {
-    margin: 0;
-
-    color: var(--sr-navy);
-
-    font-size: 14px;
-    line-height: 1.3;
-    font-weight: 700;
-}
-
-.sr-section-header p {
-    margin: 3px 0 0;
-
-    color: var(--sr-muted);
-
-    font-size: 12px;
-    line-height: 1.4;
+    box-sizing: border-box !important;
 }
 
 
-/* =========================================================
-   FILTER BODY
-========================================================= */
+/* ============================================================
+   HEADER
+============================================================ */
 
-.sr-filter-body {
-    width: 100%;
+.sr-period-filter-header {
+    width: 100% !important;
+    margin-bottom: 18px !important;
+}
 
-    display: grid;
+.sr-period-filter-heading {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+}
+
+.sr-period-filter-heading-icon {
+    width: 42px !important;
+    height: 42px !important;
+
+    min-width: 42px !important;
+    min-height: 42px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    background: #ecfeff !important;
+
+    border: 1px solid #c7eef1 !important;
+    border-radius: 11px !important;
+
+    color: #00838f !important;
+}
+
+.sr-period-filter-heading-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+
+    display: block !important;
+
+    color: #00838f !important;
+}
+
+.sr-period-filter-heading h3 {
+    margin: 0 !important;
+
+    color: #0f172a !important;
+
+    font-size: 15px !important;
+    line-height: 20px !important;
+
+    font-weight: 800 !important;
+
+    letter-spacing: -0.01em !important;
+}
+
+.sr-period-filter-heading p {
+    margin: 4px 0 0 0 !important;
+
+    color: #64748b !important;
+
+    font-size: 12px !important;
+    line-height: 18px !important;
+
+    font-weight: 500 !important;
+}
+
+
+/* ============================================================
+   PERIOD OPTIONS GRID
+============================================================ */
+
+.sr-period-options {
+    width: 100% !important;
+
+    display: grid !important;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr)) !important;
+
+    gap: 10px !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* ============================================================
+   PERIOD BUTTON
+============================================================ */
+
+.sr-period-option {
+    width: 100% !important;
+
+    min-width: 0 !important;
+    min-height: 64px !important;
+
+    display: flex !important;
+    align-items: center !important;
+
+    gap: 11px !important;
+
+    padding: 10px 13px !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 11px !important;
+
+    color: #334155 !important;
+
+    cursor: pointer !important;
+
+    text-align: left !important;
+
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease !important;
+
+    appearance: none !important;
+    -webkit-appearance: none !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* Hover */
+
+.sr-period-option:hover {
+    background: #f8fafc !important;
+
+    border-color: #8bd0d5 !important;
+
+    transform: translateY(-1px) !important;
+
+    box-shadow:
+        0 4px 12px rgba(0, 131, 143, 0.08) !important;
+}
+
+
+/* ============================================================
+   ACTIVE BUTTON
+============================================================ */
+
+.sr-period-option.is-active {
+    background: #f0fbfc !important;
+
+    border-color: #00838f !important;
+
+    box-shadow:
+        0 0 0 1px rgba(0, 131, 143, 0.08),
+        0 5px 14px rgba(0, 131, 143, 0.08) !important;
+}
+
+
+/* ============================================================
+   OPTION ICON
+============================================================ */
+
+.sr-period-option-icon {
+    width: 38px !important;
+    height: 38px !important;
+
+    min-width: 38px !important;
+    min-height: 38px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    border-radius: 9px !important;
+
+    background: #f1f5f9 !important;
+
+    color: #64748b !important;
+
+    box-sizing: border-box !important;
+}
+
+.sr-period-option-icon svg {
+    width: 18px !important;
+    height: 18px !important;
+
+    display: block !important;
+
+    color: inherit !important;
+}
+
+
+/* Active Icon */
+
+.sr-period-option.is-active .sr-period-option-icon {
+    background: #00838f !important;
+
+    color: #ffffff !important;
+}
+
+
+/* ============================================================
+   OPTION CONTENT
+============================================================ */
+
+.sr-period-option-content {
+    min-width: 0 !important;
+
+    display: flex !important;
+
+    flex-direction: column !important;
+
+    gap: 2px !important;
+}
+
+.sr-period-option-title {
+    display: block !important;
+
+    color: #1e293b !important;
+
+    font-size: 13px !important;
+    line-height: 18px !important;
+
+    font-weight: 800 !important;
+}
+
+.sr-period-option-subtitle {
+    display: block !important;
+
+    color: #94a3b8 !important;
+
+    font-size: 11px !important;
+    line-height: 15px !important;
+
+    font-weight: 500 !important;
+}
+
+
+/* Active Text */
+
+.sr-period-option.is-active .sr-period-option-title {
+    color: #006b73 !important;
+}
+
+.sr-period-option.is-active .sr-period-option-subtitle {
+    color: #4f8f94 !important;
+}
+
+
+/* ============================================================
+   CUSTOM RANGE
+============================================================ */
+
+.sr-custom-range {
+    width: 100% !important;
+
+    display: grid !important;
 
     grid-template-columns:
         minmax(0, 1fr)
         minmax(0, 1fr)
-        auto;
+        auto
+        auto !important;
 
-    align-items: end;
+    align-items: end !important;
 
-    gap: 18px;
+    gap: 12px !important;
 
-    padding: 22px;
+    margin-top: 18px !important;
+    padding-top: 18px !important;
+
+    border-top: 1px solid #eef2f7 !important;
+
+    box-sizing: border-box !important;
 }
 
-.sr-field {
-    min-width: 0;
+
+/* ============================================================
+   DATE FIELD
+============================================================ */
+
+.sr-date-field {
+    width: 100% !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+
+    gap: 6px !important;
 }
 
-.sr-field label {
-    display: block;
+.sr-date-field label {
+    display: block !important;
 
-    margin: 0 0 7px;
+    margin: 0 !important;
 
-    color: var(--sr-text);
+    color: #475569 !important;
 
-    font-size: 12px;
-    line-height: 1.3;
-    font-weight: 650;
+    font-size: 12px !important;
+    line-height: 17px !important;
+
+    font-weight: 700 !important;
 }
 
-.sr-field input {
-    display: block;
+.sr-date-field input {
+    width: 100% !important;
 
-    width: 100%;
-    height: 43px;
+    height: 42px !important;
 
-    margin: 0;
+    padding: 0 11px !important;
 
-    padding: 0 13px;
+    background: #ffffff !important;
 
-    color: var(--sr-text);
-    background: #ffffff;
+    border: 1px solid #dbe3ea !important;
+    border-radius: 9px !important;
 
-    border: 1px solid #d8e0e4;
-    border-radius: 10px;
+    color: #334155 !important;
 
-    outline: none;
+    font-size: 13px !important;
+    font-weight: 500 !important;
 
-    font-family: inherit;
-    font-size: 13px;
+    outline: none !important;
+
+    box-sizing: border-box !important;
 
     transition:
         border-color 0.2s ease,
-        box-shadow 0.2s ease,
-        background 0.2s ease;
+        box-shadow 0.2s ease !important;
 }
 
-.sr-field input:hover {
-    border-color: #c6d0d5;
-}
-
-.sr-field input:focus {
-    border-color: var(--sr-primary);
-
-    background: #ffffff;
+.sr-date-field input:focus {
+    border-color: #00838f !important;
 
     box-shadow:
-        0 0 0 3px rgba(0, 151, 167, 0.10);
+        0 0 0 3px rgba(0, 131, 143, 0.08) !important;
 }
 
 
-/* =========================================================
-   FILTER BUTTONS
-========================================================= */
+/* ============================================================
+   ACTION BUTTONS
+============================================================ */
 
-.sr-filter-actions {
-    height: 43px;
+.sr-filter-action {
+    display: flex !important;
 
-    display: flex;
-    align-items: stretch;
-
-    gap: 10px;
-
-    white-space: nowrap;
+    align-items: flex-end !important;
 }
 
-.sr-btn {
-    height: 43px;
+.sr-apply-btn,
+.sr-reset-btn {
+    height: 42px !important;
 
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    display: inline-flex !important;
 
-    gap: 7px;
+    align-items: center !important;
+    justify-content: center !important;
 
-    padding: 0 18px;
+    gap: 7px !important;
 
-    border-radius: 10px;
+    padding: 0 15px !important;
 
-    font-family: inherit;
-    font-size: 12px;
-    font-weight: 650;
+    border-radius: 9px !important;
 
-    line-height: 1;
+    font-size: 12px !important;
+    line-height: 1 !important;
 
-    cursor: pointer;
+    font-weight: 700 !important;
 
-    transition:
-        background 0.2s ease,
-        border-color 0.2s ease,
-        box-shadow 0.2s ease,
-        transform 0.2s ease;
+    white-space: nowrap !important;
+
+    cursor: pointer !important;
+
+    appearance: none !important;
+    -webkit-appearance: none !important;
+
+    box-sizing: border-box !important;
 }
 
-.sr-btn svg {
-    width: 17px;
-    height: 17px;
 
-    flex: 0 0 17px;
-}
+/* Apply */
 
-.sr-btn-primary {
-    color: #ffffff;
+.sr-apply-btn {
+    background: #00838f !important;
 
-    background: var(--sr-primary);
+    border: 1px solid #00838f !important;
 
-    border: 1px solid var(--sr-primary);
+    color: #ffffff !important;
 
     box-shadow:
-        0 5px 13px rgba(0, 151, 167, 0.16);
+        0 3px 8px rgba(0, 131, 143, 0.15) !important;
 }
 
-.sr-btn-primary:hover {
-    color: #ffffff;
+.sr-apply-btn:hover {
+    background: #006b73 !important;
 
-    background: var(--sr-primary-dark);
-
-    border-color: var(--sr-primary-dark);
-
-    transform: translateY(-1px);
-
-    box-shadow:
-        0 7px 16px rgba(0, 151, 167, 0.20);
+    border-color: #006b73 !important;
 }
 
-.sr-btn-secondary {
-    color: #52606d;
 
-    background: #ffffff;
+/* Reset */
 
-    border: 1px solid #d8e0e4;
+.sr-reset-btn {
+    background: #ffffff !important;
+
+    border: 1px solid #dbe3ea !important;
+
+    color: #64748b !important;
 }
 
-.sr-btn-secondary:hover {
-    color: var(--sr-text);
+.sr-reset-btn:hover {
+    background: #f8fafc !important;
 
-    background: #f7fafb;
+    border-color: #cbd5e1 !important;
 
-    border-color: #bdc8ce;
+    color: #334155 !important;
 }
 
+
+/* Button Icons */
+
+.sr-apply-btn svg,
+.sr-reset-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+
+    display: block !important;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 1000px) {
+
+    .sr-period-options {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .sr-custom-range {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .sr-filter-action {
+        width: 100% !important;
+    }
+
+    .sr-apply-btn,
+    .sr-reset-btn {
+        width: 100% !important;
+    }
+}
+
+
+@media (max-width: 640px) {
+
+    .sr-period-filter {
+        padding: 16px !important;
+    }
+
+    .sr-period-options {
+        grid-template-columns: 1fr !important;
+    }
+
+    .sr-custom-range {
+        grid-template-columns: 1fr !important;
+    }
+
+    .sr-period-option {
+        min-height: 58px !important;
+    }
+}
 
 /* =========================================================
    KPI GRID

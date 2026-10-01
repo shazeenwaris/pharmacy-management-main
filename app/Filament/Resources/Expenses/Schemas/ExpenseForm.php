@@ -49,18 +49,11 @@ class ExpenseForm
                 | Account
                 |--------------------------------------------------------------------------
                 */
-                Select::make('account_id')
-                    ->label('Account')
-                    ->options(
-                        Account::query()
-                            ->where('status', 'active')
-                            ->orderBy('account_name')
-                            ->pluck('account_name', 'id')
-                    )
-                    ->searchable()
-                    ->preload()
-                    ->required()
-                    ->placeholder('Select account'),
+              TextInput::make('account_name')
+    ->label('Account')
+    ->placeholder('Enter account name')
+    ->required()
+    ->maxLength(255),
 
                 /*
                 |--------------------------------------------------------------------------
@@ -95,10 +88,10 @@ class ExpenseForm
                 | Reference
                 |--------------------------------------------------------------------------
                 */
-                TextInput::make('reference')
-                    ->label('Reference')
-                    ->maxLength(255)
-                    ->placeholder('Invoice / Receipt / Reference'),
+              TextInput::make('reference')
+    ->label('Reference (Optional)')
+    ->maxLength(255)
+    ->placeholder('Invoice, receipt or transaction number'),
 
                 /*
                 |--------------------------------------------------------------------------

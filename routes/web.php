@@ -2,7 +2,7 @@
 use App\Livewire\PosScreen;
 use App\Models\Sale;
 
-
+use App\Http\Controllers\CashierNotificationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Cashier\SaleController;
 Route::get('/', function () {
@@ -71,3 +71,17 @@ Route::middleware(['auth'])
 
         
     });
+
+    Route::middleware(['auth'])->prefix('cashier')->group(function () {
+
+    Route::post(
+        '/notifications/{notification}/read',
+        [CashierNotificationController::class, 'markAsRead']
+    )->name('cashier.notifications.read');
+
+    Route::post(
+        '/notifications/read-all',
+        [CashierNotificationController::class, 'markAllAsRead']
+    )->name('cashier.notifications.read-all');
+
+});

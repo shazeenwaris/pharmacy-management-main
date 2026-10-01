@@ -250,7 +250,7 @@
     </div>
 
     {{-- Customers --}}
-    <a
+    <!-- <a
         href="{{ url('/cashier/customers') }}"
         class="pms-nav-item {{ request()->is('cashier/customers*') ? 'active' : '' }}"
     >
@@ -297,7 +297,7 @@
 
     </a>
 
-</div>
+</div> -->
 
 
         {{-- ============================================================

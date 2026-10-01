@@ -8,6 +8,7 @@ use App\Filament\Cashier\Resources\Customers\Tables\CustomersTable;
 use App\Models\Customer;
 use BackedEnum;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Components\ViewEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -358,6 +359,41 @@ class CustomerResource extends Resource
                     ->extraAttributes([
                         'class' => 'pms-customer-section',
                     ]),
+                    /*
+|--------------------------------------------------------------------------
+| PURCHASE HISTORY
+|--------------------------------------------------------------------------
+*/
+
+Section::make('Purchase History')
+    ->description(
+        'All products purchased by this customer'
+    )
+    ->icon(Heroicon::OutlinedReceiptPercent)
+    ->schema([
+
+        ViewEntry::make('purchase_history')
+            ->view('filament.cashier.customers.purchase-history')
+            ->state(function ($record) {
+
+                return $record
+                    ->sales()
+                    ->with([
+                        'items.medicine',
+                        'items.batch',
+                    ])
+                    ->latest('created_at')
+                    ->get();
+
+            })
+            ->columnSpanFull(),
+
+    ])
+    ->columnSpanFull()
+    ->extraAttributes([
+        'class' => 'pms-customer-section',
+    ]),
             ]);
+            
     }
 }

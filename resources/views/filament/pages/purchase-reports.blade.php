@@ -66,159 +66,121 @@
         {{-- =========================================================
              FILTERS
         ========================================================== --}}
-        <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+       <div class="pms-report-filters">
 
-            <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-
-                <div>
-                    <div class="flex items-center gap-2">
-
-                        <div class="flex h-9 w-9 items-center justify-center rounded-xl" style="background: rgba(0,112,122,0.1); color: #00707A;">
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.8"
-                                    d="M3 4h18M6 8h12M10 12h4M11 16h2M12 20v-4"
-                                />
-                            </svg>
-                        </div>
-
-                        <h3 class="text-base font-bold text-slate-900">
-                            Report Filters
-                        </h3>
-
-                    </div>
-
-                    <p class="mt-1 text-sm text-slate-500">
-                        Filter purchase data by date and supplier.
-                    </p>
-                </div>
-
-            </div>
-
-
-            {{-- Filter Fields --}}
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-
-                {{-- Date Range --}}
-                <div>
-                    <label class="mb-2 block text-sm font-semibold text-slate-700">
-                        Date Range
-                    </label>
-
-                    <select
-                        wire:model.live="dateRange"
-                        class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-700 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10"
-                    >
-                        <option value="all">All Time</option>
-                        <option value="today">Today</option>
-                        <option value="7_days">Last 7 Days</option>
-                        <option value="this_month">This Month</option>
-                        <option value="last_month">Last Month</option>
-                        <option value="custom">Custom Range</option>
-                    </select>
-                </div>
-
-
-                {{-- Supplier --}}
-                <div>
-                    <label class="mb-2 block text-sm font-semibold text-slate-700">
-                        Supplier
-                    </label>
-
-                    <select
-                        wire:model.live="supplierId"
-                        class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-700 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10"
-                    >
-                        <option value="">All Suppliers</option>
-
-                        @foreach($suppliers as $supplier)
-                            <option value="{{ $supplier->id }}">
-                                {{ $supplier->supplier_name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-
-                {{-- From Date --}}
-                <div>
-                    <label class="mb-2 block text-sm font-semibold text-slate-700">
-                        From Date
-                    </label>
-
-                    <input
-                        type="date"
-                        wire:model.live="fromDate"
-                        @disabled($dateRange !== 'custom')
-                        class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-700 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                </div>
-
-
-                {{-- To Date --}}
-                <div>
-                    <label class="mb-2 block text-sm font-semibold text-slate-700">
-                        To Date
-                    </label>
-
-                    <input
-                        type="date"
-                        wire:model.live="toDate"
-                        @disabled($dateRange !== 'custom')
-                        class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-medium text-slate-700 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                </div>
-
-            </div>
-
-
-            {{-- Filter Buttons --}}
-            <div class="mt-5 flex flex-col gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end">
-
-                <button
-                    type="button"
-                    wire:click="resetFilters"
-                    class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 transition hover:border-teal-200 hover:bg-teal-50 hover:text-teal-700"
-                >
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="1.8"
-                            d="M4 4v5h5M20 20v-5h-5M5.5 9A7 7 0 0117 6.5L20 9M18.5 15A7 7 0 017 17.5L4 15"
-                        />
-                    </svg>
-
-                    Reset
-                </button>
-
-
-                <button
-                    type="button"
-                    wire:click="applyFilters"
-                    class="inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:shadow-md"
-                    style="background: #00707A;"
-                    onmouseover="this.style.background='#005a63'"
-                    onmouseout="this.style.background='#00707A'"
-                >
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="1.8"
-                            d="M3 4h18M6 8h12M10 12h4M11 16h2M12 20v-4"
-                        />
-                    </svg>
-
-                    Apply Filters
-                </button>
-
-            </div>
-
+    {{-- Header --}}
+    <div class="pms-report-filter-header">
+        <div class="pms-filter-icon">
+            <x-heroicon-o-funnel class="w-5 h-5" />
         </div>
 
+        <div>
+            <h3>Report Filters</h3>
+            <p>Filter purchase data by date and supplier.</p>
+        </div>
+    </div>
+
+
+    {{-- Filter Fields --}}
+    <div class="pms-report-filter-grid">
+
+        {{-- Date Range --}}
+        <div class="pms-filter-field">
+            <label>Date Range</label>
+
+            <select
+                wire:model="dateRange"
+                class="pms-filter-control"
+            >
+                <option value="all">All Time</option>
+                <option value="today">Today</option>
+                <option value="7_days">Last 7 Days</option>
+                <option value="this_month">This Month</option>
+                <option value="last_month">Last Month</option>
+                <option value="this_year">This Year</option>
+                <option value="last_year">Last Year</option>
+                <option value="custom">Custom Range</option>
+            </select>
+        </div>
+
+
+        {{-- Supplier --}}
+        <div class="pms-filter-field">
+            <label>Supplier</label>
+
+            <select
+                wire:model="supplierId"
+                class="pms-filter-control"
+            >
+                <option value="">All Suppliers</option>
+
+                @foreach ($suppliers as $supplier)
+                    <option value="{{ $supplier->id }}">
+                        {{ $supplier->supplier_name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+
+        {{-- From Date --}}
+        <div class="pms-filter-field">
+            <label>From Date</label>
+
+            <input
+                type="date"
+                wire:model="fromDate"
+                class="pms-filter-control"
+            >
+        </div>
+
+
+        {{-- To Date --}}
+        <div class="pms-filter-field">
+            <label>To Date</label>
+
+            <input
+                type="date"
+                wire:model="toDate"
+                class="pms-filter-control"
+            >
+        </div>
+
+    </div>
+
+
+    {{-- Actions --}}
+    <div class="pms-report-filter-actions">
+
+        <button
+            type="button"
+            wire:click="resetFilters"
+            class="pms-reset-btn"
+        >
+            <x-heroicon-o-arrow-path class="w-4 h-4" />
+            <span>Reset</span>
+        </button>
+
+        <button
+            type="button"
+            wire:click="applyFilters"
+            wire:loading.attr="disabled"
+            class="pms-apply-btn"
+        >
+            <x-heroicon-o-funnel class="w-4 h-4" />
+
+            <span wire:loading.remove wire:target="applyFilters">
+                Apply Filters
+            </span>
+
+            <span wire:loading wire:target="applyFilters">
+                Applying...
+            </span>
+        </button>
+
+    </div>
+
+</div>
 
         {{-- =========================================================
              SUMMARY CARDS
@@ -1067,6 +1029,262 @@
                 transition: none !important;
             }
         }
+
+        /* ============================================================
+   PURCHASE REPORT FILTERS
+============================================================ */
+
+.pms-report-filters {
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #dfe7ec;
+    border-radius: 16px;
+    padding: 24px 28px;
+    box-sizing: border-box;
+}
+
+
+/* HEADER */
+
+.pms-report-filter-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.pms-filter-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: #e7f5f6;
+    color: #00838f;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+}
+
+.pms-report-filter-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #102a43;
+}
+
+.pms-report-filter-header p {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: #52708a;
+}
+
+
+/* ============================================================
+   FILTER GRID
+============================================================ */
+
+.pms-report-filter-grid {
+    display: grid;
+
+    grid-template-columns:
+        minmax(180px, 1fr)
+        minmax(180px, 1fr)
+        minmax(180px, 1fr)
+        minmax(180px, 1fr);
+
+    gap: 16px;
+
+    width: 100%;
+    align-items: end;
+}
+
+
+/* FIELD */
+
+.pms-filter-field {
+    min-width: 0;
+}
+
+.pms-filter-field label {
+    display: block;
+    margin-bottom: 8px;
+
+    font-size: 14px;
+    font-weight: 600;
+    color: #17324d;
+}
+
+
+/* INPUT / SELECT */
+
+.pms-filter-control {
+    width: 100%;
+    height: 44px;
+
+    box-sizing: border-box;
+
+    border: 1px solid #d8e2e9;
+    border-radius: 11px;
+
+    background: #ffffff;
+
+    padding: 0 14px;
+
+    font-size: 14px;
+    color: #183247;
+
+    outline: none;
+
+    transition:
+        border-color .2s ease,
+        box-shadow .2s ease;
+}
+
+.pms-filter-control:focus {
+    border-color: #00838f;
+
+    box-shadow:
+        0 0 0 3px rgba(0, 131, 143, 0.10);
+}
+
+
+/* DATE INPUT */
+
+.pms-filter-control[type="date"] {
+    color-scheme: light;
+    cursor: pointer;
+}
+
+
+/* ============================================================
+   ACTION BUTTONS
+============================================================ */
+
+.pms-report-filter-actions {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 10px;
+
+    margin-top: 20px;
+    padding-top: 18px;
+
+    border-top: 1px solid #edf1f4;
+}
+
+
+/* RESET */
+
+.pms-reset-btn {
+    height: 44px;
+    min-width: 104px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    padding: 0 16px;
+
+    border: 1px solid #d8e2e9;
+    border-radius: 11px;
+
+    background: #ffffff;
+    color: #425466;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+}
+
+.pms-reset-btn:hover {
+    background: #f7fafb;
+}
+
+
+/* APPLY */
+
+.pms-apply-btn {
+    height: 44px;
+    min-width: 140px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    padding: 0 18px;
+
+    border: 0;
+    border-radius: 11px;
+
+    background: #00838f;
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    box-shadow:
+        0 3px 8px rgba(0, 131, 143, 0.18);
+}
+
+.pms-apply-btn:hover {
+    background: #006974;
+}
+
+.pms-apply-btn:disabled {
+    opacity: .65;
+    cursor: not-allowed;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 1000px) {
+
+    .pms-report-filter-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 640px) {
+
+    .pms-report-filters {
+        padding: 18px;
+    }
+
+    .pms-report-filter-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pms-report-filter-actions {
+        justify-content: stretch;
+    }
+
+    .pms-reset-btn,
+    .pms-apply-btn {
+        flex: 1;
+    }
+
+}
     </style>
 
 </x-filament-panels::page>

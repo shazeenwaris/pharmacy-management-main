@@ -11,7 +11,7 @@ class Expense extends Model
     protected $fillable = [
         'expense_date',
         'expense_category_id',
-        'account_id',
+        'account_name',
         'amount',
         'payment_method',
         'reference',
@@ -30,11 +30,6 @@ class Expense extends Model
             ExpenseCategory::class,
             'expense_category_id'
         );
-    }
-
-    public function account(): BelongsTo
-    {
-        return $this->belongsTo(Account::class);
     }
 
     public function creator(): BelongsTo

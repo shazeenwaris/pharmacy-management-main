@@ -2,10 +2,7 @@
 
 namespace App\Filament\Cashier\Pages;
 
-
-use Livewire\Attributes\Computed;
 use App\Models\MedicineBatch;
-
 use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\SaleReturn;
@@ -13,6 +10,7 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Support\Enums\Width;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Computed;
 use Throwable;
 
 class SaleReturns extends Page
@@ -32,7 +30,7 @@ class SaleReturns extends Page
 
     /*
     |--------------------------------------------------------------------------
-    | Page Layout
+    | Page
     |--------------------------------------------------------------------------
     */
 
@@ -43,23 +41,48 @@ class SaleReturns extends Page
 
     /*
     |--------------------------------------------------------------------------
-    | Properties
+    | Modal
     |--------------------------------------------------------------------------
     */
 
-   public string $invoiceSearch = '';
+    public bool $showReturnModal = false;
+
+    /*
+    |--------------------------------------------------------------------------
+    | Invoice
+    |--------------------------------------------------------------------------
+    */
+
+    public string $invoiceSearch = '';
+
+public bool $showInvoiceDropdown = false;
 
 public ?int $selectedSaleId = null;
 
-public ?int $selectedSaleItemId = null;
+    
 
-public array $saleData = [];
+    public array $saleData = [];
 
-public array $returnQuantities = [];
+    /*
+    |--------------------------------------------------------------------------
+    | Return
+    |--------------------------------------------------------------------------
+    */
 
-public array $reasons = [];
+    public array $returnQuantities = [];
 
-public bool $processing = false;
+    public array $reasons = [];
+
+    public bool $processing = false;
+
+    /*
+    |--------------------------------------------------------------------------
+    | History
+    |--------------------------------------------------------------------------
+    */
+
+    public string $returnSearch = '';
+
     /*
     |--------------------------------------------------------------------------
     | Access
@@ -71,36 +94,71 @@ public bool $processing = false;
         return auth()->check()
             && auth()->user()->can('handle returns');
     }
-public function getInvoiceOptionsProperty(): array
+
+    /*
+    |--------------------------------------------------------------------------
+    | Open Modal
+    |--------------------------------------------------------------------------
+    */
+
+    public function openReturnModal(): void
+    {
+        $this->resetReturnForm();
+
+        $this->showReturnModal = true;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Close Modal
+    |--------------------------------------------------------------------------
+    */
+
+    public function closeReturnModal(): void
+    {
+        if ($this->processing) {
+            return;
+        }
+
+        $this->resetReturnForm();
+
+        $this->showReturnModal = false;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Reset Return Form
+    |--------------------------------------------------------------------------
+    */
+
+   protected function resetReturnForm(): void
 {
-    return Sale::query()
-        ->where('created_by', auth()->id())
-        ->latest('id')
-        ->get()
-        ->mapWithKeys(function ($sale) {
-            $invoice = $sale->invoice_number ?: 'INV-' . $sale->id;
+    $this->invoiceSearch = '';
+    $this->selectedSaleId = null;
+    $this->showInvoiceDropdown = false;
 
-            $customer = $sale->customer?->name ?? 'Walk-in Customer';
-
-            return [
-                $sale->id => $invoice . ' — ' . $customer,
-            ];
-        })
-        ->toArray();
+    $this->saleData = [];
+    $this->returnQuantities = [];
+    $this->reasons = [];
 }
-public function updatedSelectedSaleId($saleId): void
-{
-    $this->selectedSaleItemId = null;
+    /*
+    |--------------------------------------------------------------------------
+    | Invoice Search
+    |--------------------------------------------------------------------------
+    */
 
+ public function updatedInvoiceSearch(): void
+{
+    $this->selectedSaleId = null;
+
+    $this->saleData = [];
     $this->returnQuantities = [];
     $this->reasons = [];
 
-    if (! $saleId) {
-        $this->saleData = [];
-
-        return;
-    }
-
+    $this->showInvoiceDropdown = true;
+}
+public function selectInvoice(int $saleId): void
+{
     $sale = Sale::query()
         ->with([
             'customer',
@@ -108,13 +166,11 @@ public function updatedSelectedSaleId($saleId): void
             'items.medicine',
             'items.batch',
         ])
-        ->whereKey((int) $saleId)
+        ->whereKey($saleId)
         ->where('created_by', auth()->id())
         ->first();
 
     if (! $sale) {
-        $this->resetSale();
-
         Notification::make()
             ->danger()
             ->title('Invoice not found')
@@ -124,117 +180,72 @@ public function updatedSelectedSaleId($saleId): void
         return;
     }
 
+    // Load invoice
     $this->loadSale($sale);
 
-    Notification::make()
-        ->success()
-        ->title('Invoice selected')
-        ->body(
-            'Invoice ' .
-            ($sale->invoice_number ?: '#' . $sale->id) .
-            ' loaded successfully.'
-        )
-        ->send();
+    // Put selected invoice in input
+    $this->invoiceSearch =
+        $sale->invoice_number ?: 'INV-' . $sale->id;
+
+    // Close dropdown
+    $this->showInvoiceDropdown = false;
 }
-public function updatedSelectedSaleItemId($saleItemId): void
+#[Computed]
+public function invoiceOptions(): array
 {
-    if (! $saleItemId) {
-        return;
-    }
+    $search = trim($this->invoiceSearch);
 
-    $item = collect($this->saleData['items'] ?? [])
-        ->firstWhere('id', (int) $saleItemId);
+    return Sale::query()
+        ->with('customer')
+        ->where('created_by', auth()->id())
+        ->when($search !== '', function ($query) use ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where(
+                    'invoice_number',
+                    'like',
+                    "%{$search}%"
+                );
 
-    if (! $item) {
-        return;
-    }
+                if (is_numeric($search)) {
+                    $q->orWhereKey((int) $search);
+                }
 
-    if ((int) $item['returnable_quantity'] <= 0) {
-        $this->selectedSaleItemId = null;
-
-        Notification::make()
-            ->warning()
-            ->title('Medicine already returned')
-            ->body('There is no remaining quantity available for return.')
-            ->send();
-
-        return;
-    }
-
-    $this->returnQuantities = [
-        $item['id'] => 1,
-    ];
-
-    $this->reasons = [
-        $item['id'] => 'customer_request',
-    ];
-}
-    /*
-    |--------------------------------------------------------------------------
-    | Search Invoice
-    |--------------------------------------------------------------------------
-    */
-
-    public function searchInvoice(): void
-    {
-        $search = trim($this->invoiceSearch);
-
-        if ($search === '') {
-            $this->resetSale();
-
-            Notification::make()
-                ->warning()
-                ->title('Enter invoice number')
-                ->body('Please enter an invoice number to search.')
-                ->send();
-
-            return;
-        }
-
-        $this->resetSale();
-
-        $sale = Sale::query()
-            ->with([
-                'customer',
-                'creator',
-                'items.medicine',
-                'items.batch',
-            ])
-            ->where('created_by', auth()->id())
-            ->where(function ($query) use ($search) {
-                $query
-                    ->where('invoice_number', 'like', "%{$search}%")
-                    ->when(
-                        is_numeric($search),
-                        fn ($q) => $q->orWhereKey((int) $search)
+                $q->orWhereHas('customer', function ($customerQuery) use ($search) {
+                    $customerQuery->where(
+                        'name',
+                        'like',
+                        "%{$search}%"
                     );
-            })
-            ->latest('id')
-            ->first();
+                });
+            });
+        })
+        ->latest('id')
+        ->limit(20)
+        ->get()
+        ->map(fn ($sale) => [
+            'id' => $sale->id,
+            'invoice_number' => $sale->invoice_number ?: 'INV-' . $sale->id,
+            'customer' => $sale->customer?->name ?? 'Walk-in Customer',
+            'date' => $sale->created_at?->format('d M Y h:i A'),
+            'total' => (float) ($sale->grand_total ?? 0),
+        ])
+        ->toArray();
+}
 
-        if (! $sale) {
-            Notification::make()
-                ->danger()
-                ->title('Sale not found')
-                ->body('No sale belonging to your cashier account was found.')
-                ->send();
+public function openInvoiceDropdown(): void
+{
+    $this->showInvoiceDropdown = true;
+}
 
-            return;
-        }
+public function toggleInvoiceDropdown(): void
+{
+    $this->showInvoiceDropdown = ! $this->showInvoiceDropdown;
+}
 
-        $this->loadSale($sale);
-
-        Notification::make()
-            ->success()
-            ->title('Invoice found')
-            ->body(
-                'Invoice ' .
-                ($sale->invoice_number ?: '#' . $sale->id) .
-                ' loaded successfully.'
-            )
-            ->send();
-    }
-
+public function closeInvoiceDropdown(): void
+{
+    $this->showInvoiceDropdown = false;
+}
     /*
     |--------------------------------------------------------------------------
     | Load Sale
@@ -244,67 +255,118 @@ public function updatedSelectedSaleItemId($saleItemId): void
    protected function loadSale(Sale $sale): void
 {
     $this->selectedSaleId = $sale->id;
-    $this->selectedSaleItemId = null;
 
-    
-        $this->saleData = [
-            'id' => $sale->id,
-            'invoice_number' => $sale->invoice_number ?: 'N/A',
-            'date' => $sale->created_at?->format('d M Y h:i A'),
-            'customer' => $sale->customer?->name ?? 'Walk-in Customer',
-            'phone' => $sale->customer?->phone ?? null,
-            'cashier' => $sale->creator?->name ?? 'Current Cashier',
-            'grand_total' => (float) ($sale->grand_total ?? 0),
-            'paid_amount' => (float) ($sale->paid_amount ?? 0),
-            'items' => [],
-        ];
+    $this->saleData = [
+        'id' => $sale->id,
 
-        $this->returnQuantities = [];
-        $this->reasons = [];
+        'invoice_number' =>
+            $sale->invoice_number ?: 'INV-' . $sale->id,
 
-        foreach ($sale->items as $item) {
-            $returnedQuantity = (int) SaleReturn::query()
-                ->where('sale_item_id', $item->id)
-                ->sum('quantity');
+        'date' =>
+            $sale->created_at?->format('d M Y h:i A'),
 
-            $returnableQuantity = max(
-                0,
-                (int) $item->quantity - $returnedQuantity
-            );
+        'customer' =>
+            $sale->customer?->name ?? 'Walk-in Customer',
 
-            $this->saleData['items'][] = [
-                'id' => $item->id,
-                'medicine_id' => $item->medicine_id,
-                'medicine_name' => $item->medicine?->name ?? 'Unknown Medicine',
+        'phone' =>
+            $sale->customer?->phone ?? null,
 
-                'batch_id' => $item->medicine_batch_id,
+        'cashier' =>
+            $sale->creator?->name ?? 'Unknown',
 
-                'batch_number' => $item->batch?->batch_number ?? 'N/A',
+        'grand_total' =>
+            (float) ($sale->grand_total ?? 0),
 
-                'expiry_date' => $item->batch?->expiry_date
+        'paid_amount' =>
+            (float) ($sale->paid_amount ?? 0),
+
+        'items' => [],
+    ];
+
+    $this->returnQuantities = [];
+    $this->reasons = [];
+
+    foreach ($sale->items as $item) {
+
+        $soldQuantity = (float) $item->quantity;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Already Returned Quantity
+        |--------------------------------------------------------------------------
+        */
+
+        $returnedQuantity = (float) SaleReturn::query()
+            ->where('sale_id', $sale->id)
+            ->where('sale_item_id', $item->id)
+            ->sum('quantity');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Remaining Returnable Quantity
+        |--------------------------------------------------------------------------
+        */
+
+        $returnableQuantity = max(
+            0,
+            $soldQuantity - $returnedQuantity
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Sale Item Data
+        |--------------------------------------------------------------------------
+        */
+
+        $this->saleData['items'][] = [
+
+            'id' =>
+                $item->id,
+
+            'medicine_id' =>
+                $item->medicine_id,
+
+            'medicine_name' =>
+                $item->medicine?->name ?? 'Unknown Medicine',
+
+            'batch_number' =>
+                $item->batch?->batch_number ?? '-',
+
+            'expiry_date' =>
+                $item->batch?->expiry_date
                     ? $item->batch->expiry_date->format('d M Y')
                     : null,
 
-                'sold_quantity' => (int) $item->quantity,
+            'sold_quantity' =>
+                $soldQuantity,
 
-                'returned_quantity' => $returnedQuantity,
+            'returned_quantity' =>
+                $returnedQuantity,
 
-                'returnable_quantity' => $returnableQuantity,
+            'returnable_quantity' =>
+                $returnableQuantity,
 
-                'unit_price' => (float) ($item->unit_price ?? 0),
+            'unit_price' =>
+                (float) ($item->unit_price ?? 0),
 
-                'line_total' => (float) ($item->total ?? 0),
-            ];
+            'line_total' =>
+                (float) ($item->total ?? 0),
+        ];
 
-            $this->returnQuantities[$item->id] = 0;
+        /*
+        |--------------------------------------------------------------------------
+        | Start Return Quantity From 0
+        |--------------------------------------------------------------------------
+        */
 
-            $this->reasons[$item->id] = 'customer_request';
-        }
+        $this->returnQuantities[$item->id] = 0;
+
+        $this->reasons[$item->id] = '';
     }
-
+}
     /*
     |--------------------------------------------------------------------------
-    | Return Quantity Validation
+    | Return Quantity
     |--------------------------------------------------------------------------
     */
 
@@ -328,11 +390,12 @@ public function updatedSelectedSaleItemId($saleItemId): void
 
     /*
     |--------------------------------------------------------------------------
-    | Refund Total
+    | Return Total
     |--------------------------------------------------------------------------
     */
 
-    public function getReturnTotalProperty(): float
+    #[Computed]
+    public function returnTotal(): float
     {
         $total = 0;
 
@@ -350,10 +413,6 @@ public function updatedSelectedSaleItemId($saleItemId): void
                 (int) $item['sold_quantity']
             );
 
-            /*
-             * Use actual line total.
-             * This preserves item-level discount.
-             */
             $effectiveUnitPrice =
                 (float) $item['line_total'] / $soldQuantity;
 
@@ -365,11 +424,12 @@ public function updatedSelectedSaleItemId($saleItemId): void
 
     /*
     |--------------------------------------------------------------------------
-    | Selected Return Lines
+    | Selected Return Count
     |--------------------------------------------------------------------------
     */
 
-    public function getSelectedReturnCountProperty(): int
+    #[Computed]
+    public function selectedReturnCount(): int
     {
         return collect($this->returnQuantities)
             ->map(fn ($quantity) => (int) $quantity)
@@ -383,13 +443,29 @@ public function updatedSelectedSaleItemId($saleItemId): void
     |--------------------------------------------------------------------------
     */
 
-    public function getReturnRowsProperty(): array
+    #[Computed]
+    public function returnRows(): array
     {
         $query = DB::table('sale_returns as sr')
             ->leftJoin('sales as s', 's.id', '=', 'sr.sale_id')
-            ->leftJoin('sale_items as si', 'si.id', '=', 'sr.sale_item_id')
-            ->leftJoin('medicines as m', 'm.id', '=', 'sr.medicine_id')
-            ->leftJoin('users as u', 'u.id', '=', 'sr.processed_by')
+            ->leftJoin(
+                'sale_items as si',
+                'si.id',
+                '=',
+                'sr.sale_item_id'
+            )
+            ->leftJoin(
+                'medicines as m',
+                'm.id',
+                '=',
+                'sr.medicine_id'
+            )
+            ->leftJoin(
+                'users as u',
+                'u.id',
+                '=',
+                'sr.processed_by'
+            )
             ->where('s.created_by', auth()->id())
             ->select([
                 'sr.id',
@@ -407,9 +483,21 @@ public function updatedSelectedSaleItemId($saleItemId): void
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
-                $q->where('s.invoice_number', 'like', "%{$search}%")
-                    ->orWhere('m.name', 'like', "%{$search}%")
-                    ->orWhere('sr.reason', 'like', "%{$search}%");
+                $q->where(
+                    's.invoice_number',
+                    'like',
+                    "%{$search}%"
+                )
+                    ->orWhere(
+                        'm.name',
+                        'like',
+                        "%{$search}%"
+                    )
+                    ->orWhere(
+                        'sr.reason',
+                        'like',
+                        "%{$search}%"
+                    );
             });
         }
 
@@ -419,15 +507,31 @@ public function updatedSelectedSaleItemId($saleItemId): void
             ->map(function ($row) {
                 return [
                     'id' => $row->id,
-                    'invoice_number' => $row->invoice_number ?: '-',
-                    'medicine_name' => $row->medicine_name ?: '-',
+
+                    'invoice_number' =>
+                        $row->invoice_number ?: '-',
+
+                    'medicine_name' =>
+                        $row->medicine_name ?: '-',
+
                     'quantity' => (int) $row->quantity,
-                    'refund_amount' => (float) $row->refund_amount,
-                    'reason' => $this->formatReason($row->reason),
-                    'return_date' => $row->return_date
-                        ? date('d M Y', strtotime($row->return_date))
-                        : '-',
-                    'processed_by' => $row->processed_by ?: 'Unknown',
+
+                    'refund_amount' =>
+                        (float) $row->refund_amount,
+
+                    'reason' =>
+                        $this->formatReason($row->reason),
+
+                    'return_date' =>
+                        $row->return_date
+                            ? date(
+                                'd M Y',
+                                strtotime($row->return_date)
+                            )
+                            : '-',
+
+                    'processed_by' =>
+                        $row->processed_by ?: 'Unknown',
                 ];
             })
             ->toArray();
@@ -435,38 +539,32 @@ public function updatedSelectedSaleItemId($saleItemId): void
 
     /*
     |--------------------------------------------------------------------------
-    | Search Property
+    | Statistics
     |--------------------------------------------------------------------------
     */
 
-    public string $returnSearch = '';
-
-    /*
-    |--------------------------------------------------------------------------
-    | Total Returns
-    |--------------------------------------------------------------------------
-    */
-
-    public function getTotalReturnsProperty(): int
+    #[Computed]
+    public function totalReturns(): int
     {
         return SaleReturn::query()
             ->whereHas('sale', function ($query) {
-                $query->where('created_by', auth()->id());
+                $query->where(
+                    'created_by',
+                    auth()->id()
+                );
             })
             ->count();
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Monthly Returns
-    |--------------------------------------------------------------------------
-    */
-
-    public function getMonthlyReturnsProperty(): int
+    #[Computed]
+    public function monthlyReturns(): int
     {
         return SaleReturn::query()
             ->whereHas('sale', function ($query) {
-                $query->where('created_by', auth()->id());
+                $query->where(
+                    'created_by',
+                    auth()->id()
+                );
             })
             ->whereBetween('return_date', [
                 now()->startOfMonth()->toDateString(),
@@ -475,18 +573,16 @@ public function updatedSelectedSaleItemId($saleItemId): void
             ->count();
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Total Refund Amount
-    |--------------------------------------------------------------------------
-    */
-
-    public function getTotalRefundAmountProperty(): float
+    #[Computed]
+    public function totalRefundAmount(): float
     {
         return round(
             (float) SaleReturn::query()
                 ->whereHas('sale', function ($query) {
-                    $query->where('created_by', auth()->id());
+                    $query->where(
+                        'created_by',
+                        auth()->id()
+                    );
                 })
                 ->sum('refund_amount'),
             2
@@ -509,7 +605,19 @@ public function updatedSelectedSaleItemId($saleItemId): void
             Notification::make()
                 ->warning()
                 ->title('No invoice selected')
-                ->body('Please search and select an invoice first.')
+                ->body('Please search for an invoice first.')
+                ->send();
+
+            return;
+        }
+
+        if ($this->selectedReturnCount <= 0) {
+            Notification::make()
+                ->warning()
+                ->title('No quantity selected')
+                ->body(
+                    'Please enter a return quantity for at least one medicine.'
+                )
                 ->send();
 
             return;
@@ -519,7 +627,6 @@ public function updatedSelectedSaleItemId($saleItemId): void
 
         try {
             $result = DB::transaction(function () {
-
                 $sale = Sale::query()
                     ->whereKey($this->selectedSaleId)
                     ->where('created_by', auth()->id())
@@ -535,17 +642,16 @@ public function updatedSelectedSaleItemId($saleItemId): void
                 $returnCount = 0;
                 $refundTotal = 0;
 
-                foreach ($this->returnQuantities as $saleItemId => $requestedQuantity) {
-
+                foreach (
+                    $this->returnQuantities
+                    as $saleItemId => $requestedQuantity
+                ) {
                     $requestedQuantity = (int) $requestedQuantity;
 
                     if ($requestedQuantity <= 0) {
                         continue;
                     }
 
-                    /*
-                     * Lock original sale item.
-                     */
                     $saleItem = SaleItem::query()
                         ->whereKey((int) $saleItemId)
                         ->where('sale_id', $sale->id)
@@ -558,11 +664,11 @@ public function updatedSelectedSaleItemId($saleItemId): void
                         );
                     }
 
-                    /*
-                     * Calculate already returned quantity.
-                     */
                     $alreadyReturned = (int) SaleReturn::query()
-                        ->where('sale_item_id', $saleItem->id)
+                        ->where(
+                            'sale_item_id',
+                            $saleItem->id
+                        )
                         ->sum('quantity');
 
                     $returnableQuantity = max(
@@ -578,15 +684,13 @@ public function updatedSelectedSaleItemId($saleItemId): void
                         );
                     }
 
-                    /*
-                     * Original batch.
-                     */
                     $batch = null;
 
                     if ($saleItem->medicine_batch_id) {
-
                         $batch = MedicineBatch::query()
-                            ->whereKey($saleItem->medicine_batch_id)
+                            ->whereKey(
+                                $saleItem->medicine_batch_id
+                            )
                             ->lockForUpdate()
                             ->first();
 
@@ -607,43 +711,69 @@ public function updatedSelectedSaleItemId($saleItemId): void
                     }
 
                     /*
-                     * Refund calculation.
-                     */
+                    |--------------------------------------------------------------------------
+                    | Refund
+                    |--------------------------------------------------------------------------
+                    */
+
                     $soldQuantity = max(
                         1,
                         (int) $saleItem->quantity
                     );
 
-                    $lineTotal = (float) ($saleItem->total ?? 0);
+                    $lineTotal =
+                        (float) ($saleItem->total ?? 0);
 
                     $effectiveUnitPrice =
                         $lineTotal / $soldQuantity;
 
                     $refundAmount = round(
-                        $effectiveUnitPrice * $requestedQuantity,
+                        $effectiveUnitPrice *
+                        $requestedQuantity,
                         2
                     );
 
                     /*
-                     * Create return.
-                     */
+                    |--------------------------------------------------------------------------
+                    | Create Return
+                    |--------------------------------------------------------------------------
+                    */
+
                     SaleReturn::create([
                         'sale_id' => $sale->id,
-                        'sale_item_id' => $saleItem->id,
-                        'medicine_id' => $saleItem->medicine_id,
-                        'medicine_batch_id' => $saleItem->medicine_batch_id,
-                        'quantity' => $requestedQuantity,
-                        'refund_amount' => $refundAmount,
+
+                        'sale_item_id' =>
+                            $saleItem->id,
+
+                        'medicine_id' =>
+                            $saleItem->medicine_id,
+
+                        'medicine_batch_id' =>
+                            $saleItem->medicine_batch_id,
+
+                        'quantity' =>
+                            $requestedQuantity,
+
+                        'refund_amount' =>
+                            $refundAmount,
+
                         'reason' =>
                             $this->reasons[$saleItem->id]
                             ?? 'other',
-                        'return_date' => today(),
-                        'processed_by' => auth()->id(),
+
+                        'return_date' =>
+                            today(),
+
+                        'processed_by' =>
+                            auth()->id(),
                     ]);
 
                     /*
-                     * Restore stock to ORIGINAL batch.
-                     */
+                    |--------------------------------------------------------------------------
+                    | Restore Original Batch Stock
+                    |--------------------------------------------------------------------------
+                    */
+
                     if ($batch) {
                         $batch->increment(
                             'quantity',
@@ -652,6 +782,7 @@ public function updatedSelectedSaleItemId($saleItemId): void
                     }
 
                     $returnCount++;
+
                     $refundTotal += $refundAmount;
                 }
 
@@ -663,8 +794,13 @@ public function updatedSelectedSaleItemId($saleItemId): void
 
                 return [
                     'count' => $returnCount,
-                    'refund' => round($refundTotal, 2),
-                    'invoice' => $sale->invoice_number,
+
+                    'refund' =>
+                        round($refundTotal, 2),
+
+                    'invoice' =>
+                        $sale->invoice_number
+                        ?: '#' . $sale->id,
                 ];
             });
 
@@ -675,33 +811,24 @@ public function updatedSelectedSaleItemId($saleItemId): void
                     $result['count'] .
                     ' item line(s) returned successfully. Refund: ' .
                     currency_symbol() .
-                    number_format($result['refund'], 2)
+                    number_format(
+                        $result['refund'],
+                        2
+                    )
                 )
                 ->send();
 
             /*
-             * Reload current invoice.
-             */
-            $sale = Sale::query()
-                ->with([
-                    'customer',
-                    'creator',
-                    'items.medicine',
-                    'items.batch',
-                ])
-                ->find($this->selectedSaleId);
+            |--------------------------------------------------------------------------
+            | Close Modal
+            |--------------------------------------------------------------------------
+            */
 
-            if ($sale) {
-                $this->loadSale($sale);
-            }
+            $this->showReturnModal = false;
 
-            /*
-             * Reset search/history state.
-             */
-            $this->returnSearch = '';
+            $this->resetReturnForm();
 
         } catch (Throwable $e) {
-
             report($e);
 
             Notification::make()
@@ -717,84 +844,49 @@ public function updatedSelectedSaleItemId($saleItemId): void
 
     /*
     |--------------------------------------------------------------------------
-    | Reset Sale
+    | Clear
     |--------------------------------------------------------------------------
     */
 
-  public function resetSale(): void
-{
-    $this->selectedSaleId = null;
+    public function clearSearch(): void
+    {
+        $this->resetReturnForm();
+    }
 
-    $this->selectedSaleItemId = null;
-
-    $this->saleData = [];
-
-    $this->returnQuantities = [];
-
-    $this->reasons = [];
-}
     /*
     |--------------------------------------------------------------------------
-    | New Return
-    |--------------------------------------------------------------------------
-    */
-/*
-|--------------------------------------------------------------------------
-| Clear Search / New Return
-|--------------------------------------------------------------------------
-*/
-
-public function clearSearch(): void
-{
-    $this->invoiceSearch = '';
-
-    $this->returnSearch = '';
-
-    $this->resetSale();
-
-    $this->processing = false;
-}
-   
-    /*
-    |--------------------------------------------------------------------------
-    | Reason Formatter
+    | Reason
     |--------------------------------------------------------------------------
     */
 
     protected function formatReason(?string $reason): string
     {
         return match ($reason) {
-            'defective' => 'Defective / Damaged',
-            'wrong_item' => 'Wrong Item Sold',
-            'customer_request' => 'Customer Changed Mind',
-            'expired' => 'Expired',
-            'other' => 'Other',
-            default => $reason
-                ? ucwords(str_replace('_', ' ', $reason))
-                : '-',
+            'defective' =>
+                'Defective / Damaged',
+
+            'wrong_item' =>
+                'Wrong Item Sold',
+
+            'customer_request' =>
+                'Customer Changed Mind',
+
+            'expired' =>
+                'Expired',
+
+            'other' =>
+                'Other',
+
+            default =>
+                $reason
+                    ? ucwords(
+                        str_replace(
+                            '_',
+                            ' ',
+                            $reason
+                        )
+                    )
+                    : '-',
         };
     }
-
-    #[Computed]
-public function filteredInvoiceOptions(): array
-{
-    $search = trim((string) $this->invoiceSearch);
-
-    $options = $this->invoiceOptions;
-
-    if ($search === '') {
-        return $options;
-    }
-
-    return collect($options)
-        ->filter(function ($label) use ($search) {
-
-            return str_contains(
-                strtolower((string) $label),
-                strtolower($search)
-            );
-
-        })
-        ->toArray();
-}
 }
