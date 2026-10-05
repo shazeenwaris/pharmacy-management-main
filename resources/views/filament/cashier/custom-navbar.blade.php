@@ -123,18 +123,8 @@
 
 <div
     class="pms-cashier-notification-wrapper"
-    x-data="{
-        open: false,
-        refreshNotifications() {
-            window.location.reload();
-        }
-    }"
+    x-data="{ open: false }"
     @click.outside="open = false"
-    x-init="
-        setInterval(() => {
-            refreshNotifications();
-        }, 30000);
-    "
 >
 
     {{-- Notification Button --}}
@@ -552,7 +542,7 @@
 
             box-sizing: border-box !important;
 
-            z-index: 9999 !important;
+           z-index: 40 !important;
 
             transition:
                 left 0.2s ease,
@@ -1518,9 +1508,9 @@
         })
         .then(() => {
 
-            window.location.reload();
+    open = false;
 
-        })
+})
         .catch(error => {
 
             console.error(

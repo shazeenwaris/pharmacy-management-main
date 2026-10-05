@@ -1493,27 +1493,52 @@
 
 
         /* MODAL */
+.pms-modal-overlay {
+    position: fixed !important;
 
-        .pms-modal-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 25px;
-            background: rgba(23,55,74,.48);
-        }
+    /* Full browser viewport */
+    top: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
 
-        .pms-sale-modal {
-            width: 100%;
-            max-width: 900px;
-            max-height: 90vh;
-            overflow-y: auto;
-            background: #fff;
-            border-radius: 14px;
-            box-shadow: 0 25px 70px rgba(23,55,74,.25);
-        }
+    width: 100vw !important;
+    height: 100vh !important;
+
+    margin: 0 !important;
+    padding: 25px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    background: rgba(23, 55, 74, 0.48) !important;
+
+    z-index: 999999 !important;
+
+    overflow-y: auto;
+}
+
+       .pms-sale-modal {
+    position: relative;
+
+    width: min(900px, calc(100vw - 50px));
+    max-width: 900px;
+
+    max-height: calc(100vh - 50px);
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    margin: auto;
+
+    background: #fff;
+    border-radius: 14px;
+
+    box-shadow: 0 25px 70px rgba(23,55,74,.25);
+
+    z-index: 1000000;
+}
 
         .pms-modal-header {
             display: flex;

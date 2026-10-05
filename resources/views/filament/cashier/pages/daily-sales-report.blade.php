@@ -520,13 +520,12 @@
             --pms-text: #173B3F;
             --pms-muted: #71898D;
 
-            width: 100%;
-            max-width: none;
+        width: 100%;
+max-width: 100%;
 
-            padding: 4px 0 32px;
+padding: 24px 24px 32px 24px;
 
-            box-sizing: border-box;
-
+box-sizing: border-box;
         }
 
 

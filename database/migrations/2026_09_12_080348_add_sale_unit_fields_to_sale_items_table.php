@@ -9,19 +9,21 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('sale_items', function (Blueprint $table) {
+
             /*
-             * Selected packaging/sale unit.
+             * Selected sellable unit from MedicineBatchPackaging.
              *
              * Example:
              * Tablet
              * Strip
              * Box
+             *
+             * FK will be added later, after the
+             * medicine_batch_packagings table exists.
              */
-            $table->foreignId('medicine_packaging_id')
+            $table->unsignedBigInteger('medicine_batch_packaging_id')
                 ->nullable()
-                ->after('medicine_batch_id')
-                ->constrained('medicine_packagings')
-                ->nullOnDelete();
+                ->after('medicine_batch_id');
 
             /*
              * Snapshot of the unit name at the time of sale.
@@ -31,10 +33,10 @@ return new class extends Migration
              */
             $table->string('sale_unit', 100)
                 ->nullable()
-                ->after('medicine_packaging_id');
+                ->after('medicine_batch_packaging_id');
 
             /*
-             * How many base units are inside one sale unit.
+             * Number of base units inside one sale unit.
              *
              * Tablet = 1
              * Strip  = 10
@@ -49,12 +51,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('sale_items', function (Blueprint $table) {
-            $table->dropForeign([
-                'medicine_packaging_id',
-            ]);
 
             $table->dropColumn([
-                'medicine_packaging_id',
+                'medicine_batch_packaging_id',
                 'sale_unit',
                 'conversion_factor',
             ]);

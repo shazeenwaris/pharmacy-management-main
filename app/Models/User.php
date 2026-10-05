@@ -60,15 +60,15 @@ class User extends Authenticatable implements FilamentUser
     }
 
     return match ($panel->getId()) {
-        'admin' => $this->hasRole('admin'),
+        'admin' => $this->hasRole('Admin'),
 
         'cashier' => $this->hasAnyRole([
-            'admin',
+            'Admin',
             'Cashier',
         ]),
 
         'pharmacist' => $this->hasAnyRole([
-            'admin',
+            'Admin',
             'Cashier',
             'Pharmacist',
             'Inventory Manager',

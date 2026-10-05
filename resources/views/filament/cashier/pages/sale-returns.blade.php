@@ -269,16 +269,24 @@
 
     padding: 24px;
 }
-        .pms-sr-modal {
-            width: min(1050px, 100%);
-            max-height: calc(100vh - 48px);
-            background: white;
-            border-radius: 18px;
-            overflow: hidden;
-            box-shadow: 0 25px 70px rgba(15, 23, 42, .25);
-            display: flex;
-            flex-direction: column;
-        }
+       .pms-sr-modal {
+    width: min(760px, calc(100vw - 120px)) !important;
+
+    max-width: 760px !important;
+
+    height: calc(100vh - 40px);
+    max-height: calc(100vh - 40px);
+
+    background: white;
+    border-radius: 16px;
+
+    overflow: hidden;
+
+    box-shadow: 0 25px 70px rgba(15, 23, 42, .25);
+
+    display: flex;
+    flex-direction: column;
+}
 
         .pms-sr-modal-head {
             padding: 18px 22px;

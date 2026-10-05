@@ -1164,14 +1164,33 @@ body:has(.pms-sidebar-wrapper)
    26. COLLAPSED SIDEBAR
    ========================================================= */
 
-html[data-pms-sidebar="collapsed"] .pms-brand {
+/* html[data-pms-sidebar="collapsed"] .pms-brand {
     justify-content: center;
 
     padding-left: 8px;
     padding-right: 8px;
+} */
+
+html[data-pms-sidebar="collapsed"] .pms-brand {
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+
+    min-height: 100px;
+    padding: 12px 8px 8px;
 }
 
+html[data-pms-sidebar="collapsed"] .pms-sidebar-toggle {
+    position: static;
 
+    top: auto;
+    right: auto;
+
+    width: 32px;
+    height: 32px;
+
+    margin: 0;
+}
 html[data-pms-sidebar="collapsed"] .pms-brand-info {
     display: none !important;
 }
@@ -1182,13 +1201,13 @@ html[data-pms-sidebar="collapsed"] .pms-brand-logo {
 }
 
 
-html[data-pms-sidebar="collapsed"] .pms-sidebar-toggle {
+/* html[data-pms-sidebar="collapsed"] .pms-sidebar-toggle {
     top: 8px;
     right: 7px;
 
     width: 26px;
     height: 26px;
-}
+} */
 
 
 html[data-pms-sidebar="collapsed"] .pms-sidebar-search {
