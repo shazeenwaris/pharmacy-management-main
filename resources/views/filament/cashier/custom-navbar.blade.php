@@ -103,145 +103,217 @@
         ====================================================== --}}
         <div class="pms-topbar-right">
 
-            {{-- =================================================
-                NOTIFICATIONS
-            ================================================== --}}
-            @php
-                use App\Models\CashierNotification;
+          {{-- =================================================
+    CASHIER NOTIFICATIONS
+================================================== --}}
 
-                $cashierUnreadNotifications = CashierNotification::unread()
-                    ->latest()
-                    ->take(8)
-                    ->get();
+@php
+    use App\Models\CashierNotification;
 
-                $cashierUnreadCount = CashierNotification::unread()->count();
-            @endphp
+    $cashierUnreadNotifications = CashierNotification::query()
+        ->unread()
+        ->latest()
+        ->take(8)
+        ->get();
 
-            <div
-                class="pms-cashier-notification-wrapper"
-                x-data="{ open: false }"
-                @click.outside="open = false"
-            >
+    $cashierUnreadCount = CashierNotification::query()
+        ->unread()
+        ->count();
+@endphp
 
-                <button
-                    type="button"
-                    class="pms-topbar-action pms-notification-button"
-                    @click="open = !open"
-                    title="Notifications"
-                    aria-label="Notifications"
-                >
+<div
+    class="pms-cashier-notification-wrapper"
+    x-data="{ open: false }"
+    @click.outside="open = false"
+>
 
-                    <x-heroicon-o-bell class="w-5 h-5" />
+    {{-- Notification Button --}}
+    <button
+        type="button"
+        class="pms-topbar-action pms-notification-button"
+        @click="open = !open"
+        title="Notifications"
+        aria-label="Notifications"
+    >
 
-                    @if ($cashierUnreadCount > 0)
-                        <span class="pms-notification-badge">
-                            {{ $cashierUnreadCount > 99 ? '99+' : $cashierUnreadCount }}
-                        </span>
-                    @endif
+        <x-heroicon-o-bell class="w-5 h-5" />
 
-                </button>
+        @if ($cashierUnreadCount > 0)
+
+            <span class="pms-notification-badge">
+                {{ $cashierUnreadCount > 99 ? '99+' : $cashierUnreadCount }}
+            </span>
+
+        @endif
+
+    </button>
 
 
-                {{-- Notification Dropdown --}}
+    {{-- =================================================
+        NOTIFICATION DROPDOWN
+    ================================================== --}}
+
+    <div
+        x-show="open"
+        x-transition.origin.top.right
+        x-cloak
+        class="pms-cashier-notification-dropdown"
+    >
+
+        {{-- Header --}}
+        <div class="pms-notification-header">
+
+            <div>
+
+                <h3>
+                    Notifications
+                </h3>
+
+                <span>
+                    {{ $cashierUnreadCount }}
+                    {{ $cashierUnreadCount === 1 ? 'unread' : 'unread' }}
+                </span>
+
+            </div>
+
+            <div class="pms-notification-header-icon">
+
+                <x-heroicon-o-bell class="w-5 h-5" />
+
+            </div>
+
+        </div>
+
+
+        {{-- Notification List --}}
+        <div class="pms-notification-list">
+
+            @forelse ($cashierUnreadNotifications as $notification)
+
+                @php
+
+                    $icon = match ($notification->type) {
+
+                        'sale_completed'
+                            => 'heroicon-o-shopping-cart',
+
+                        'payment_received'
+                            => 'heroicon-o-banknotes',
+
+                        'return_processed'
+                            => 'heroicon-o-arrow-uturn-left',
+
+                        'refund'
+                            => 'heroicon-o-arrow-path',
+
+                        default
+                            => 'heroicon-o-information-circle',
+
+                    };
+
+
+                    $iconClass = match ($notification->level) {
+
+                        'success'
+                            => 'success',
+
+                        'warning'
+                            => 'warning',
+
+                        'danger'
+                            => 'danger',
+
+                        default
+                            => 'info',
+
+                    };
+
+                @endphp
+
+
+                {{-- Notification --}}
                 <div
-                    x-show="open"
-                    x-transition.origin.top.right
-                    x-cloak
-                    class="pms-cashier-notification-dropdown"
+                    class="pms-notification-item"
+                    onclick="markCashierNotificationRead({{ $notification->id }})"
                 >
 
-                    {{-- Header --}}
-                    <div class="pms-notification-header">
+                    <div
+                        class="pms-notification-icon {{ $iconClass }}"
+                    >
 
-                        <div>
-                            <h3>Notifications</h3>
-
-                            <span>
-                                {{ $cashierUnreadCount }}
-                                {{ $cashierUnreadCount === 1 ? 'unread' : 'unread' }}
-                            </span>
-                        </div>
-
-                        <div class="pms-notification-header-icon">
-                            <x-heroicon-o-bell class="w-5 h-5" />
-                        </div>
+                        <x-dynamic-component
+                            :component="$icon"
+                            class="w-5 h-5"
+                        />
 
                     </div>
 
 
-                    {{-- Notification List --}}
-                    <div class="pms-notification-list">
+                    <div class="pms-notification-content">
 
-                        @forelse ($cashierUnreadNotifications as $notification)
+                        <div class="pms-notification-title">
+                            {{ $notification->title }}
+                        </div>
 
-                            @php
-                                $icon = match ($notification->type) {
-                                    'sale_completed' => 'heroicon-o-shopping-cart',
-                                    'payment_received' => 'heroicon-o-banknotes',
-                                    'return_processed' => 'heroicon-o-arrow-uturn-left',
-                                    'refund' => 'heroicon-o-arrow-path',
-                                    default => 'heroicon-o-information-circle',
-                                };
+                        <div class="pms-notification-message">
+                            {{ $notification->message }}
+                        </div>
 
-                                $iconClass = match ($notification->level) {
-                                    'success' => 'success',
-                                    'warning' => 'warning',
-                                    'danger' => 'danger',
-                                    default => 'info',
-                                };
-                            @endphp
-
-
-                            <div class="pms-notification-item">
-
-                                <div class="pms-notification-icon {{ $iconClass }}">
-                                    <x-dynamic-component
-                                        :component="$icon"
-                                        class="w-5 h-5"
-                                    />
-                                </div>
-
-                                <div class="pms-notification-content">
-
-                                    <div class="pms-notification-title">
-                                        {{ $notification->title }}
-                                    </div>
-
-                                    <div class="pms-notification-message">
-                                        {{ $notification->message }}
-                                    </div>
-
-                                    <div class="pms-notification-time">
-                                        {{ $notification->created_at?->diffForHumans() }}
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        @empty
-
-                            <div class="pms-notification-empty">
-
-                                <div class="pms-notification-empty-icon">
-                                    <x-heroicon-o-bell-slash class="w-6 h-6" />
-                                </div>
-
-                                <h4>No notifications</h4>
-
-                                <p>
-                                    You're all caught up.
-                                </p>
-
-                            </div>
-
-                        @endforelse
+                        <div class="pms-notification-time">
+                            {{ $notification->created_at?->diffForHumans() }}
+                        </div>
 
                     </div>
 
                 </div>
 
+            @empty
+
+                <div class="pms-notification-empty">
+
+                    <div class="pms-notification-empty-icon">
+
+                        <x-heroicon-o-bell-slash class="w-6 h-6" />
+
+                    </div>
+
+                    <h4>
+                        No notifications
+                    </h4>
+
+                    <p>
+                        You're all caught up.
+                    </p>
+
+                </div>
+
+            @endforelse
+
+        </div>
+
+
+        {{-- Footer --}}
+        @if ($cashierUnreadCount > 0)
+
+            <div class="pms-notification-footer">
+
+                <button
+                    type="button"
+                    onclick="markAllCashierNotificationsRead()"
+                    class="pms-notification-mark-all"
+                >
+                    Mark all as read
+                </button>
+
             </div>
+
+        @endif
+
+    </div>
+
+</div>
+
+
 
 
             {{-- =================================================
@@ -1437,5 +1509,105 @@
         }
 
     </style>
+{{-- =================================================
+    NOTIFICATION JAVASCRIPT
+================================================== --}}
+
+<script>
+
+    function markCashierNotificationRead(notificationId)
+    {
+        fetch(
+            "{{ url('/cashier/notifications') }}/" + notificationId + "/read",
+            {
+                method: 'POST',
+
+                headers: {
+                    'X-CSRF-TOKEN':
+                        document
+                            .querySelector('meta[name="csrf-token"]')
+                            .getAttribute('content'),
+
+                    'Accept': 'application/json',
+
+                    'Content-Type': 'application/json',
+                },
+
+                body: JSON.stringify({})
+            }
+        )
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error('Unable to mark notification as read.');
+            }
+
+            return response.json();
+
+        })
+        .then(() => {
+
+    open = false;
+
+})
+        .catch(error => {
+
+            console.error(
+                'Notification error:',
+                error
+            );
+
+        });
+    }
+
+
+    function markAllCashierNotificationsRead()
+    {
+        fetch(
+            "{{ url('/cashier/notifications/read-all') }}",
+            {
+                method: 'POST',
+
+                headers: {
+                    'X-CSRF-TOKEN':
+                        document
+                            .querySelector('meta[name="csrf-token"]')
+                            .getAttribute('content'),
+
+                    'Accept': 'application/json',
+
+                    'Content-Type': 'application/json',
+                },
+
+                body: JSON.stringify({})
+            }
+        )
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error(
+                    'Unable to mark notifications as read.'
+                );
+            }
+
+            return response.json();
+
+        })
+        .then(() => {
+
+            window.location.reload();
+
+        })
+        .catch(error => {
+
+            console.error(
+                'Notification error:',
+                error
+            );
+
+        });
+    }
+
+</script>
 
 </div>

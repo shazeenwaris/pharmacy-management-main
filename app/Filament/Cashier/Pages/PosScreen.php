@@ -5,13 +5,13 @@ namespace App\Filament\Cashier\Pages;
 use App\Models\Customer;
 use App\Models\HeldSale;
 use App\Models\MedicineBatch;
-use App\Models\MedicineBatchPackaging;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\SalePayment;
 use Carbon\Carbon;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -31,6 +31,7 @@ class PosScreen extends Page
     protected static ?string $slug = 'pos';
 
     protected string $view = 'filament.cashier.pages.pos-screen';
+
 
     /*
     |--------------------------------------------------------------------------
@@ -54,66 +55,236 @@ class PosScreen extends Page
 
     /*
     |--------------------------------------------------------------------------
+    | PRINT RECEIPT STATE
+    |--------------------------------------------------------------------------
+    */
+
+    public ?int $completedSaleId = null;
+
+    public bool $showPrintReceiptPrompt = false;
+
+
+    /*
+    |--------------------------------------------------------------------------
     | VIEW DATA
     |--------------------------------------------------------------------------
     */
 
-   public function getViewData(): array
-{
-    $searchResults = collect();
+    public function getViewData(): array
+    {
+        $searchResults = collect();
 
-    if (trim((string) $this->search) !== '') {
-        $term = trim((string) $this->search);
+        if (trim((string) $this->search) !== '') {
 
-        $searchResults = MedicineBatch::query()
-            ->with([
-                'medicine',
-                'batchPackagings' => function ($query) {
+            $term = trim((string) $this->search);
+
+            $searchResults = MedicineBatch::query()
+                ->with([
+                    'medicine.unit',
+                ])
+                ->where('medicine_batches.status', true)
+                ->where('medicine_batches.quantity', '>', 0)
+
+                /*
+                |--------------------------------------------------------------------------
+                | EXPIRY
+                |--------------------------------------------------------------------------
+                */
+
+                ->where(function (Builder $query) {
+
                     $query
-                        ->where('can_sell', true)
-                        ->with('unit');
-                },
-            ])
-            ->where('medicine_batches.status', true)
-            ->where('medicine_batches.quantity', '>', 0)
-            ->whereNotNull('medicine_batches.expiry_date')
-            ->whereDate(
-                'medicine_batches.expiry_date',
-                '>=',
-                today()
-            )
-            ->where(function ($query) use ($term) {
-                $query
-                    ->whereHas('medicine', function ($medicineQuery) use ($term) {
-                        $medicineQuery->where(function ($q) use ($term) {
+                        ->whereHas(
+                            'medicine',
+                            function (Builder $medicineQuery) {
+                                $medicineQuery->where(
+                                    'has_expiry',
+                                    false
+                                );
+                            }
+                        )
+                        ->orWhere(function (Builder $q) {
                             $q
-                                ->where('name', 'like', "%{$term}%")
-                                ->orWhere('generic_name', 'like', "%{$term}%")
-                                ->orWhere('sku', 'like', "%{$term}%")
-                                ->orWhere('barcode', 'like', "%{$term}%");
+                                ->whereNotNull(
+                                    'medicine_batches.expiry_date'
+                                )
+                                ->whereDate(
+                                    'medicine_batches.expiry_date',
+                                    '>=',
+                                    today()
+                                );
                         });
-                    })
-                    ->orWhere(
-                        'batch_number',
-                        'like',
-                        "%{$term}%"
-                    );
-            })
-            ->orderBy('expiry_date')
-            ->limit(15)
-            ->get();
+                })
+
+                /*
+                |--------------------------------------------------------------------------
+                | SEARCH
+                |--------------------------------------------------------------------------
+                */
+
+                ->where(function (Builder $query) use ($term) {
+
+                    $query
+                        ->whereHas(
+                            'medicine',
+                            function (Builder $medicineQuery) use ($term) {
+
+                                $medicineQuery->where(function (
+                                    Builder $q
+                                ) use ($term) {
+
+                                    $q
+                                        ->where(
+                                            'name',
+                                            'like',
+                                            "%{$term}%"
+                                        )
+                                        ->orWhere(
+                                            'generic_name',
+                                            'like',
+                                            "%{$term}%"
+                                        )
+                                        ->orWhere(
+                                            'sku',
+                                            'like',
+                                            "%{$term}%"
+                                        )
+                                        ->orWhere(
+                                            'barcode',
+                                            'like',
+                                            "%{$term}%"
+                                        );
+                                });
+                            }
+                        )
+                        ->orWhere(
+                            'batch_number',
+                            'like',
+                            "%{$term}%"
+                        );
+                })
+
+                /*
+                |--------------------------------------------------------------------------
+                | FEFO
+                |--------------------------------------------------------------------------
+                */
+
+                ->orderByRaw(
+                    'CASE
+                        WHEN expiry_date IS NULL THEN 1
+                        ELSE 0
+                     END'
+                )
+                ->orderBy('expiry_date')
+                ->orderBy('id')
+                ->limit(15)
+                ->get();
+        }
+
+        return [
+
+            /*
+            |--------------------------------------------------------------------------
+            | CUSTOMERS
+            |--------------------------------------------------------------------------
+            */
+
+            'customers' => Customer::query()
+                ->where('status', true)
+                ->orderBy('name')
+                ->get([
+                    'id',
+                    'name',
+                    'phone',
+                ]),
+
+            /*
+            |--------------------------------------------------------------------------
+            | SEARCH RESULTS
+            |--------------------------------------------------------------------------
+            */
+
+            'searchResults' => $searchResults,
+
+            /*
+            |--------------------------------------------------------------------------
+            | HELD SALES
+            |--------------------------------------------------------------------------
+            */
+
+            'heldSales' => HeldSale::query()
+                ->where('status', 'held')
+                ->where('user_id', auth()->id())
+                ->with('customer')
+                ->latest()
+                ->get(),
+
+            /*
+            |--------------------------------------------------------------------------
+            | TOTALS
+            |--------------------------------------------------------------------------
+            */
+
+            'totals' => $this->calculateTotals(),
+        ];
     }
 
-    return [
-        'customers' => Customer::query()
-            ->where('status', true)
-            ->orderBy('name')
-            ->get([
-                'id',
-                'name',
-                'phone',
-            ]),
 
+    /*
+    |--------------------------------------------------------------------------
+    | APPLY SELLABLE BATCH RULES
+    |--------------------------------------------------------------------------
+    */
+
+    protected function sellableBatchQuery(
+        Builder $query
+    ): Builder {
+
+        return $query
+            ->where('status', true)
+            ->where('quantity', '>', 0)
+
+            ->where(function (Builder $query) {
+
+                /*
+                |--------------------------------------------------------------------------
+                | NON-EXPIRY PRODUCT
+                |--------------------------------------------------------------------------
+                */
+
+                $query
+                    ->whereHas(
+                        'medicine',
+                        function (Builder $medicineQuery) {
+                            $medicineQuery->where(
+                                'has_expiry',
+                                false
+                            );
+                        }
+                    )
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | EXPIRY PRODUCT
+                    |--------------------------------------------------------------------------
+                    */
+
+                    ->orWhere(function (Builder $q) {
+
+                        $q
+                            ->whereNotNull('expiry_date')
+                            ->whereDate(
+                                'expiry_date',
+                                '>=',
+                                today()
+                            );
+                    });
+            });
+    }
+
+
+<<<<<<< HEAD
         'searchResults' => $searchResults,
 // 'heldSales' => HeldSale::query()
 //     ->where('status', 'held')
@@ -129,6 +300,8 @@ class PosScreen extends Page
         'totals' => $this->calculateTotals(),
     ];
 }
+=======
+>>>>>>> 404f8ffa9cd0037be434329645d15733c8b2fee9
     /*
     |--------------------------------------------------------------------------
     | SCAN BARCODE
@@ -143,41 +316,51 @@ class PosScreen extends Page
             return;
         }
 
-        $batch = MedicineBatch::query()
+        $query = MedicineBatch::query()
             ->with([
-                'medicine',
-                'batchPackagings' => function ($query) {
-                    $query
-                        ->where('can_sell', true)
-                        ->with('unit');
-                },
-            ])
-            ->where('status', true)
-            ->where('quantity', '>', 0)
-            ->whereNotNull('expiry_date')
-            ->whereDate(
-                'expiry_date',
-                '>=',
-                today()
-            )
-            ->where(function ($query) use ($term) {
+                'medicine.unit',
+            ]);
+
+        $this->sellableBatchQuery($query);
+
+        $batch = $query
+            ->where(function (Builder $query) use ($term) {
+
                 $query
-                    ->whereHas('medicine', function ($medicineQuery) use ($term) {
-                        $medicineQuery
-                            ->where('barcode', $term)
-                            ->orWhere('sku', $term);
-                    })
+                    ->whereHas(
+                        'medicine',
+                        function (Builder $medicineQuery) use ($term) {
+
+                            $medicineQuery
+                                ->where(
+                                    'barcode',
+                                    $term
+                                )
+                                ->orWhere(
+                                    'sku',
+                                    $term
+                                );
+                        }
+                    )
                     ->orWhere(
                         'batch_number',
                         $term
                     );
             })
+            ->orderByRaw(
+                'CASE
+                    WHEN expiry_date IS NULL THEN 1
+                    ELSE 0
+                 END'
+            )
             ->orderBy('expiry_date')
+            ->orderBy('id')
             ->first();
 
         if (! $batch) {
+
             Notification::make()
-                ->title('Medicine not available')
+                ->title('Product not available')
                 ->body(
                     'No active, non-expired, in-stock batch was found.'
                 )
@@ -187,42 +370,484 @@ class PosScreen extends Page
             return;
         }
 
-        $this->addToCart((int) $batch->id);
+        $this->addToCart(
+            (int) $batch->id
+        );
     }
+
 
     /*
     |--------------------------------------------------------------------------
-    | ADD MEDICINE TO CART
+    | BUILD SALE UNITS
     |--------------------------------------------------------------------------
     */
 
-    public function addToCart(int $batchId): void
-    {
-        $batch = MedicineBatch::query()
-            ->with([
-                'medicine',
-                'batchPackagings' => function ($query) {
-                    $query
-                        ->where('can_sell', true)
-                        ->with('unit');
-                },
-            ])
-            ->where('id', $batchId)
-            ->where('status', true)
-            ->where('quantity', '>', 0)
-            ->whereNotNull('expiry_date')
-            ->whereDate(
-                'expiry_date',
-                '>=',
-                today()
+    protected function buildSaleUnits(
+        MedicineBatch $batch
+    ): array {
+
+        $medicine = $batch->medicine;
+
+        if (! $medicine) {
+            return [];
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | PRODUCT PACKAGING TYPE
+        |--------------------------------------------------------------------------
+        */
+
+        $type = strtolower(
+            trim(
+                (string) (
+                    $medicine->packaging_type
+                    ?? 'single'
+                )
             )
-            ->first();
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | NORMALIZE TYPE
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            in_array(
+                $type,
+                [
+                    'piece',
+                    'unit',
+                    'single',
+                    'tablet',
+                    'bottle',
+                    'item',
+                ],
+                true
+            )
+        ) {
+            $type = 'single';
+        }
+
+        if (
+            in_array(
+                $type,
+                [
+                    'box',
+                    'strip',
+                    'strips',
+                ],
+                true
+            )
+        ) {
+            $type = 'strip';
+        }
+
+        if (
+            in_array(
+                $type,
+                [
+                    'pack',
+                    'package',
+                ],
+                true
+            )
+        ) {
+            $type = 'pack';
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | BATCH VALUES
+        |--------------------------------------------------------------------------
+        */
+
+        $boxesReceived = max(
+            0,
+            (int) (
+                $batch->boxes_received ?? 0
+            )
+        );
+
+        $stripsPerBox = max(
+            1,
+            (int) (
+                $batch->strips_per_box ?? 1
+            )
+        );
+
+        $unitsPerStrip = max(
+            1,
+            (int) (
+                $batch->units_per_strip ?? 1
+            )
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | CURRENT BASE STOCK
+        |--------------------------------------------------------------------------
+        */
+
+        $stock = max(
+            0,
+            (int) (
+                $batch->quantity ?? 0
+            )
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | OUTER PRICE
+        |--------------------------------------------------------------------------
+        */
+
+        $outerPrice = max(
+            0,
+            (float) (
+                $batch->sale_price ?? 0
+            )
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | BASE UNIT NAME
+        |--------------------------------------------------------------------------
+        */
+
+        $baseUnitName = trim(
+            (string) (
+                $medicine->unit?->name
+                ?? 'Piece'
+            )
+        );
+
+        if ($baseUnitName === '') {
+            $baseUnitName = 'Piece';
+        }
+
+        $units = [];
+
+        /*
+        |--------------------------------------------------------------------------
+        | STRIP PRODUCT
+        |--------------------------------------------------------------------------
+        */
+
+        if ($type === 'strip') {
+
+            /*
+            |--------------------------------------------------------------------------
+            | BOX CONVERSION
+            |--------------------------------------------------------------------------
+            */
+
+            $boxConversion =
+                $stripsPerBox *
+                $unitsPerStrip;
+
+            /*
+            |--------------------------------------------------------------------------
+            | AVAILABLE BOXES
+            |--------------------------------------------------------------------------
+            */
+
+            $availableBoxes =
+                $boxConversion > 0
+                    ? (int) floor(
+                        $stock /
+                        $boxConversion
+                    )
+                    : 0;
+
+            if ($availableBoxes > 0) {
+
+                $units[] = [
+
+                    'key' => 'box',
+
+                    'name' => 'Box',
+
+                    'conversion_factor' =>
+                        $boxConversion,
+
+                    'price' =>
+                        round(
+                            $outerPrice,
+                            2
+                        ),
+
+                    'available_quantity' =>
+                        $availableBoxes,
+                ];
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | STRIP PRICE
+            |--------------------------------------------------------------------------
+            */
+
+            $stripPrice =
+                $stripsPerBox > 0
+                    ? $outerPrice /
+                        $stripsPerBox
+                    : $outerPrice;
+
+            /*
+            |--------------------------------------------------------------------------
+            | AVAILABLE STRIPS
+            |--------------------------------------------------------------------------
+            */
+
+            $availableStrips =
+                $unitsPerStrip > 0
+                    ? (int) floor(
+                        $stock /
+                        $unitsPerStrip
+                    )
+                    : 0;
+
+            if ($availableStrips > 0) {
+
+                $units[] = [
+
+                    'key' => 'strip',
+
+                    'name' => 'Strip',
+
+                    'conversion_factor' =>
+                        $unitsPerStrip,
+
+                    'price' =>
+                        round(
+                            $stripPrice,
+                            2
+                        ),
+
+                    'available_quantity' =>
+                        $availableStrips,
+                ];
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | BASE UNIT PRICE
+            |--------------------------------------------------------------------------
+            */
+
+            $basePrice =
+                (
+                    $stripsPerBox > 0 &&
+                    $unitsPerStrip > 0
+                )
+                    ? $outerPrice /
+                        (
+                            $stripsPerBox *
+                            $unitsPerStrip
+                        )
+                    : $outerPrice;
+
+            /*
+            |--------------------------------------------------------------------------
+            | BASE UNIT
+            |--------------------------------------------------------------------------
+            */
+
+            if ($stock > 0) {
+
+                $units[] = [
+
+                    'key' => 'base',
+
+                    'name' =>
+                        $baseUnitName,
+
+                    'conversion_factor' => 1,
+
+                    'price' =>
+                        round(
+                            $basePrice,
+                            2
+                        ),
+
+                    'available_quantity' =>
+                        $stock,
+                ];
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | PACK PRODUCT
+        |--------------------------------------------------------------------------
+        */
+
+        elseif ($type === 'pack') {
+
+            $packConversion =
+                $unitsPerStrip;
+
+            /*
+            |--------------------------------------------------------------------------
+            | AVAILABLE PACKS
+            |--------------------------------------------------------------------------
+            */
+
+            $availablePacks =
+                $packConversion > 0
+                    ? (int) floor(
+                        $stock /
+                        $packConversion
+                    )
+                    : 0;
+
+            /*
+            |--------------------------------------------------------------------------
+            | PACK
+            |--------------------------------------------------------------------------
+            */
+
+            if ($availablePacks > 0) {
+
+                $units[] = [
+
+                    'key' => 'pack',
+
+                    'name' => 'Pack',
+
+                    'conversion_factor' =>
+                        $packConversion,
+
+                    'price' =>
+                        round(
+                            $outerPrice,
+                            2
+                        ),
+
+                    'available_quantity' =>
+                        $availablePacks,
+                ];
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | PIECE
+            |--------------------------------------------------------------------------
+            */
+
+            if ($stock > 0) {
+
+                $piecePrice =
+                    $packConversion > 0
+                        ? $outerPrice /
+                            $packConversion
+                        : $outerPrice;
+
+                $units[] = [
+
+                    'key' => 'base',
+
+                    'name' =>
+                        $baseUnitName,
+
+                    'conversion_factor' => 1,
+
+                    'price' =>
+                        round(
+                            $piecePrice,
+                            2
+                        ),
+
+                    'available_quantity' =>
+                        $stock,
+                ];
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | SINGLE PRODUCT
+        |--------------------------------------------------------------------------
+        */
+
+        else {
+
+            if ($stock > 0) {
+
+                $units[] = [
+
+                    'key' => 'base',
+
+                    'name' =>
+                        $baseUnitName,
+
+                    'conversion_factor' => 1,
+
+                    'price' =>
+                        round(
+                            $outerPrice,
+                            2
+                        ),
+
+                    'available_quantity' =>
+                        $stock,
+                ];
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | FINAL FILTER
+        |--------------------------------------------------------------------------
+        */
+
+        return collect($units)
+            ->filter(function ($unit) {
+
+                return
+                    (float) (
+                        $unit['conversion_factor']
+                        ?? 0
+                    ) > 0
+                    &&
+                    (int) (
+                        $unit['available_quantity']
+                        ?? 0
+                    ) > 0;
+            })
+            ->values()
+            ->all();
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ADD PRODUCT TO CART
+    |--------------------------------------------------------------------------
+    */
+
+    public function addToCart(
+        int $batchId
+    ): void {
+
+        $query = MedicineBatch::query()
+            ->with([
+                'medicine.unit',
+            ])
+            ->where('id', $batchId);
+
+        $this->sellableBatchQuery($query);
+
+        $batch = $query->first();
 
         if (! $batch) {
+
             Notification::make()
-                ->title('Medicine unavailable')
+                ->title('Product unavailable')
                 ->body(
-                    'This batch is expired, inactive, or out of stock.'
+                    'This batch is inactive, expired, or out of stock.'
                 )
                 ->danger()
                 ->send();
@@ -231,37 +856,11 @@ class PosScreen extends Page
         }
 
         if (! $batch->medicine) {
+
             Notification::make()
-                ->title('Medicine not found')
+                ->title('Product not found')
                 ->body(
-                    'The selected batch is not connected to a valid medicine.'
-                )
-                ->danger()
-                ->send();
-
-            return;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | BATCH BASE PRICE
-        |--------------------------------------------------------------------------
-        |
-        | IMPORTANT:
-        |
-        | Only medicine_batches.sale_price is used.
-        |
-        | This is the price of ONE BASE UNIT.
-        |
-        */
-
-        $basePrice = (float) ($batch->sale_price ?? 0);
-
-        if ($basePrice <= 0) {
-            Notification::make()
-                ->title('Invalid sale price')
-                ->body(
-                    'This batch does not have a valid base-unit sale price.'
+                    'This batch is not connected to a valid product.'
                 )
                 ->danger()
                 ->send();
@@ -273,24 +872,17 @@ class PosScreen extends Page
         |--------------------------------------------------------------------------
         | SALE UNITS
         |--------------------------------------------------------------------------
-        |
-        | Units come from medicine_batch_packagings.
-        |
         */
 
-       $packagings = $batch->batchPackagings
-    ->filter(function ($packaging) {
-        return $packaging->can_sell
-            && $packaging->unit
-            && (float) $packaging->conversion_factor > 0;
-    })
-    ->sortBy('sort_order')
-    ->values();
-        if ($packagings->isEmpty()) {
+        $availableUnits =
+            $this->buildSaleUnits($batch);
+
+        if (empty($availableUnits)) {
+
             Notification::make()
-                ->title('Sale units not configured')
+                ->title('Sale units not available')
                 ->body(
-                    'Please configure at least one sellable unit for this batch.'
+                    'This batch does not have a valid packaging configuration.'
                 )
                 ->danger()
                 ->send();
@@ -300,97 +892,12 @@ class PosScreen extends Page
 
         /*
         |--------------------------------------------------------------------------
-        | DEFAULT SALE UNIT
-        |--------------------------------------------------------------------------
-        |
-        | First packaging according to sort_order.
-        |
-        */
-
-        $selectedPackaging = $packagings->first();
-
-        $unitId = (int) $selectedPackaging->unit_id;
-
-        $unitName = trim(
-            (string) $selectedPackaging->unit->name
-        );
-
-        $conversionFactor = (float) $selectedPackaging->conversion_factor;
-
-        if (
-            $unitId <= 0 ||
-            $unitName === '' ||
-            $conversionFactor <= 0
-        ) {
-            Notification::make()
-                ->title('Invalid sale unit')
-                ->body(
-                    'The selected batch has an invalid sale-unit configuration.'
-                )
-                ->danger()
-                ->send();
-
-            return;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | UNIT PRICE
-        |--------------------------------------------------------------------------
-        |
-        | Base price × conversion factor.
-        |
-        | Example:
-        |
-        | Base price = 30
-        | Strip = 10
-        |
-        | Strip price = 30 × 10 = 300
-        |
-        */
-
-        $unitPrice = round(
-            $basePrice * $conversionFactor,
-            2
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | AVAILABLE UNITS FOR CART
+        | DEFAULT UNIT
         |--------------------------------------------------------------------------
         */
 
-        $availableUnits = $packagings
-            ->map(function ($packaging) use ($basePrice) {
-                $conversionFactor =
-                    (float) $packaging->conversion_factor;
-
-                return [
-                    'packaging_id' =>
-                        (int) $packaging->id,
-
-                    'unit_id' =>
-                        (int) $packaging->unit_id,
-
-                    'name' =>
-                        trim((string) $packaging->unit->name),
-
-                    'conversion_factor' =>
-                        $conversionFactor,
-
-                    /*
-                     * Price is ALWAYS calculated
-                     * from batch base price.
-                     */
-                    'price' =>
-                        round(
-                            $basePrice * $conversionFactor,
-                            2
-                        ),
-                ];
-            })
-            ->values()
-            ->all();
+        $selectedUnit =
+            $availableUnits[0];
 
         /*
         |--------------------------------------------------------------------------
@@ -398,43 +905,56 @@ class PosScreen extends Page
         |--------------------------------------------------------------------------
         */
 
-        $key = (string) $batch->id;
+        $key =
+            $batch->id .
+            '_' .
+            $selectedUnit['key'];
 
         /*
         |--------------------------------------------------------------------------
-        | EXISTING CART ITEM
+        | ALREADY IN CART
         |--------------------------------------------------------------------------
         */
 
         if (isset($this->cart[$key])) {
-            $currentQuantity = (int) (
-                $this->cart[$key]['quantity'] ?? 0
-            );
 
-            $conversionFactor = (float) (
-                $this->cart[$key]['conversion_factor'] ?? 1
-            );
+            $currentQuantity =
+                (int) (
+                    $this->cart[$key]['quantity']
+                    ?? 0
+                );
 
-            $stockQuantity = (float) $batch->quantity;
+            $conversionFactor =
+                (float) (
+                    $this->cart[$key]['conversion_factor']
+                    ?? 1
+                );
 
             $newQuantity =
                 $currentQuantity + 1;
 
             $requiredBaseUnits =
-                $newQuantity * $conversionFactor;
+                $newQuantity *
+                $conversionFactor;
 
-            if ($requiredBaseUnits > $stockQuantity) {
-                $availableQuantity = max(
-                    0,
-                    (int) floor(
-                        $stockQuantity / $conversionFactor
-                    )
-                );
+            if (
+                $requiredBaseUnits >
+                (float) $batch->quantity
+            ) {
+
+                $availableQuantity =
+                    max(
+                        0,
+                        (int) floor(
+                            $batch->quantity /
+                            $conversionFactor
+                        )
+                    );
 
                 Notification::make()
                     ->title('Stock limit reached')
                     ->body(
-                        "Only {$availableQuantity} {$this->cart[$key]['sale_unit']} can be sold from this batch."
+                        "Only {$availableQuantity} {$selectedUnit['name']} available."
                     )
                     ->warning()
                     ->send();
@@ -459,14 +979,12 @@ class PosScreen extends Page
         */
 
         $this->cart[$key] = [
+
             'batch_id' =>
                 (int) $batch->id,
 
             'medicine_id' =>
                 (int) $batch->medicine_id,
-
-            'unit_id' =>
-                $unitId,
 
             'name' =>
                 $batch->medicine->name,
@@ -480,60 +998,40 @@ class PosScreen extends Page
             'expiry_date' =>
                 $batch->expiry_date,
 
-            /*
-             * Stock is always stored in BASE units.
-             */
             'stock_quantity' =>
                 (float) $batch->quantity,
 
-            /*
-             * Selected POS unit.
-             */
             'sale_unit' =>
-                $unitName,
+                $selectedUnit['name'],
 
-            /*
-             * Selected packaging ID.
-             */
-            'packaging_id' =>
-                (int) $selectedPackaging->id,
+            'unit_key' =>
+                $selectedUnit['key'],
 
-            /*
-             * Base-unit price from batch.
-             */
-            'base_price' =>
-                $basePrice,
-
-            /*
-             * Conversion factor.
-             */
             'conversion_factor' =>
-                $conversionFactor,
+                (float) $selectedUnit[
+                    'conversion_factor'
+                ],
 
-            /*
-             * Price of ONE selected sale unit.
-             */
             'price' =>
-                $unitPrice,
+                (float) $selectedUnit['price'],
 
-            'quantity' =>
-                1,
+            'base_price' =>
+                (float) $batch->sale_price,
 
-            'discount' =>
-                0,
+            'quantity' => 1,
+
+            'discount' => 0,
 
             'total' =>
-                $unitPrice,
+                (float) $selectedUnit['price'],
 
-            /*
-             * All available units for dropdown.
-             */
             'available_units' =>
                 $availableUnits,
         ];
 
         $this->search = '';
     }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -543,44 +1041,61 @@ class PosScreen extends Page
 
     public function updateSaleUnit(
         string $key,
-        $unitId
+        $unitKey
     ): void {
+
         if (! isset($this->cart[$key])) {
             return;
         }
 
-        $unitId = (int) $unitId;
-
-        if ($unitId <= 0) {
-            return;
-        }
+        $unitKey = (string) $unitKey;
 
         $batchId = (int) (
-            $this->cart[$key]['batch_id'] ?? 0
+            $this->cart[$key]['batch_id']
+            ?? 0
         );
 
         if ($batchId <= 0) {
             return;
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Load exact batch packaging
-        |--------------------------------------------------------------------------
-        */
+        $query = MedicineBatch::query()
+            ->with('medicine.unit')
+            ->where('id', $batchId);
 
-        $packaging = MedicineBatchPackaging::query()
-            ->with('unit')
-            ->where('medicine_batch_id', $batchId)
-            ->where('unit_id', $unitId)
-            ->where('can_sell', true)
-            ->first();
+        $this->sellableBatchQuery($query);
 
-        if (! $packaging || ! $packaging->unit) {
+        $batch = $query->first();
+
+        if (! $batch) {
+
+            Notification::make()
+                ->title('Batch unavailable')
+                ->body(
+                    'The selected batch is no longer available.'
+                )
+                ->danger()
+                ->send();
+
+            return;
+        }
+
+        $availableUnits =
+            $this->buildSaleUnits($batch);
+
+        $selectedUnit =
+            collect($availableUnits)
+                ->firstWhere(
+                    'key',
+                    $unitKey
+                );
+
+        if (! $selectedUnit) {
+
             Notification::make()
                 ->title('Invalid sale unit')
                 ->body(
-                    'The selected unit is not configured for this batch.'
+                    'The selected sale unit is not available.'
                 )
                 ->danger()
                 ->send();
@@ -589,85 +1104,53 @@ class PosScreen extends Page
         }
 
         $conversionFactor =
-            (float) $packaging->conversion_factor;
-
-        if ($conversionFactor <= 0) {
-            Notification::make()
-                ->title('Invalid conversion')
-                ->body(
-                    'The selected unit has an invalid conversion factor.'
-                )
-                ->danger()
-                ->send();
-
-            return;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Get current batch price
-        |--------------------------------------------------------------------------
-        |
-        | Do NOT use packaging.sale_price.
-        |
-        */
-
-        $batch = MedicineBatch::query()
-            ->find($batchId);
-
-        if (! $batch) {
-            return;
-        }
-
-        $basePrice =
-            (float) ($batch->sale_price ?? 0);
-
-        if ($basePrice <= 0) {
-            Notification::make()
-                ->title('Invalid sale price')
-                ->body(
-                    'This batch does not have a valid base-unit sale price.'
-                )
-                ->danger()
-                ->send();
-
-            return;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Check current quantity against new unit
-        |--------------------------------------------------------------------------
-        */
-
-        $currentQuantity = max(
-            1,
-            (int) (
-                $this->cart[$key]['quantity'] ?? 1
-            )
-        );
+            (float) $selectedUnit[
+                'conversion_factor'
+            ];
 
         $stockQuantity =
             (float) $batch->quantity;
 
-        $requiredBaseUnits =
-            $currentQuantity * $conversionFactor;
+        $maxQuantity =
+            (int) floor(
+                $stockQuantity /
+                $conversionFactor
+            );
 
-        if ($requiredBaseUnits > $stockQuantity) {
-            $maxQuantity = max(
+        if ($maxQuantity < 1) {
+
+            Notification::make()
+                ->title('Insufficient stock')
+                ->body(
+                    "No {$selectedUnit['name']} is currently available."
+                )
+                ->warning()
+                ->send();
+
+            return;
+        }
+
+        $currentQuantity =
+            max(
                 1,
-                (int) floor(
-                    $stockQuantity / $conversionFactor
+                (int) (
+                    $this->cart[$key]['quantity']
+                    ?? 1
                 )
             );
 
-            $this->cart[$key]['quantity'] =
+        if ($currentQuantity > $maxQuantity) {
+
+            $currentQuantity =
                 $maxQuantity;
+
+            $this->cart[$key]['quantity'] =
+                $currentQuantity;
 
             Notification::make()
                 ->title('Quantity adjusted')
                 ->body(
-                    "Maximum available quantity for {$packaging->unit->name} is {$maxQuantity}."
+                    "Maximum available quantity is {$maxQuantity} {$selectedUnit['name']}."
                 )
                 ->warning()
                 ->send();
@@ -675,41 +1158,34 @@ class PosScreen extends Page
 
         /*
         |--------------------------------------------------------------------------
-        | Calculate selected unit price
+        | UPDATE CART
         |--------------------------------------------------------------------------
         */
-
-        $unitPrice = round(
-            $basePrice * $conversionFactor,
-            2
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | Update cart
-        |--------------------------------------------------------------------------
-        */
-
-        $this->cart[$key]['unit_id'] =
-            (int) $packaging->unit_id;
-
-        $this->cart[$key]['packaging_id'] =
-            (int) $packaging->id;
 
         $this->cart[$key]['sale_unit'] =
-            trim((string) $packaging->unit->name);
+            $selectedUnit['name'];
+
+        $this->cart[$key]['unit_key'] =
+            $selectedUnit['key'];
 
         $this->cart[$key]['conversion_factor'] =
             $conversionFactor;
 
-        $this->cart[$key]['base_price'] =
-            $basePrice;
-
         $this->cart[$key]['price'] =
-            $unitPrice;
+            (float) $selectedUnit['price'];
+
+        $this->cart[$key]['base_price'] =
+            (float) $batch->sale_price;
+
+        $this->cart[$key]['stock_quantity'] =
+            $stockQuantity;
+
+        $this->cart[$key]['available_units'] =
+            $availableUnits;
 
         $this->updateCartTotal($key);
     }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -717,52 +1193,75 @@ class PosScreen extends Page
     |--------------------------------------------------------------------------
     */
 
-    public function increaseQuantity(string $key): void
-    {
+    public function increaseQuantity(
+        string $key
+    ): void {
+
         if (! isset($this->cart[$key])) {
             return;
         }
 
-        $currentQuantity = (int) (
-            $this->cart[$key]['quantity'] ?? 0
-        );
+        $currentQuantity =
+            (int) (
+                $this->cart[$key]['quantity']
+                ?? 0
+            );
 
-        $conversionFactor = (float) (
-            $this->cart[$key]['conversion_factor'] ?? 1
-        );
+        $conversionFactor =
+            (float) (
+                $this->cart[$key]['conversion_factor']
+                ?? 1
+            );
 
         if ($conversionFactor <= 0) {
             $conversionFactor = 1;
         }
 
-        $stockQuantity = (float) (
-            $this->cart[$key]['stock_quantity'] ?? 0
+        $batchId = (int) (
+            $this->cart[$key]['batch_id']
+            ?? 0
         );
+
+        $batch = MedicineBatch::find(
+            $batchId
+        );
+
+        if (! $batch) {
+
+            Notification::make()
+                ->title('Batch unavailable')
+                ->body(
+                    'The selected batch no longer exists.'
+                )
+                ->danger()
+                ->send();
+
+            return;
+        }
+
+        $stockQuantity =
+            (float) $batch->quantity;
 
         $newQuantity =
             $currentQuantity + 1;
 
-        /*
-        |--------------------------------------------------------------------------
-        | IMPORTANT
-        |--------------------------------------------------------------------------
-        |
-        | Stock is BASE units.
-        |
-        | Required = sale quantity × conversion.
-        |
-        */
-
         $requiredBaseUnits =
-            $newQuantity * $conversionFactor;
+            $newQuantity *
+            $conversionFactor;
 
-        if ($requiredBaseUnits > $stockQuantity) {
-            $availableQuantity = max(
-                0,
-                (int) floor(
-                    $stockQuantity / $conversionFactor
-                )
-            );
+        if (
+            $requiredBaseUnits >
+            $stockQuantity
+        ) {
+
+            $availableQuantity =
+                max(
+                    0,
+                    (int) floor(
+                        $stockQuantity /
+                        $conversionFactor
+                    )
+                );
 
             Notification::make()
                 ->title('Stock limit reached')
@@ -778,8 +1277,12 @@ class PosScreen extends Page
         $this->cart[$key]['quantity'] =
             $newQuantity;
 
+        $this->cart[$key]['stock_quantity'] =
+            $stockQuantity;
+
         $this->updateCartTotal($key);
     }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -787,16 +1290,24 @@ class PosScreen extends Page
     |--------------------------------------------------------------------------
     */
 
-    public function decreaseQuantity(string $key): void
-    {
+    public function decreaseQuantity(
+        string $key
+    ): void {
+
         if (! isset($this->cart[$key])) {
             return;
         }
 
         if (
-            (int) $this->cart[$key]['quantity'] <= 1
+            (int) (
+                $this->cart[$key]['quantity']
+                ?? 0
+            ) <= 1
         ) {
-            unset($this->cart[$key]);
+
+            unset(
+                $this->cart[$key]
+            );
 
             return;
         }
@@ -805,6 +1316,7 @@ class PosScreen extends Page
 
         $this->updateCartTotal($key);
     }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -816,6 +1328,7 @@ class PosScreen extends Page
         string $key,
         $quantity
     ): void {
+
         if (! isset($this->cart[$key])) {
             return;
         }
@@ -826,33 +1339,54 @@ class PosScreen extends Page
             $quantity = 1;
         }
 
-        $stockQuantity = (float) (
-            $this->cart[$key]['stock_quantity'] ?? 0
+        $batchId = (int) (
+            $this->cart[$key]['batch_id']
+            ?? 0
         );
 
-        $conversionFactor = (float) (
-            $this->cart[$key]['conversion_factor'] ?? 1
+        $batch = MedicineBatch::find(
+            $batchId
         );
+
+        if (! $batch) {
+
+            Notification::make()
+                ->title('Batch unavailable')
+                ->body(
+                    'The selected batch no longer exists.'
+                )
+                ->danger()
+                ->send();
+
+            return;
+        }
+
+        $stockQuantity =
+            (float) $batch->quantity;
+
+        $conversionFactor =
+            (float) (
+                $this->cart[$key]['conversion_factor']
+                ?? 1
+            );
 
         if ($conversionFactor <= 0) {
             $conversionFactor = 1;
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Maximum SALE quantity
-        |--------------------------------------------------------------------------
-        */
-
-        $maxQuantity = max(
-            1,
-            (int) floor(
-                $stockQuantity / $conversionFactor
-            )
-        );
+        $maxQuantity =
+            max(
+                1,
+                (int) floor(
+                    $stockQuantity /
+                    $conversionFactor
+                )
+            );
 
         if ($quantity > $maxQuantity) {
-            $quantity = $maxQuantity;
+
+            $quantity =
+                $maxQuantity;
 
             Notification::make()
                 ->title('Stock limit reached')
@@ -866,19 +1400,28 @@ class PosScreen extends Page
         $this->cart[$key]['quantity'] =
             $quantity;
 
+        $this->cart[$key]['stock_quantity'] =
+            $stockQuantity;
+
         $this->updateCartTotal($key);
     }
 
+
     /*
     |--------------------------------------------------------------------------
-    | REMOVE
+    | REMOVE ITEM
     |--------------------------------------------------------------------------
     */
 
-    public function removeFromCart(string $key): void
-    {
-        unset($this->cart[$key]);
+    public function removeFromCart(
+        string $key
+    ): void {
+
+        unset(
+            $this->cart[$key]
+        );
     }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -886,26 +1429,49 @@ class PosScreen extends Page
     |--------------------------------------------------------------------------
     */
 
-    protected function updateCartTotal(string $key): void
-    {
+    protected function updateCartTotal(
+        string $key
+    ): void {
+
         if (! isset($this->cart[$key])) {
             return;
         }
 
-        $quantity = (int) (
-            $this->cart[$key]['quantity'] ?? 0
-        );
+        $quantity =
+            (int) (
+                $this->cart[$key]['quantity']
+                ?? 0
+            );
 
-        $price = (float) (
-            $this->cart[$key]['price'] ?? 0
-        );
+        $price =
+            (float) (
+                $this->cart[$key]['price']
+                ?? 0
+            );
+
+        $itemDiscount =
+            max(
+                0,
+                (float) (
+                    $this->cart[$key]['discount']
+                    ?? 0
+                )
+            );
 
         $this->cart[$key]['total'] =
-            round(
-                $quantity * $price,
-                2
+            max(
+                0,
+                round(
+                    (
+                        $quantity *
+                        $price
+                    ) -
+                    $itemDiscount,
+                    2
+                )
             );
     }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -915,55 +1481,107 @@ class PosScreen extends Page
 
     public function calculateTotals(): array
     {
-        $subtotal = collect($this->cart)
-            ->sum(function ($item) {
-                return (float) (
-                    $item['total'] ?? 0
-                );
-            });
+        $subtotal = collect(
+            $this->cart
+        )->sum(function ($item) {
 
-        $discount = max(
-            0,
-            (float) ($this->discount ?? 0)
-        );
+            return (float) (
+                $item['total'] ?? 0
+            );
+        });
 
-        $tax = max(
-            0,
-            (float) ($this->tax ?? 0)
-        );
+        $discount =
+            max(
+                0,
+                (float) (
+                    $this->discount ?? 0
+                )
+            );
 
-        $grandTotal = max(
-            0,
-            $subtotal -
-            $discount +
-            $tax
-        );
+        $tax =
+            max(
+                0,
+                (float) (
+                    $this->tax ?? 0
+                )
+            );
 
-        $paid = max(
-            0,
-            (float) ($this->paidAmount ?? 0)
-        );
+        $grandTotal =
+            max(
+                0,
+                $subtotal -
+                $discount +
+                $tax
+            );
 
-        $change = max(
-            0,
-            $paid - $grandTotal
-        );
+        $paid =
+            max(
+                0,
+                (float) (
+                    $this->paidAmount ?? 0
+                )
+            );
 
-        $due = max(
-            0,
-            $grandTotal - $paid
-        );
+        $change =
+            max(
+                0,
+                $paid -
+                $grandTotal
+            );
+
+        $due =
+            max(
+                0,
+                $grandTotal -
+                $paid
+            );
 
         return [
-            'subtotal' => $subtotal,
-            'discount' => $discount,
-            'tax' => $tax,
-            'grandTotal' => $grandTotal,
-            'paid' => $paid,
-            'change' => $change,
-            'due' => $due,
+
+            'subtotal' =>
+                round(
+                    $subtotal,
+                    2
+                ),
+
+            'discount' =>
+                round(
+                    $discount,
+                    2
+                ),
+
+            'tax' =>
+                round(
+                    $tax,
+                    2
+                ),
+
+            'grandTotal' =>
+                round(
+                    $grandTotal,
+                    2
+                ),
+
+            'paid' =>
+                round(
+                    $paid,
+                    2
+                ),
+
+            'change' =>
+                round(
+                    $change,
+                    2
+                ),
+
+            'due' =>
+                round(
+                    $due,
+                    2
+                ),
         ];
     }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -972,592 +1590,13 @@ class PosScreen extends Page
     */
 
     public function holdSale(): void
-{
-    /*
-    |--------------------------------------------------------------------------
-    | CART CHECK
-    |--------------------------------------------------------------------------
-    */
+    {
+        if (empty($this->cart)) {
 
-    if (empty($this->cart)) {
-        Notification::make()
-            ->title('Cart is empty')
-            ->body(
-                'Add at least one medicine before holding the sale.'
-            )
-            ->warning()
-            ->send();
-
-        return;
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | CALCULATE TOTALS
-    |--------------------------------------------------------------------------
-    */
-
-    $totals = $this->calculateTotals();
-
-    $grandTotal = max(
-        0,
-        (float) ($totals['grandTotal'] ?? 0)
-    );
-
-    if ($grandTotal <= 0) {
-        Notification::make()
-            ->title('Invalid sale')
-            ->body(
-                'The sale total must be greater than zero.'
-            )
-            ->danger()
-            ->send();
-
-        return;
-    }
-
-    try {
-
-        /*
-        |--------------------------------------------------------------------------
-        | CREATE UNIQUE HOLD NUMBER
-        |--------------------------------------------------------------------------
-        */
-
-        do {
-            $holdNumber =
-                'HOLD-' .
-                now()->format('YmdHis') .
-                '-' .
-                strtoupper(
-                    Str::random(5)
-                );
-
-        } while (
-            HeldSale::where(
-                'hold_number',
-                $holdNumber
-            )->exists()
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | SAVE HELD SALE
-        |--------------------------------------------------------------------------
-        |
-        | IMPORTANT:
-        |
-        | We only save the POS snapshot.
-        |
-        | No Sale is created.
-        | No SaleItem is created.
-        | Therefore stock is NOT deducted.
-        |
-        */
-
-        $heldSale = HeldSale::create([
-            'hold_number' => $holdNumber,
-
-            'user_id' => auth()->id(),
-
-            'customer_id' =>
-                $this->customerId ?: null,
-
-            'cart' => $this->cart,
-
-            'subtotal' =>
-                (float) $totals['subtotal'],
-
-            'discount' =>
-                (float) $totals['discount'],
-
-            'tax' =>
-                (float) $totals['tax'],
-
-            'grand_total' =>
-                $grandTotal,
-
-            'paid_amount' =>
-                max(
-                    0,
-                    (float) ($this->paidAmount ?? 0)
-                ),
-
-            'payment_method' =>
-                $this->paymentMethod ?: 'cash',
-
-            'status' => 'held',
-        ]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | CLEAR CURRENT POS
-        |--------------------------------------------------------------------------
-        */
-
-        $this->cart = [];
-
-        $this->search = '';
-
-        $this->customerId = null;
-
-        $this->discount = 0;
-
-        $this->tax = 0;
-
-        $this->paidAmount = 0;
-
-        $this->paymentMethod = 'cash';
-
-        /*
-        |--------------------------------------------------------------------------
-        | SUCCESS
-        |--------------------------------------------------------------------------
-        */
-
-        Notification::make()
-            ->title('Sale held successfully')
-            ->body(
-                'Hold ' .
-                $heldSale->hold_number .
-                ' has been saved. You can resume it later.'
-            )
-            ->success()
-            ->send();
-
-    } catch (\Throwable $e) {
-
-        report($e);
-
-        Notification::make()
-            ->title('Could not hold sale')
-            ->body(
-                $e->getMessage()
-            )
-            ->danger()
-            ->send();
-    }
-}
-
-public function resumeHeldSale(int $heldSaleId): void
-{
-    /*
-    |--------------------------------------------------------------------------
-    | DO NOT RESUME IF CURRENT CART HAS ITEMS
-    |--------------------------------------------------------------------------
-    */
-
-    if (! empty($this->cart)) {
-        Notification::make()
-            ->title('Current cart is not empty')
-            ->body(
-                'Complete, clear, or hold the current sale before resuming another sale.'
-            )
-            ->warning()
-            ->send();
-
-        return;
-    }
-
-    try {
-
-        $heldSale = HeldSale::query()
-            ->where('id', $heldSaleId)
-            ->where('user_id', auth()->id())
-            ->where('status', 'held')
-            ->first();
-
-        if (! $heldSale) {
             Notification::make()
-                ->title('Held sale not found')
+                ->title('Cart is empty')
                 ->body(
-                    'This held sale is no longer available.'
-                )
-                ->danger()
-                ->send();
-
-            return;
-        }
-
-        $restoredCart = [];
-
-        /*
-        |--------------------------------------------------------------------------
-        | VALIDATE EVERY CART ITEM AGAINST CURRENT STOCK
-        |--------------------------------------------------------------------------
-        */
-
-        foreach ($heldSale->cart as $key => $item) {
-
-            $batchId = (int) (
-                $item['batch_id'] ?? 0
-            );
-
-            $packagingId = (int) (
-                $item['packaging_id'] ?? 0
-            );
-
-            $quantity = (int) (
-                $item['quantity'] ?? 0
-            );
-
-            if (
-                $batchId <= 0 ||
-                $packagingId <= 0 ||
-                $quantity <= 0
-            ) {
-                throw new \RuntimeException(
-                    'Invalid item found in held sale.'
-                );
-            }
-
-            /*
-            |--------------------------------------------------------------------------
-            | CURRENT BATCH
-            |--------------------------------------------------------------------------
-            */
-
-            $batch = MedicineBatch::query()
-                ->with('medicine')
-                ->find($batchId);
-
-            if (! $batch) {
-                throw new \RuntimeException(
-                    'A medicine batch from this held sale no longer exists.'
-                );
-            }
-
-            if (! $batch->medicine) {
-                throw new \RuntimeException(
-                    'A medicine from this held sale no longer exists.'
-                );
-            }
-
-            if (! $batch->status) {
-                throw new \RuntimeException(
-                    'Medicine batch ' .
-                    ($batch->batch_number ?: '#' . $batch->id) .
-                    ' is inactive.'
-                );
-            }
-
-            /*
-            |--------------------------------------------------------------------------
-            | EXPIRY
-            |--------------------------------------------------------------------------
-            */
-
-            if (empty($batch->expiry_date)) {
-                throw new \RuntimeException(
-                    'Medicine batch ' .
-                    ($batch->batch_number ?: '#' . $batch->id) .
-                    ' has no expiry date.'
-                );
-            }
-
-            $expiryDate = Carbon::parse(
-                $batch->expiry_date
-            )->startOfDay();
-
-            if ($expiryDate->lt(today()->startOfDay())) {
-                throw new \RuntimeException(
-                    'Medicine batch ' .
-                    ($batch->batch_number ?: '#' . $batch->id) .
-                    ' has expired.'
-                );
-            }
-
-            /*
-            |--------------------------------------------------------------------------
-            | PACKAGING
-            |--------------------------------------------------------------------------
-            */
-
-            $packaging = MedicineBatchPackaging::query()
-                ->with('unit')
-                ->where('id', $packagingId)
-                ->where(
-                    'medicine_batch_id',
-                    $batch->id
-                )
-                ->where('can_sell', true)
-                ->first();
-
-            if (! $packaging || ! $packaging->unit) {
-                throw new \RuntimeException(
-                    'The selected sale unit is no longer available for ' .
-                    ($batch->batch_number ?: '#' . $batch->id) .
-                    '.'
-                );
-            }
-
-            $conversionFactor =
-                (float) $packaging->conversion_factor;
-
-            if ($conversionFactor <= 0) {
-                throw new \RuntimeException(
-                    'Invalid conversion factor in held sale.'
-                );
-            }
-
-            /*
-            |--------------------------------------------------------------------------
-            | CURRENT STOCK
-            |--------------------------------------------------------------------------
-            */
-
-            $stockQuantity =
-                (float) ($batch->quantity ?? 0);
-
-            $maxQuantity = (int) floor(
-                $stockQuantity /
-                $conversionFactor
-            );
-
-            if ($maxQuantity < 1) {
-                throw new \RuntimeException(
-                    'No stock is currently available for ' .
-                    $batch->medicine->name .
-                    '.'
-                );
-            }
-
-            if ($quantity > $maxQuantity) {
-                throw new \RuntimeException(
-                    $batch->medicine->name .
-                    ' only has ' .
-                    $maxQuantity .
-                    ' ' .
-                    $packaging->unit->name .
-                    ' available now.'
-                );
-            }
-
-            /*
-            |--------------------------------------------------------------------------
-            | CURRENT BASE PRICE
-            |--------------------------------------------------------------------------
-            */
-
-            $basePrice =
-                (float) ($batch->sale_price ?? 0);
-
-            if ($basePrice <= 0) {
-                throw new \RuntimeException(
-                    'Invalid sale price for ' .
-                    $batch->medicine->name .
-                    '.'
-                );
-            }
-
-            $unitPrice = round(
-                $basePrice *
-                $conversionFactor,
-                2
-            );
-
-            /*
-            |--------------------------------------------------------------------------
-            | AVAILABLE SALE UNITS
-            |--------------------------------------------------------------------------
-            */
-
-            $availableUnits =
-                MedicineBatchPackaging::query()
-                    ->with('unit')
-                    ->where(
-                        'medicine_batch_id',
-                        $batch->id
-                    )
-                    ->where('can_sell', true)
-                    ->get()
-                    ->filter(function ($packaging) {
-                        return
-                            $packaging->unit &&
-                            (float) $packaging->conversion_factor > 0;
-                    })
-                    ->sortBy('sort_order')
-                    ->values()
-                    ->map(function ($packaging) use (
-                        $batch,
-                        $stockQuantity
-                    ) {
-                        $conversion =
-                            (float) $packaging->conversion_factor;
-
-                        $availableQuantity =
-                            (int) floor(
-                                $stockQuantity /
-                                $conversion
-                            );
-
-                        return [
-                            'packaging_id' =>
-                                (int) $packaging->id,
-
-                            'unit_id' =>
-                                (int) $packaging->unit_id,
-
-                            'name' =>
-                                trim(
-                                    (string) $packaging->unit->name
-                                ),
-
-                            'conversion_factor' =>
-                                $conversion,
-
-                            'price' =>
-                                round(
-                                    (float) $batch->sale_price *
-                                    $conversion,
-                                    2
-                                ),
-
-                            'available_quantity' =>
-                                $availableQuantity,
-
-                            'available' =>
-                                $availableQuantity > 0,
-                        ];
-                    })
-                    ->toArray();
-
-            /*
-            |--------------------------------------------------------------------------
-            | REBUILD CART ITEM
-            |--------------------------------------------------------------------------
-            */
-
-            $item['batch_id'] =
-                (int) $batch->id;
-
-            $item['medicine_id'] =
-                (int) $batch->medicine_id;
-
-            $item['unit_id'] =
-                (int) $packaging->unit_id;
-
-            $item['name'] =
-                $batch->medicine->name;
-
-            $item['generic_name'] =
-                $batch->medicine->generic_name;
-
-            $item['batch_number'] =
-                $batch->batch_number;
-
-            $item['expiry_date'] =
-                $batch->expiry_date;
-
-            $item['stock_quantity'] =
-                $stockQuantity;
-
-            $item['sale_unit'] =
-                trim(
-                    (string) $packaging->unit->name
-                );
-
-            $item['packaging_id'] =
-                (int) $packaging->id;
-
-            $item['base_price'] =
-                $basePrice;
-
-            $item['conversion_factor'] =
-                $conversionFactor;
-
-            $item['price'] =
-                $unitPrice;
-
-            $item['quantity'] =
-                $quantity;
-
-            $item['total'] =
-                round(
-                    $quantity * $unitPrice,
-                    2
-                );
-
-            $item['available_units'] =
-                $availableUnits;
-
-            $restoredCart[(string) $key] =
-                $item;
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | RESTORE POS DATA
-        |--------------------------------------------------------------------------
-        */
-
-        $this->cart = $restoredCart;
-
-        $this->customerId =
-            $heldSale->customer_id;
-
-        $this->discount =
-            (float) $heldSale->discount;
-
-        $this->tax =
-            (float) $heldSale->tax;
-
-        $this->paidAmount =
-            (float) $heldSale->paid_amount;
-
-        $this->paymentMethod =
-            $heldSale->payment_method ?: 'cash';
-
-        /*
-        |--------------------------------------------------------------------------
-        | DELETE HELD RECORD
-        |--------------------------------------------------------------------------
-        |
-        | Once resumed, it is removed from the active held list.
-        |
-        */
-
-        $heldSale->delete();
-
-        Notification::make()
-            ->title('Sale resumed')
-            ->body(
-                'Hold ' .
-                $heldSale->hold_number .
-                ' has been restored to the POS.'
-            )
-            ->success()
-            ->send();
-
-    } catch (\Throwable $e) {
-
-        report($e);
-
-        Notification::make()
-            ->title('Could not resume sale')
-            ->body(
-                $e->getMessage()
-            )
-            ->danger()
-            ->send();
-    }
-}
-
-public function cancelHeldSale(int $heldSaleId): void
-{
-    try {
-
-        $heldSale = HeldSale::query()
-            ->where('id', $heldSaleId)
-            ->where('user_id', auth()->id())
-            ->where('status', 'held')
-            ->first();
-
-        if (! $heldSale) {
-            Notification::make()
-                ->title('Held sale not found')
-                ->body(
-                    'This held sale is no longer available.'
+                    'Add at least one product before holding the sale.'
                 )
                 ->warning()
                 ->send();
@@ -1565,34 +1604,615 @@ public function cancelHeldSale(int $heldSaleId): void
             return;
         }
 
-        $holdNumber =
-            $heldSale->hold_number;
+        $totals =
+            $this->calculateTotals();
 
-        $heldSale->delete();
+        $grandTotal =
+            max(
+                0,
+                (float) (
+                    $totals['grandTotal']
+                    ?? 0
+                )
+            );
 
-        Notification::make()
-            ->title('Held sale removed')
-            ->body(
-                'Hold ' .
-                $holdNumber .
-                ' has been removed.'
-            )
-            ->success()
-            ->send();
+        if ($grandTotal <= 0) {
 
-    } catch (\Throwable $e) {
+            Notification::make()
+                ->title('Invalid sale')
+                ->body(
+                    'The sale total must be greater than zero.'
+                )
+                ->danger()
+                ->send();
 
-        report($e);
+            return;
+        }
 
-        Notification::make()
-            ->title('Could not remove held sale')
-            ->body(
-                $e->getMessage()
-            )
-            ->danger()
-            ->send();
+        try {
+
+            /*
+            |--------------------------------------------------------------------------
+            | HOLD NUMBER
+            |--------------------------------------------------------------------------
+            */
+
+            do {
+
+                $holdNumber =
+                    'HOLD-' .
+                    now()->format('YmdHis') .
+                    '-' .
+                    strtoupper(
+                        Str::random(5)
+                    );
+
+            } while (
+                HeldSale::where(
+                    'hold_number',
+                    $holdNumber
+                )->exists()
+            );
+
+            /*
+            |--------------------------------------------------------------------------
+            | CREATE HELD SALE
+            |--------------------------------------------------------------------------
+            */
+
+            $heldSale =
+                HeldSale::create([
+
+                    'hold_number' =>
+                        $holdNumber,
+
+                    'user_id' =>
+                        auth()->id(),
+
+                    'customer_id' =>
+                        $this->customerId
+                            ?: null,
+
+                    'cart' =>
+                        $this->cart,
+
+                    'subtotal' =>
+                        (float) (
+                            $totals['subtotal']
+                            ?? 0
+                        ),
+
+                    'discount' =>
+                        (float) (
+                            $totals['discount']
+                            ?? 0
+                        ),
+
+                    'tax' =>
+                        (float) (
+                            $totals['tax']
+                            ?? 0
+                        ),
+
+                    'grand_total' =>
+                        $grandTotal,
+
+                    'paid_amount' =>
+                        max(
+                            0,
+                            (float) (
+                                $this->paidAmount
+                                ?? 0
+                            )
+                        ),
+
+                    'payment_method' =>
+                        $this->paymentMethod
+                            ?: 'cash',
+
+                    'status' =>
+                        'held',
+                ]);
+
+            /*
+            |--------------------------------------------------------------------------
+            | RESET POS
+            |--------------------------------------------------------------------------
+            */
+
+            $this->resetPos();
+
+            Notification::make()
+                ->title('Sale held successfully')
+                ->body(
+                    'Hold ' .
+                    $heldSale->hold_number .
+                    ' has been saved.'
+                )
+                ->success()
+                ->send();
+
+        } catch (\Throwable $e) {
+
+            report($e);
+
+            Notification::make()
+                ->title('Could not hold sale')
+                ->body(
+                    $e->getMessage()
+                )
+                ->danger()
+                ->send();
+        }
     }
-}
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | RESUME HELD SALE
+    |--------------------------------------------------------------------------
+    */
+
+    public function resumeHeldSale(
+        int $heldSaleId
+    ): void {
+
+        if (! empty($this->cart)) {
+
+            Notification::make()
+                ->title('Current cart is not empty')
+                ->body(
+                    'Complete, clear, or hold the current sale before resuming another sale.'
+                )
+                ->warning()
+                ->send();
+
+            return;
+        }
+
+        try {
+
+            $heldSale =
+                HeldSale::query()
+                    ->where(
+                        'id',
+                        $heldSaleId
+                    )
+                    ->where(
+                        'user_id',
+                        auth()->id()
+                    )
+                    ->where(
+                        'status',
+                        'held'
+                    )
+                    ->first();
+
+            if (! $heldSale) {
+
+                Notification::make()
+                    ->title('Held sale not found')
+                    ->body(
+                        'This held sale is no longer available.'
+                    )
+                    ->danger()
+                    ->send();
+
+                return;
+            }
+
+            $restoredCart = [];
+
+            /*
+            |--------------------------------------------------------------------------
+            | VALIDATE EVERY HELD ITEM
+            |--------------------------------------------------------------------------
+            */
+
+            foreach (
+                $heldSale->cart
+                as $key => $item
+            ) {
+
+                $batchId =
+                    (int) (
+                        $item['batch_id']
+                        ?? 0
+                    );
+
+                $quantity =
+                    (int) (
+                        $item['quantity']
+                        ?? 0
+                    );
+
+                $unitKey =
+                    (string) (
+                        $item['unit_key']
+                        ?? 'base'
+                    );
+
+                if (
+                    $batchId <= 0 ||
+                    $quantity <= 0
+                ) {
+
+                    throw new \RuntimeException(
+                        'Invalid item found in held sale.'
+                    );
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | CURRENT BATCH
+                |--------------------------------------------------------------------------
+                */
+
+                $batch =
+                    MedicineBatch::query()
+                        ->with([
+                            'medicine.unit',
+                        ])
+                        ->where(
+                            'id',
+                            $batchId
+                        )
+                        ->first();
+
+                if (! $batch) {
+
+                    throw new \RuntimeException(
+                        'A product batch from this held sale no longer exists.'
+                    );
+                }
+
+                if (! $batch->medicine) {
+
+                    throw new \RuntimeException(
+                        'A product from this held sale no longer exists.'
+                    );
+                }
+
+                if (! $batch->status) {
+
+                    throw new \RuntimeException(
+                        'Batch ' .
+                        (
+                            $batch->batch_number
+                            ?: '#' . $batch->id
+                        ) .
+                        ' is inactive.'
+                    );
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | EXPIRY
+                |--------------------------------------------------------------------------
+                */
+
+                if (
+                    $batch->medicine->has_expiry
+                ) {
+
+                    if (
+                        empty(
+                            $batch->expiry_date
+                        )
+                    ) {
+
+                        throw new \RuntimeException(
+                            'Batch ' .
+                            (
+                                $batch->batch_number
+                                ?: '#' . $batch->id
+                            ) .
+                            ' has no expiry date.'
+                        );
+                    }
+
+                    $expiryDate =
+                        Carbon::parse(
+                            $batch->expiry_date
+                        )->startOfDay();
+
+                    if (
+                        $expiryDate->lt(
+                            today()->startOfDay()
+                        )
+                    ) {
+
+                        throw new \RuntimeException(
+                            'Batch ' .
+                            (
+                                $batch->batch_number
+                                ?: '#' . $batch->id
+                            ) .
+                            ' has expired.'
+                        );
+                    }
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | REBUILD CURRENT SALE UNITS
+                |--------------------------------------------------------------------------
+                */
+
+                $availableUnits =
+                    $this->buildSaleUnits(
+                        $batch
+                    );
+
+                $selectedUnit =
+                    collect(
+                        $availableUnits
+                    )->firstWhere(
+                        'key',
+                        $unitKey
+                    );
+
+                if (! $selectedUnit) {
+
+                    throw new \RuntimeException(
+                        'The selected sale unit is no longer available for ' .
+                        (
+                            $batch->batch_number
+                            ?: '#' . $batch->id
+                        ) .
+                        '.'
+                    );
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | CONVERSION
+                |--------------------------------------------------------------------------
+                */
+
+                $conversionFactor =
+                    (float) (
+                        $selectedUnit[
+                            'conversion_factor'
+                        ]
+                    );
+
+                /*
+                |--------------------------------------------------------------------------
+                | CURRENT STOCK
+                |--------------------------------------------------------------------------
+                */
+
+                $stockQuantity =
+                    (float) (
+                        $batch->quantity
+                        ?? 0
+                    );
+
+                $maxQuantity =
+                    (int) floor(
+                        $stockQuantity /
+                        $conversionFactor
+                    );
+
+                if ($maxQuantity < 1) {
+
+                    throw new \RuntimeException(
+                        'No ' .
+                        $selectedUnit['name'] .
+                        ' is currently available for ' .
+                        $batch->medicine->name .
+                        '.'
+                    );
+                }
+
+                if (
+                    $quantity >
+                    $maxQuantity
+                ) {
+
+                    throw new \RuntimeException(
+                        $batch->medicine->name .
+                        ' only has ' .
+                        $maxQuantity .
+                        ' ' .
+                        $selectedUnit['name'] .
+                        ' available now.'
+                    );
+                }
+
+                /*
+                |--------------------------------------------------------------------------
+                | REBUILD CART ITEM
+                |--------------------------------------------------------------------------
+                */
+
+                $item['batch_id'] =
+                    (int) $batch->id;
+
+                $item['medicine_id'] =
+                    (int) $batch->medicine_id;
+
+                $item['name'] =
+                    $batch->medicine->name;
+
+                $item['generic_name'] =
+                    $batch->medicine->generic_name;
+
+                $item['batch_number'] =
+                    $batch->batch_number;
+
+                $item['expiry_date'] =
+                    $batch->expiry_date;
+
+                $item['stock_quantity'] =
+                    $stockQuantity;
+
+                $item['sale_unit'] =
+                    $selectedUnit['name'];
+
+                $item['unit_key'] =
+                    $selectedUnit['key'];
+
+                $item['base_price'] =
+                    (float) $batch->sale_price;
+
+                $item['conversion_factor'] =
+                    $conversionFactor;
+
+                $item['price'] =
+                    (float) $selectedUnit['price'];
+
+                $item['quantity'] =
+                    $quantity;
+
+                $item['total'] =
+                    round(
+                        $quantity *
+                        (float) $selectedUnit['price'],
+                        2
+                    );
+
+                $item['available_units'] =
+                    $availableUnits;
+
+                $restoredCart[
+                    (string) $key
+                ] = $item;
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | RESTORE POS
+            |--------------------------------------------------------------------------
+            */
+
+            $this->cart =
+                $restoredCart;
+
+            $this->customerId =
+                $heldSale->customer_id;
+
+            $this->discount =
+                (float) $heldSale->discount;
+
+            $this->tax =
+                (float) $heldSale->tax;
+
+            $this->paidAmount =
+                (float) $heldSale->paid_amount;
+
+            $this->paymentMethod =
+                $heldSale->payment_method
+                    ?: 'cash';
+
+            /*
+            |--------------------------------------------------------------------------
+            | REMOVE HELD RECORD
+            |--------------------------------------------------------------------------
+            */
+
+            $holdNumber =
+                $heldSale->hold_number;
+
+            $heldSale->delete();
+
+            Notification::make()
+                ->title('Sale resumed')
+                ->body(
+                    'Hold ' .
+                    $holdNumber .
+                    ' has been restored to the POS.'
+                )
+                ->success()
+                ->send();
+
+        } catch (\Throwable $e) {
+
+            report($e);
+
+            Notification::make()
+                ->title('Could not resume sale')
+                ->body(
+                    $e->getMessage()
+                )
+                ->danger()
+                ->send();
+        }
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CANCEL HELD SALE
+    |--------------------------------------------------------------------------
+    */
+
+    public function cancelHeldSale(
+        int $heldSaleId
+    ): void {
+
+        try {
+
+            $heldSale =
+                HeldSale::query()
+                    ->where(
+                        'id',
+                        $heldSaleId
+                    )
+                    ->where(
+                        'user_id',
+                        auth()->id()
+                    )
+                    ->where(
+                        'status',
+                        'held'
+                    )
+                    ->first();
+
+            if (! $heldSale) {
+
+                Notification::make()
+                    ->title('Held sale not found')
+                    ->body(
+                        'This held sale is no longer available.'
+                    )
+                    ->warning()
+                    ->send();
+
+                return;
+            }
+
+            $holdNumber =
+                $heldSale->hold_number;
+
+            $heldSale->delete();
+
+            Notification::make()
+                ->title('Held sale removed')
+                ->body(
+                    'Hold ' .
+                    $holdNumber .
+                    ' has been removed.'
+                )
+                ->success()
+                ->send();
+
+        } catch (\Throwable $e) {
+
+            report($e);
+
+            Notification::make()
+                ->title('Could not remove held sale')
+                ->body(
+                    $e->getMessage()
+                )
+                ->danger()
+                ->send();
+        }
+    }
+
+
     /*
     |--------------------------------------------------------------------------
     | COMPLETE SALE
@@ -1602,10 +2222,11 @@ public function cancelHeldSale(int $heldSaleId): void
     public function completeSale(): void
     {
         if (empty($this->cart)) {
+
             Notification::make()
                 ->title('Cart is empty')
                 ->body(
-                    'Please add at least one medicine before completing the sale.'
+                    'Please add at least one product before completing the sale.'
                 )
                 ->danger()
                 ->send();
@@ -1613,19 +2234,29 @@ public function cancelHeldSale(int $heldSaleId): void
             return;
         }
 
-        $totals = $this->calculateTotals();
+        $totals =
+            $this->calculateTotals();
 
-        $paidAmount = max(
-            0,
-            (float) ($this->paidAmount ?? 0)
-        );
+        $paidAmount =
+            max(
+                0,
+                (float) (
+                    $this->paidAmount
+                    ?? 0
+                )
+            );
 
-        $grandTotal = max(
-            0,
-            (float) ($totals['grandTotal'] ?? 0)
-        );
+        $grandTotal =
+            max(
+                0,
+                (float) (
+                    $totals['grandTotal']
+                    ?? 0
+                )
+            );
 
         if ($grandTotal <= 0) {
+
             Notification::make()
                 ->title('Invalid sale amount')
                 ->body(
@@ -1637,15 +2268,28 @@ public function cancelHeldSale(int $heldSaleId): void
             return;
         }
 
-        if ($paidAmount < $grandTotal) {
+        /*
+        |--------------------------------------------------------------------------
+        | FULL PAYMENT REQUIRED
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            $paidAmount <
+            $grandTotal
+        ) {
+
             $dueAmount =
-                $grandTotal - $paidAmount;
+                $grandTotal -
+                $paidAmount;
 
             Notification::make()
                 ->title('Insufficient payment')
                 ->body(
                     'Customer still has a due amount of ' .
-                    $this->money($dueAmount)
+                    $this->money(
+                        $dueAmount
+                    )
                 )
                 ->danger()
                 ->send();
@@ -1653,428 +2297,524 @@ public function cancelHeldSale(int $heldSaleId): void
             return;
         }
 
-        $changeAmount = max(
-            0,
-            $paidAmount - $grandTotal
-        );
+        $changeAmount =
+            max(
+                0,
+                $paidAmount -
+                $grandTotal
+            );
 
         try {
-            $sale = DB::transaction(
-                function () use (
-                    $totals,
-                    $paidAmount,
-                    $grandTotal,
-                    $changeAmount
-                ) {
-                    /*
-                    |--------------------------------------------------------------------------
-                    | INVOICE NUMBER
-                    |--------------------------------------------------------------------------
-                    */
 
-                    do {
-                        $invoiceNumber =
-                            'INV-' .
-                            now()->format('YmdHis') .
-                            '-' .
-                            strtoupper(
-                                Str::random(5)
-                            );
-                    } while (
-                        Sale::where(
-                            'invoice_number',
-                            $invoiceNumber
-                        )->exists()
-                    );
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | CREATE SALE
-                    |--------------------------------------------------------------------------
-                    */
-
-                    $sale = Sale::create([
-                        'invoice_number' =>
-                            $invoiceNumber,
-
-                        'customer_id' =>
-                            $this->customerId ?: null,
-
-                        'subtotal' =>
-                            (float) $totals['subtotal'],
-
-                        'discount' =>
-                            (float) $totals['discount'],
-
-                        'tax' =>
-                            (float) $totals['tax'],
-
-                        'grand_total' =>
-                            $grandTotal,
-
-                        'paid_amount' =>
-                            $paidAmount,
-
-                        'change_amount' =>
-                            $changeAmount,
-
-                        'payment_method' =>
-                            $this->paymentMethod ?: 'cash',
-
-                        'created_by' =>
-                            auth()->id(),
-                    ]);
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | SALE ITEMS
-                    |--------------------------------------------------------------------------
-                    */
-
-                    foreach ($this->cart as $item) {
-                        $batchId = (int) (
-                            $item['batch_id'] ?? 0
-                        );
-
-                        $quantity = (int) (
-                            $item['quantity'] ?? 0
-                        );
-
-                        $cartMedicineId = (int) (
-                            $item['medicine_id'] ?? 0
-                        );
-
-                        $packagingId = (int) (
-                            $item['packaging_id'] ?? 0
-                        );
-
-                        if (
-                            $batchId <= 0 ||
-                            $quantity <= 0
-                        ) {
-                            throw new \RuntimeException(
-                                'Invalid medicine batch or quantity.'
-                            );
-                        }
-
-                        if ($cartMedicineId <= 0) {
-                            throw new \RuntimeException(
-                                'Invalid medicine selected for sale.'
-                            );
-                        }
-
-                        if ($packagingId <= 0) {
-                            throw new \RuntimeException(
-                                'No valid sale unit was selected.'
-                            );
-                        }
+            $sale =
+                DB::transaction(
+                    function () use (
+                        $totals,
+                        $paidAmount,
+                        $grandTotal,
+                        $changeAmount
+                    ) {
 
                         /*
                         |--------------------------------------------------------------------------
-                        | LOCK EXACT BATCH
+                        | INVOICE NUMBER
                         |--------------------------------------------------------------------------
                         */
 
-                        $batch = MedicineBatch::query()
-                            ->lockForUpdate()
-                            ->find($batchId);
+                        do {
 
-                        if (! $batch) {
-                            throw new \RuntimeException(
-                                'Medicine batch #' .
-                                $batchId .
-                                ' was not found.'
-                            );
-                        }
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | MEDICINE MATCH
-                        |--------------------------------------------------------------------------
-                        */
-
-                        if (
-                            (int) $batch->medicine_id !==
-                            $cartMedicineId
-                        ) {
-                            throw new \RuntimeException(
-                                'Selected medicine does not belong to batch #' .
-                                $batch->id .
-                                '.'
-                            );
-                        }
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | VERIFY PACKAGING
-                        |--------------------------------------------------------------------------
-                        */
-
-                        $packaging = \App\Models\MedicineBatchPackaging::query()
-                            ->with('unit')
-                            ->where('id', $packagingId)
-                            ->where(
-                                'medicine_batch_id',
-                                $batch->id
-                            )
-                            ->where('can_sell', true)
-                            ->first();
-
-                        if (! $packaging || ! $packaging->unit) {
-                            throw new \RuntimeException(
-                                'The selected sale unit is no longer available for this batch.'
-                            );
-                        }
-
-                        $conversionFactor =
-                            (float) $packaging->conversion_factor;
-
-                        if ($conversionFactor <= 0) {
-                            throw new \RuntimeException(
-                                'Invalid conversion factor for sale unit.'
-                            );
-                        }
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | SALE UNIT
-                        |--------------------------------------------------------------------------
-                        */
-
-                        $realSaleUnit = trim(
-                            (string) $packaging->unit->name
-                        );
-
-                        if ($realSaleUnit === '') {
-                            throw new \RuntimeException(
-                                'The selected sale unit name is invalid.'
-                            );
-                        }
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | STATUS
-                        |--------------------------------------------------------------------------
-                        */
-
-                        if (! $batch->status) {
-                            throw new \RuntimeException(
-                                'The selected medicine batch is inactive.'
-                            );
-                        }
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | EXPIRY
-                        |--------------------------------------------------------------------------
-                        */
-
-                        if (empty($batch->expiry_date)) {
-                            throw new \RuntimeException(
-                                'The selected medicine batch has no expiry date and cannot be sold.'
-                            );
-                        }
-
-                        $expiryDate = Carbon::parse(
-                            $batch->expiry_date
-                        )->startOfDay();
-
-                        $today =
-                            today()->startOfDay();
-
-                        if ($expiryDate->lt($today)) {
-                            throw new \RuntimeException(
-                                'Cannot sell expired medicine. Batch ' .
-                                (
-                                    $batch->batch_number
-                                    ?: '#' . $batch->id
+                            $invoiceNumber =
+                                'INV-' .
+                                now()->format(
+                                    'YmdHis'
                                 ) .
-                                ' expired on ' .
-                                $expiryDate->format('d-m-Y') .
-                                '.'
-                            );
-                        }
+                                '-' .
+                                strtoupper(
+                                    Str::random(5)
+                                );
+
+                        } while (
+                            Sale::where(
+                                'invoice_number',
+                                $invoiceNumber
+                            )->exists()
+                        );
 
                         /*
                         |--------------------------------------------------------------------------
-                        | STOCK
+                        | CREATE SALE
                         |--------------------------------------------------------------------------
-                        |
-                        | IMPORTANT:
-                        |
-                        | Batch stock is stored in BASE units.
-                        |
-                        | Example:
-                        |
-                        | Strip conversion = 10
-                        | Qty = 2
-                        |
-                        | Required base stock = 20
-                        |
                         */
 
-                        $requiredQuantity =
-                            $quantity * $conversionFactor;
+                        $sale =
+                            Sale::create([
 
-                        $availableStock =
-                            (float) ($batch->quantity ?? 0);
+                                'invoice_number' =>
+                                    $invoiceNumber,
 
-                        if (
-                            $availableStock <
-                            $requiredQuantity
+                                'customer_id' =>
+                                    $this->customerId
+                                        ?: null,
+
+                                'subtotal' =>
+                                    (float) (
+                                        $totals[
+                                            'subtotal'
+                                        ] ?? 0
+                                    ),
+
+                                'discount' =>
+                                    (float) (
+                                        $totals[
+                                            'discount'
+                                        ] ?? 0
+                                    ),
+
+                                'tax' =>
+                                    (float) (
+                                        $totals[
+                                            'tax'
+                                        ] ?? 0
+                                    ),
+
+                                'grand_total' =>
+                                    $grandTotal,
+
+                                'paid_amount' =>
+                                    $paidAmount,
+
+                                'change_amount' =>
+                                    $changeAmount,
+
+                                'payment_method' =>
+                                    $this->paymentMethod
+                                        ?: 'cash',
+
+                                'created_by' =>
+                                    auth()->id(),
+                            ]);
+
+                        /*
+                        |--------------------------------------------------------------------------
+                        | SALE ITEMS
+                        |--------------------------------------------------------------------------
+                        */
+
+                        foreach (
+                            $this->cart
+                            as $item
                         ) {
-                            throw new \RuntimeException(
-                                'Insufficient stock for batch ' .
-                                (
-                                    $batch->batch_number
-                                    ?: '#' . $batch->id
-                                ) .
-                                '. Available base stock: ' .
-                                $availableStock .
-                                ', Required base stock: ' .
-                                $requiredQuantity .
-                                '.'
-                            );
+
+                            $batchId =
+                                (int) (
+                                    $item['batch_id']
+                                    ?? 0
+                                );
+
+                            $quantity =
+                                (int) (
+                                    $item['quantity']
+                                    ?? 0
+                                );
+
+                            $cartMedicineId =
+                                (int) (
+                                    $item['medicine_id']
+                                    ?? 0
+                                );
+
+                            $unitKey =
+                                (string) (
+                                    $item['unit_key']
+                                    ?? ''
+                                );
+
+                            if (
+                                $batchId <= 0 ||
+                                $quantity <= 0
+                            ) {
+
+                                throw new \RuntimeException(
+                                    'Invalid product batch or quantity.'
+                                );
+                            }
+
+                            if (
+                                $cartMedicineId <= 0
+                            ) {
+
+                                throw new \RuntimeException(
+                                    'Invalid product selected for sale.'
+                                );
+                            }
+
+                            if (
+                                $unitKey === ''
+                            ) {
+
+                                throw new \RuntimeException(
+                                    'No valid sale unit was selected.'
+                                );
+                            }
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | LOCK EXACT BATCH
+                            |--------------------------------------------------------------------------
+                            */
+
+                            $batch =
+                                MedicineBatch::query()
+                                    ->with([
+                                        'medicine.unit',
+                                    ])
+                                    ->lockForUpdate()
+                                    ->find(
+                                        $batchId
+                                    );
+
+                            if (! $batch) {
+
+                                throw new \RuntimeException(
+                                    'Product batch #' .
+                                    $batchId .
+                                    ' was not found.'
+                                );
+                            }
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | PRODUCT MATCH
+                            |--------------------------------------------------------------------------
+                            */
+
+                            if (
+                                (int) $batch->medicine_id
+                                !==
+                                $cartMedicineId
+                            ) {
+
+                                throw new \RuntimeException(
+                                    'Selected product does not belong to batch #' .
+                                    $batch->id .
+                                    '.'
+                                );
+                            }
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | STATUS
+                            |--------------------------------------------------------------------------
+                            */
+
+                            if (! $batch->status) {
+
+                                throw new \RuntimeException(
+                                    'The selected product batch is inactive.'
+                                );
+                            }
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | EXPIRY
+                            |--------------------------------------------------------------------------
+                            */
+
+                            if (
+                                $batch->medicine
+                                &&
+                                $batch->medicine->has_expiry
+                            ) {
+
+                                if (
+                                    empty(
+                                        $batch->expiry_date
+                                    )
+                                ) {
+
+                                    throw new \RuntimeException(
+                                        'The selected product batch has no expiry date.'
+                                    );
+                                }
+
+                                $expiryDate =
+                                    Carbon::parse(
+                                        $batch->expiry_date
+                                    )->startOfDay();
+
+                                if (
+                                    $expiryDate->lt(
+                                        today()->startOfDay()
+                                    )
+                                ) {
+
+                                    throw new \RuntimeException(
+                                        'Cannot sell expired product. Batch ' .
+                                        (
+                                            $batch->batch_number
+                                            ?: '#' . $batch->id
+                                        ) .
+                                        ' expired on ' .
+                                        $expiryDate->format(
+                                            'd-m-Y'
+                                        ) .
+                                        '.'
+                                    );
+                                }
+                            }
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | REBUILD SALE UNITS
+                            |--------------------------------------------------------------------------
+                            */
+
+                            $availableUnits =
+                                $this->buildSaleUnits(
+                                    $batch
+                                );
+
+                            $selectedUnit =
+                                collect(
+                                    $availableUnits
+                                )->firstWhere(
+                                    'key',
+                                    $unitKey
+                                );
+
+                            if (! $selectedUnit) {
+
+                                throw new \RuntimeException(
+                                    'The selected sale unit is no longer available for ' .
+                                    $batch->medicine->name .
+                                    '.'
+                                );
+                            }
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | CONVERSION FACTOR
+                            |--------------------------------------------------------------------------
+                            */
+
+                            $conversionFactor =
+                                (float) (
+                                    $selectedUnit[
+                                        'conversion_factor'
+                                    ]
+                                );
+
+                            if (
+                                $conversionFactor <= 0
+                            ) {
+
+                                throw new \RuntimeException(
+                                    'Invalid conversion factor for sale unit.'
+                                );
+                            }
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | SALE UNIT NAME
+                            |--------------------------------------------------------------------------
+                            */
+
+                            $saleUnit =
+                                trim(
+                                    (string) (
+                                        $selectedUnit[
+                                            'name'
+                                        ]
+                                    )
+                                );
+
+                            if (
+                                $saleUnit === ''
+                            ) {
+
+                                throw new \RuntimeException(
+                                    'The selected sale unit name is invalid.'
+                                );
+                            }
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | REQUIRED BASE STOCK
+                            |--------------------------------------------------------------------------
+                            */
+
+                            $requiredQuantity =
+                                $quantity *
+                                $conversionFactor;
+
+                            $availableStock =
+                                (float) (
+                                    $batch->quantity
+                                    ?? 0
+                                );
+
+                            if (
+                                $availableStock <
+                                $requiredQuantity
+                            ) {
+
+                                throw new \RuntimeException(
+                                    'Insufficient stock for batch ' .
+                                    (
+                                        $batch->batch_number
+                                        ?: '#' . $batch->id
+                                    ) .
+                                    '. Available base stock: ' .
+                                    $availableStock .
+                                    ', Required base stock: ' .
+                                    $requiredQuantity .
+                                    '.'
+                                );
+                            }
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | PRICE
+                            |--------------------------------------------------------------------------
+                            */
+
+                            $unitPrice =
+                                (float) (
+                                    $selectedUnit[
+                                        'price'
+                                    ]
+                                );
+
+                            if (
+                                $unitPrice <= 0
+                            ) {
+
+                                throw new \RuntimeException(
+                                    'Invalid sale price for ' .
+                                    $batch->medicine->name .
+                                    '.'
+                                );
+                            }
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | ITEM DISCOUNT
+                            |--------------------------------------------------------------------------
+                            */
+
+                            $itemDiscount =
+                                max(
+                                    0,
+                                    (float) (
+                                        $item[
+                                            'discount'
+                                        ] ?? 0
+                                    )
+                                );
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | ITEM TOTAL
+                            |--------------------------------------------------------------------------
+                            */
+
+                            $itemTotal =
+                                max(
+                                    0,
+                                    (
+                                        $unitPrice *
+                                        $quantity
+                                    ) -
+                                    $itemDiscount
+                                );
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | CREATE SALE ITEM
+                            |--------------------------------------------------------------------------
+                            */
+
+                            SaleItem::create([
+
+                                'sale_id' =>
+                                    $sale->id,
+
+                                'medicine_id' =>
+                                    $batch->medicine_id,
+
+                                'medicine_batch_id' =>
+                                    $batch->id,
+
+                                'sale_unit' =>
+                                    $saleUnit,
+
+                                'conversion_factor' =>
+                                    $conversionFactor,
+
+                                'quantity' =>
+                                    $quantity,
+
+                                'unit_price' =>
+                                    $unitPrice,
+
+                                'discount' =>
+                                    $itemDiscount,
+
+                                'total' =>
+                                    $itemTotal,
+                            ]);
+
+                            /*
+                            |--------------------------------------------------------------------------
+                            | IMPORTANT
+                            |--------------------------------------------------------------------------
+                            |
+                            | DO NOT MANUALLY DECREASE STOCK HERE.
+                            |
+                            | SaleItemObserver handles:
+                            |
+                            | quantity × conversion_factor
+                            |
+                            */
                         }
 
                         /*
                         |--------------------------------------------------------------------------
-                        | BASE PRICE
+                        | PAYMENT
                         |--------------------------------------------------------------------------
-                        |
-                        | ONLY batch sale_price is used.
-                        |
                         */
 
-                        $basePrice =
-                            (float) ($batch->sale_price ?? 0);
+                        if ($paidAmount > 0) {
 
-                        if ($basePrice <= 0) {
-                            throw new \RuntimeException(
-                                'Invalid base-unit sale price for batch #' .
-                                $batch->id .
-                                '.'
-                            );
+                            SalePayment::create([
+
+                                'sale_id' =>
+                                    $sale->id,
+
+                                'amount' =>
+                                    $paidAmount,
+
+                                'payment_method' =>
+                                    $this->paymentMethod
+                                        ?: 'cash',
+
+                                'reference_number' =>
+                                    null,
+
+                                'notes' =>
+                                    'POS payment',
+
+                                'received_by' =>
+                                    auth()->id(),
+
+                                'paid_at' =>
+                                    now(),
+                            ]);
                         }
 
-                        /*
-                        |--------------------------------------------------------------------------
-                        | SELECTED UNIT PRICE
-                        |--------------------------------------------------------------------------
-                        */
-
-                        $unitPrice = round(
-                            $basePrice *
-                            $conversionFactor,
-                            2
-                        );
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | ITEM DISCOUNT
-                        |--------------------------------------------------------------------------
-                        */
-
-                        $itemDiscount = max(
-                            0,
-                            (float) (
-                                $item['discount'] ?? 0
-                            )
-                        );
-
-                        $itemTotal = max(
-                            0,
-                            (
-                                $unitPrice *
-                                $quantity
-                            ) -
-                            $itemDiscount
-                        );
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | CREATE SALE ITEM
-                        |--------------------------------------------------------------------------
-                        */
-
-                        SaleItem::create([
-                            'sale_id' =>
-                                $sale->id,
-
-                            'medicine_id' =>
-                                $batch->medicine_id,
-
-                            'medicine_batch_id' =>
-                                $batch->id,
-
-                            'sale_unit' =>
-                                $realSaleUnit,
-
-                            'conversion_factor' =>
-                                $conversionFactor,
-
-                            'quantity' =>
-                                $quantity,
-
-                            'unit_price' =>
-                                $unitPrice,
-
-                            'discount' =>
-                                $itemDiscount,
-
-                            'total' =>
-                                $itemTotal,
-                        ]);
-
-                        /*
-                        |--------------------------------------------------------------------------
-                        | IMPORTANT
-                        |--------------------------------------------------------------------------
-                        |
-                        | Stock is NOT manually decreased here.
-                        |
-                        | SaleItemObserver should deduct:
-                        |
-                        | quantity × conversion_factor
-                        |
-                        */
+                        return $sale;
                     }
-
-                    /*
-                    |--------------------------------------------------------------------------
-                    | PAYMENT
-                    |--------------------------------------------------------------------------
-                    */
-
-                    if ($paidAmount > 0) {
-                        SalePayment::create([
-                            'sale_id' =>
-                                $sale->id,
-
-                            'amount' =>
-                                $paidAmount,
-
-                            'payment_method' =>
-                                $this->paymentMethod
-                                ?: 'cash',
-
-                            'reference_number' =>
-                                null,
-
-                            'notes' =>
-                                'POS payment',
-
-                            'received_by' =>
-                                auth()->id(),
-
-                            'paid_at' =>
-                                now(),
-                        ]);
-                    }
-
-                    return $sale;
-                }
-            );
+                );
 
             /*
             |--------------------------------------------------------------------------
@@ -2082,24 +2822,16 @@ public function cancelHeldSale(int $heldSaleId): void
             |--------------------------------------------------------------------------
             */
 
-            $this->cart = [];
+            $this->resetPos();
 
-            $this->search = '';
-
-            $this->customerId = null;
-
-            $this->discount = 0;
-
-            $this->tax = 0;
-
-            $this->paidAmount = 0;
-
-            $this->paymentMethod = 'cash';
+            /*
+            |--------------------------------------------------------------------------
+            | SUCCESS NOTIFICATION
+            |--------------------------------------------------------------------------
+            */
 
             Notification::make()
-                ->title(
-                    'Sale completed successfully'
-                )
+                ->title('Sale completed successfully')
                 ->body(
                     'Invoice ' .
                     $sale->invoice_number .
@@ -2114,7 +2846,21 @@ public function cancelHeldSale(int $heldSaleId): void
                 )
                 ->success()
                 ->send();
+
+            /*
+            |--------------------------------------------------------------------------
+            | PRINT RECEIPT PROMPT
+            |--------------------------------------------------------------------------
+            */
+
+            $this->completedSaleId =
+                (int) $sale->id;
+
+            $this->showPrintReceiptPrompt =
+                true;
+
         } catch (\Throwable $e) {
+
             report($e);
 
             Notification::make()
@@ -2129,17 +2875,99 @@ public function cancelHeldSale(int $heldSaleId): void
         }
     }
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | OPEN COMPLETED SALE RECEIPT
+    |--------------------------------------------------------------------------
+    */
+
+    public function openCompletedSaleReceipt(): void
+    {
+        if (! $this->completedSaleId) {
+            return;
+        }
+
+        $saleId =
+            $this->completedSaleId;
+
+        $this->showPrintReceiptPrompt =
+            false;
+
+        $this->completedSaleId =
+            null;
+
+        $url =
+            route(
+                'filament.cashier.pages.sale-history',
+                [
+                    'openSale' => $saleId,
+                ]
+            );
+
+        $this->dispatch(
+            'open-completed-receipt',
+            url: $url
+        );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CLOSE PRINT RECEIPT PROMPT
+    |--------------------------------------------------------------------------
+    */
+
+    public function closePrintReceiptPrompt(): void
+    {
+        $this->showPrintReceiptPrompt =
+            false;
+
+        $this->completedSaleId =
+            null;
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | RESET POS
+    |--------------------------------------------------------------------------
+    */
+
+    protected function resetPos(): void
+    {
+        $this->cart = [];
+
+        $this->search = '';
+
+        $this->customerId = null;
+
+        $this->discount = 0;
+
+        $this->tax = 0;
+
+        $this->paidAmount = 0;
+
+        $this->paymentMethod = 'cash';
+    }
+
+
     /*
     |--------------------------------------------------------------------------
     | MONEY
     |--------------------------------------------------------------------------
     */
 
-    protected function money(float $amount): string
-    {
-        $symbol = function_exists('currency_symbol')
-            ? currency_symbol()
-            : '£';
+    protected function money(
+        float $amount
+    ): string {
+
+        $symbol =
+            function_exists(
+                'currency_symbol'
+            )
+                ? currency_symbol()
+                : '£';
 
         return $symbol .
             number_format(

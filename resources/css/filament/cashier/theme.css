@@ -62,10 +62,12 @@
    CASHIER GLOBAL PAGE ALIGNMENT
    ========================================================================== */
 
-.fi-main {
+/* .fi-main {
     width: 100% !important;
     box-sizing: border-box !important;
-}
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+} */
 
 /*
 |--------------------------------------------------------------------------
@@ -73,10 +75,11 @@
 |--------------------------------------------------------------------------
 */
 
-.fi-main-ctn {
+
+/* .fi-main-ctn {
     width: 100% !important;
     box-sizing: border-box !important;
-}
+} */
 
 .fi-page {
     width: 100% !important;
@@ -88,18 +91,43 @@
 | Page Content Spacing
 |--------------------------------------------------------------------------
 */
-
 .fi-page-content {
     width: 100% !important;
     max-width: 100% !important;
 
     padding-left: 24px !important;
     padding-right: 24px !important;
-    padding-top: 24px !important;
-    padding-bottom: 40px !important;
 
     box-sizing: border-box !important;
 }
+
+
+/* ============================================================
+   FINAL FIX - GAP BETWEEN FILAMENT SIDEBAR AND PAGE
+   ============================================================ */
+
+/* .fi-main {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+    box-sizing: border-box !important;
+}
+
+.fi-main>.fi-page {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.fi-main>.fi-page .fi-page-content {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.fi-main:has(.cashier-dashboard) {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+} */
 
 /*
 |--------------------------------------------------------------------------
@@ -447,6 +475,14 @@ TABLE ROWS
    Topbar ke BILKUL NEECHE, right side par
 ========================================================= */
 
+<<<<<<< HEAD
+=======
+/* =========================================================
+   FILAMENT TOAST NOTIFICATIONS
+   Topbar ke BILKUL NEECHE, right side par
+========================================================= */
+
+>>>>>>> 404f8ffa9cd0037be434329645d15733c8b2fee9
 .fi-no {
     position: fixed !important;
 
@@ -479,6 +515,62 @@ TABLE ROWS
 
     pointer-events: auto !important;
 }
+<<<<<<< HEAD
+=======
+
+/* =========================================================
+   MAIN CONTENT SPACING (sidebar / topbar se gap)
+   ========================================================= */
+
+.fi-main-ctn {
+    padding-top: var(--pms-topbar-height, 64px) !important;
+}
+
+.fi-main {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+    padding-top: 20px !important;
+    padding-bottom: 30px !important;
+    box-sizing: border-box !important;
+}
+
+/* Page ke andar ka content dobara padding zero na kare */
+.fi-main>.fi-page,
+.fi-main>.fi-page .fi-page-content,
+.fi-page-main {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+}
+
+/* Cashier dashboard ka apna wrapper */
+.cashier-dashboard {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box !important;
+}
+
+@media (max-width: 1024px) {
+    .fi-main {
+        padding-left: 18px !important;
+        padding-right: 18px !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .fi-main {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+        padding-top: 16px !important;
+    }
+
+    .fi-main-ctn {
+        padding-top: 60px !important;
+    }
+}
+
+>>>>>>> 404f8ffa9cd0037be434329645d15733c8b2fee9
 /* ============================================================
 MOBILE
 ============================================================ */

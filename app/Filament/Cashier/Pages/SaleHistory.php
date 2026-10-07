@@ -35,26 +35,30 @@ class SaleHistory extends Page
 
     public ?int $selectedSaleId = null;
 
-    public bool $showSaleModal = false;
+public bool $showSaleModal = false;
 
-    protected $queryString = [
-        'search' => [
-            'except' => '',
-        ],
-        'dateFrom' => [
-            'except' => '',
-        ],
-        'dateTo' => [
-            'except' => '',
-        ],
-        'paymentStatus' => [
-            'except' => '',
-        ],
-        'paymentMethod' => [
-            'except' => '',
-        ],
-    ];
+public ?int $openSale = null;
 
+protected $queryString = [
+    'search' => [
+        'except' => '',
+    ],
+    'dateFrom' => [
+        'except' => '',
+    ],
+    'dateTo' => [
+        'except' => '',
+    ],
+    'paymentStatus' => [
+        'except' => '',
+    ],
+    'paymentMethod' => [
+        'except' => '',
+    ],
+    'openSale' => [
+        'except' => null,
+    ],
+];
     public function updatingSearch(): void
     {
         $this->resetPage();
@@ -296,7 +300,12 @@ class SaleHistory extends Page
             ->where('created_by', auth()->id())
             ->find($this->selectedSaleId);
     }
-
+public function mount(): void
+{
+    if ($this->openSale) {
+        $this->viewSale($this->openSale);
+    }
+}
     /**
      * Navigation access.
      */

@@ -9,7 +9,8 @@
     $monthProgress = round(($dayOfMonth / $daysInMonth) * 100);
 @endphp
 
-<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: -10px; margin-bottom: 4px;">
+<!-- <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: -10px; margin-bottom: 4px;"> -->
+   <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding: 24px 0 0 0; margin: 0 24px; box-sizing: border-box;">
 
     <div style="display: flex; align-items: center; gap: 10px;">
         <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #00838F;">
@@ -107,8 +108,10 @@
         50% { opacity: 1; }
     }
 </style>
-    <div class="cashier-dashboard">
-
+    <!-- <div class="cashier-dashboard"
+     style="padding: 20px 24px 30px 24px; box-sizing: border-box; width: 100%; max-width: 100%;"> -->
+<div class="cashier-dashboard"
+     style="padding: 14px 24px 30px 24px; box-sizing: border-box; width: 100%; max-width: 100%;">
         {{-- =========================================================
             DASHBOARD HERO
         ========================================================== --}}
@@ -455,7 +458,21 @@
 
                     </a>
 
+<a href="{{ url('/cashier/daily-sales') }}"
+   class="cashier-action">
 
+    <div class="action-icon">
+        📊
+    </div>
+
+    <div class="action-content">
+        <strong>Daily Sales</strong>
+        <span>View daily sales report</span>
+    </div>
+
+    <span class="action-arrow">→</span>
+
+</a>
                     <!-- <a href="{{ url('/cashier/payments') }}"
                        class="cashier-action">
 
