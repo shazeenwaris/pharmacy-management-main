@@ -26,13 +26,7 @@ class HeldSales extends Page implements HasTable
 
     protected string $view = 'filament.pharmacist.pages.held-sales';
 
-//    protected function getHeaderWidgets(): array
-// {
-//     return [
-//         \App\Filament\Pharmacist\Widgets\HeldSalesBanner::class,
-//         \App\Filament\Pharmacist\Widgets\HeldSalesStats::class,
-//     ];
-// }
+
     public function table(Table $table): Table
     {
         return $table
@@ -108,7 +102,7 @@ class HeldSales extends Page implements HasTable
                             </div>
                         ");
                     }),
-
+                       
                 Action::make('resume')
                     ->label('Resume')
                     ->icon(Heroicon::OutlinedPlay)
@@ -129,6 +123,7 @@ class HeldSales extends Page implements HasTable
                             ->send();
                     }),
             ])
+             
             ->defaultSort('created_at', 'desc');
     }
 }

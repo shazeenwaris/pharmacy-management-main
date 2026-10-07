@@ -4,6 +4,9 @@ use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
 
+
+Schedule::command('alerts:generate')->hourly();
+
 Schedule::command('pharmacy:generate-alerts')->daily();
 
 Artisan::command('inspire', function () {

@@ -17,6 +17,9 @@ use App\Observers\SaleItemObserver;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use App\Models\MedicineBatch;
+use App\Observers\MedicineBatchObserver;
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,25 +28,48 @@ class AppServiceProvider extends ServiceProvider
         //
     }
 
+    // public function boot(): void
+    // {
+    //      MedicineBatch::observe(MedicineBatchObserver::class);
+    //     Relation::enforceMorphMap([
+    //         'expense'      => Expense::class,
+    //         'user'         => \App\Models\User::class,
+    //         'medicine'     => Medicine::class,
+    //         'purchase'     => Purchase::class,
+    //         'customer'     => Customer::class,
+    //         'supplier'     => \App\Models\Supplier::class,
+    //         'sale'         => Sale::class,
+    //         'prescription' => Prescription::class,
+    //     ]);
+
+    //     Gate::before(function ($user, $ability) {
+    //         return $user->hasRole('Admin') ? true : null;
+    //     });
+
+    //     PurchaseItem::observe(PurchaseItemObserver::class);
+    //     PurchaseReturn::observe(PurchaseReturnObserver::class);
+    //     SaleItem::observe(SaleItemObserver::class);
+    // }
     public function boot(): void
-    {
-        Relation::enforceMorphMap([
-            'expense'      => Expense::class,
-            'user'         => \App\Models\User::class,
-            'medicine'     => Medicine::class,
-            'purchase'     => Purchase::class,
-            'customer'     => Customer::class,
-            'supplier'     => \App\Models\Supplier::class,
-            'sale'         => Sale::class,
-            'prescription' => Prescription::class,
-        ]);
+{
+    Relation::enforceMorphMap([
+        'expense'      => Expense::class,
+        'user'         => \App\Models\User::class,
+        'medicine'     => Medicine::class,
+        'purchase'     => Purchase::class,
+        'customer'     => Customer::class,
+        'supplier'     => \App\Models\Supplier::class,
+        'sale'         => Sale::class,
+        'prescription' => Prescription::class,
+    ]);
 
-        Gate::before(function ($user, $ability) {
-            return $user->hasRole('Admin') ? true : null;
-        });
+    Gate::before(function ($user, $ability) {
+        return $user->hasRole('Admin') ? true : null;
+    });
 
-        PurchaseItem::observe(PurchaseItemObserver::class);
-        PurchaseReturn::observe(PurchaseReturnObserver::class);
-        SaleItem::observe(SaleItemObserver::class);
-    }
+    PurchaseItem::observe(PurchaseItemObserver::class);
+    PurchaseReturn::observe(PurchaseReturnObserver::class);
+    SaleItem::observe(SaleItemObserver::class);
+    MedicineBatch::observe(MedicineBatchObserver::class);
+}
 }

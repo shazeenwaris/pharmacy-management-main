@@ -727,4 +727,49 @@ html[data-pms-sidebar="collapsed"] .pms-nav-section-label {
     display: none !important;
 }
 </style>
+<script>
+(function () {
+    function syncSidebarActive() {
+        const nav = document.querySelector('.pms-sidebar-nav');
+        if (!nav) return;
+
+        const clean = (p) => (p.replace(/\/+$/, '') || '/');
+        const current = clean(location.pathname);
+
+        const isActive = (href, exact = false) => {
+            if (!href || href.includes('?')) return false;
+            const p = clean(new URL(href, location.origin).pathname);
+            return exact ? current === p : (current === p || current.startsWith(p + '/'));
+        };
+
+        // Top-level links: Dashboard, Suppliers, Alerts, Expiry Tracker...
+        nav.querySelectorAll(':scope > a.pms-nav-item').forEach((a) => {
+            const href = a.getAttribute('href');
+            const exact = clean(new URL(href, location.origin).pathname) === '/admin';
+            a.classList.toggle('pms-nav-item-active', isActive(href, exact));
+        });
+
+        // Dropdown groups: Medicines, Purchases, Reports...
+        nav.querySelectorAll('[data-nav-group]').forEach((group) => {
+            let anyActive = false;
+
+            group.querySelectorAll('.pms-submenu-item').forEach((link) => {
+                const active = isActive(link.getAttribute('href'));
+                link.classList.toggle('pms-submenu-item-active', active);
+                if (active) anyActive = true;
+            });
+
+            const parent = group.querySelector('button.pms-nav-item');
+            if (parent) parent.classList.toggle('pms-supplier-parent-active', anyActive);
+
+            if (anyActive && window.Alpine) {
+                try { Alpine.$data(group).open = true; } catch (e) {}
+            }
+        });
+    }
+
+    document.addEventListener('livewire:navigated', syncSidebarActive);
+    syncSidebarActive();
+})();
+</script>
 @endpersist

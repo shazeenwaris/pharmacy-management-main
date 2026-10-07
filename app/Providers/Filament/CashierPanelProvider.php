@@ -46,7 +46,8 @@ class CashierPanelProvider extends PanelProvider
             | We use the same theme as Admin for now.
             |
             */
-           ->viteTheme('resources/css/filament/cashier/theme.css')
+        //    ->viteTheme('resources/css/filament/cashier/theme.css')
+                ->viteTheme('resources/css/filament/admin/theme.css')
             ->darkMode(false)
 
             /*

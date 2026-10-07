@@ -4,6 +4,7 @@ namespace App\Filament\Pharmacist\Pages;
 
 use App\Models\AppNotification;
 use App\Models\Medicine;
+use App\Models\User;
 use BackedEnum;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
@@ -11,6 +12,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class LowStockAlerts extends Page implements HasTable
 {
@@ -40,6 +42,18 @@ class LowStockAlerts extends Page implements HasTable
 
     public int $totalMedicines = 0;
 
+    /*
+    |--------------------------------------------------------------------------
+    | Current User's Notifications Only
+    |--------------------------------------------------------------------------
+    */
+
+    protected function baseQuery(): Builder
+    {
+        return AppNotification::query()
+            ->where('notifiable_type', User::class)
+            ->where('notifiable_id', auth()->id());
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -49,18 +63,18 @@ class LowStockAlerts extends Page implements HasTable
 
     public function mount(): void
     {
-        $this->lowStockItems = AppNotification::query()
-            ->where('type', 'low_stock')
+        // Low stock + out of stock dono
+        $this->lowStockItems = $this->baseQuery()
+            ->whereIn('data->type', ['low_stock', 'out_of_stock'])
             ->count();
 
-        $this->criticalItems = AppNotification::query()
-            ->where('type', 'low_stock')
-            ->where('level', 'danger')
+        // Critical = stock bilkul khatam
+        $this->criticalItems = $this->baseQuery()
+            ->where('data->type', 'out_of_stock')
             ->count();
 
         $this->totalMedicines = Medicine::query()->count();
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -72,8 +86,8 @@ class LowStockAlerts extends Page implements HasTable
     {
         return $table
             ->query(
-                AppNotification::query()
-                    ->where('type', 'low_stock')
+                $this->baseQuery()
+                    ->whereIn('data->type', ['low_stock', 'out_of_stock'])
             )
 
             ->columns([
@@ -89,6 +103,16 @@ class LowStockAlerts extends Page implements HasTable
                 TextColumn::make('level')
                     ->label('Level')
                     ->badge()
+                    ->getStateUsing(
+                        fn ($record): string => $record->notification_type === 'out_of_stock'
+                            ? 'danger'
+                            : 'warning'
+                    )
+                    ->formatStateUsing(
+                        fn (string $state): string => $state === 'danger'
+                            ? 'Critical'
+                            : 'Low'
+                    )
                     ->color(
                         fn (string $state): string => match ($state) {
                             'danger' => 'danger',

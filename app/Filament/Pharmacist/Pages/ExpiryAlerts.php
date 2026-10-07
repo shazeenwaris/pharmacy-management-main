@@ -3,6 +3,7 @@
 namespace App\Filament\Pharmacist\Pages;
 
 use App\Models\AppNotification;
+use App\Models\User;
 use BackedEnum;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
@@ -10,6 +11,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ExpiryAlerts extends Page implements HasTable
 {
@@ -27,7 +29,6 @@ class ExpiryAlerts extends Page implements HasTable
     protected string $view =
         'filament.pharmacist.pages.expiry-alerts';
 
-
     /*
     |--------------------------------------------------------------------------
     | Overview Stats
@@ -40,6 +41,19 @@ class ExpiryAlerts extends Page implements HasTable
 
     public int $warningExpiry = 0;
 
+    /*
+    |--------------------------------------------------------------------------
+    | Current User's Expiry Notifications Only
+    |--------------------------------------------------------------------------
+    */
+
+    protected function baseQuery(): Builder
+    {
+        return AppNotification::query()
+            ->where('notifiable_type', User::class)
+            ->where('notifiable_id', auth()->id())
+            ->where('data->type', 'expiry');
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -49,21 +63,19 @@ class ExpiryAlerts extends Page implements HasTable
 
     public function mount(): void
     {
-        $this->expiringSoon = AppNotification::query()
-            ->where('type', 'expiry')
+        // All expiry alerts (expired + expiring soon)
+        $this->expiringSoon = $this->baseQuery()->count();
+
+        // Critical = already expired
+        $this->criticalExpiry = $this->baseQuery()
+            ->where('data->alert_key', 'like', 'expired:%')
             ->count();
 
-        $this->criticalExpiry = AppNotification::query()
-            ->where('type', 'expiry')
-            ->where('level', 'danger')
-            ->count();
-
-        $this->warningExpiry = AppNotification::query()
-            ->where('type', 'expiry')
-            ->where('level', 'warning')
+        // Warning = expiring soon
+        $this->warningExpiry = $this->baseQuery()
+            ->where('data->alert_key', 'like', 'expiring:%')
             ->count();
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -74,10 +86,7 @@ class ExpiryAlerts extends Page implements HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->query(
-                AppNotification::query()
-                    ->where('type', 'expiry')
-            )
+            ->query($this->baseQuery())
 
             ->columns([
 
@@ -92,6 +101,16 @@ class ExpiryAlerts extends Page implements HasTable
                 TextColumn::make('level')
                     ->label('Level')
                     ->badge()
+                    ->getStateUsing(
+                        fn ($record): string => str_starts_with($record->data['alert_key'] ?? '', 'expired:')
+                            ? 'danger'
+                            : 'warning'
+                    )
+                    ->formatStateUsing(
+                        fn (string $state): string => $state === 'danger'
+                            ? 'Expired'
+                            : 'Expiring Soon'
+                    )
                     ->color(
                         fn (string $state): string => match ($state) {
                             'danger' => 'danger',

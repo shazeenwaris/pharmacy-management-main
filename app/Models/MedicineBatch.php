@@ -59,4 +59,8 @@ class MedicineBatch extends Model
         'medicine_batch_id'
     )->orderBy('sort_order');
 }
+public function purchaseItem(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+{
+    return $this->belongsTo(\App\Models\PurchaseItem::class);
+}
 }

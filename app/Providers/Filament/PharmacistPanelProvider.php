@@ -2,12 +2,11 @@
 
 namespace App\Providers\Filament;
 
-use App\Models\PharmacySetting;
+use App\Filament\Resources\AppNotifications\AppNotificationResource;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -27,34 +26,30 @@ class PharmacistPanelProvider extends PanelProvider
             ->id('pharmacist')
             ->path('pharmacist')
             ->login()
+            ->globalSearch(\App\Filament\Pharmacist\Support\PharmacistGlobalSearch::class)
             ->viteTheme('resources/css/filament/admin/theme.css')
-->renderHook(
-    PanelsRenderHook::BODY_START,
-    fn (): string => request()->is('pharmacist/login')
-        ? ''
-        : view('filament.custom-navbar')->render(),
-)
-->renderHook(
-    PanelsRenderHook::SIDEBAR_START,
-    fn (): string => view('filament.pharmacist-sidebar')->render(),
-)
-->colors([
+            ->renderHook(
+                PanelsRenderHook::BODY_START,
+                fn (): string => request()->is('pharmacist/login')
+                    ? ''
+                    : view('filament.custom-navbar')->render(),
+            )
+            ->renderHook(
+                PanelsRenderHook::SIDEBAR_START,
+                fn (): string => view('filament.pharmacist-sidebar')->render(),
+            )
+            ->colors([
                 'primary' => Color::hex('#00838F'),
             ])
             ->discoverResources(in: app_path('Filament/Pharmacist/Resources'), for: 'App\Filament\Pharmacist\Resources')
-->discoverPages(in: app_path('Filament/Pharmacist/Pages'), for: 'App\Filament\Pharmacist\Pages')
-->pages([
-    \App\Filament\Pharmacist\Pages\Dashboard::class,
-])
-->widgets([])
-// ->pages([
-//     Dashboard::class,
-// ])
-// ->widgets([
-//     \App\Filament\Pharmacist\Widgets\TodaySalesWidget::class,
-//     \App\Filament\Pharmacist\Widgets\StockAlertsWidget::class,
-// ])
-            
+            ->resources([
+                AppNotificationResource::class,
+            ])
+            ->discoverPages(in: app_path('Filament/Pharmacist/Pages'), for: 'App\Filament\Pharmacist\Pages')
+            ->pages([
+                \App\Filament\Pharmacist\Pages\Dashboard::class,
+            ])
+            ->widgets([])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

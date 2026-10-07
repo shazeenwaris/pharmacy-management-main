@@ -53,10 +53,14 @@ class User extends Authenticatable implements FilamentUser
         return $this->avatar ? Storage::url($this->avatar) : null;
     }
 
-    public function canAccessPanel(Panel $panel): bool
+        public function canAccessPanel(Panel $panel): bool
     {
         if ($panel->getId() === 'admin') {
             return $this->hasRole('Admin');
+        }
+
+        if ($panel->getId() === 'cashier') {
+            return $this->hasAnyRole(['Cashier', 'Admin']);
         }
 
         if ($panel->getId() === 'pharmacist') {
@@ -65,4 +69,17 @@ class User extends Authenticatable implements FilamentUser
 
         return false;
     }
+    // public function canAccessPanel(Panel $panel): bool
+    // {
+    //     if ($panel->getId() === 'admin') {
+    //         return $this->hasRole('Admin');
+    //     }
+
+    //     if ($panel->getId() === 'pharmacist') {
+    //         return $this->hasAnyRole(['Pharmacist', 'Cashier', 'Inventory Manager', 'Admin']);
+    //     }
+
+    //     return false;
+    // }
+    
 }

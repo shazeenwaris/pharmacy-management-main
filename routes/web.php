@@ -1,10 +1,9 @@
 <?php
-use App\Livewire\PosScreen;
 use App\Models\Sale;
-
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Cashier\SaleController;
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -69,5 +68,4 @@ Route::middleware(['auth'])
         Route::post('/sales', [SaleController::class, 'store'])
             ->name('sales.store');
 
-        
     });

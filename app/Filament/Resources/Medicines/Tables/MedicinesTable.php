@@ -38,12 +38,33 @@ class MedicinesTable
                     ->weight('semibold')
                     ->description(fn ($record) => $record->generic_name),
 
+                TextColumn::make('sku')
+                    ->label('SKU')
+                    ->badge()
+                    ->color('gray')
+                    ->searchable()
+                    ->sortable(),
+
                 TextColumn::make('product_type')
                     ->label('Type')
                     ->badge()
-                    ->color('gray')
+                    ->color('info')
                     ->formatStateUsing(fn ($state) => MedicineResource::productTypes()[$state] ?? $state)
                     ->toggleable(),
+
+                TextColumn::make('packaging_type')
+                    ->label('Packaging')
+                    ->badge()
+                    ->color(fn ($state) => match ($state) {
+                        'pack' => 'warning',
+                        'single' => 'info',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn ($state) => match ($state) {
+                        'pack' => 'Pack',
+                        'single' => 'Single',
+                        default => 'Strip',
+                    }),
 
                 TextColumn::make('brand_name')
                     ->label('Brand')
@@ -86,6 +107,31 @@ class MedicinesTable
                     ->label('Unit')
                     ->toggleable(isToggledHiddenByDefault: true),
 
+                TextColumn::make('strips_per_box')
+                    ->label('Strips / Box')
+                    ->formatStateUsing(fn ($state, $record) => $record->packaging_type === 'strip'
+                        ? number_format((int) $state)
+                        : '—')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('units_per_strip')
+                    ->label('Per Box')
+                    ->formatStateUsing(function ($state, $record) {
+                        $count = (int) $state;
+
+                        return match ($record->packaging_type) {
+                            'pack' => number_format($count) . ' Piece' . ($count === 1 ? '' : 's'),
+                            'single' => '—',
+                            default => number_format($count) . ' Tablet' . ($count === 1 ? '' : 's'),
+                        };
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('sale_price')
+                    ->label('Sale Price')
+                    ->formatStateUsing(fn ($state) => format_currency($state))
+                    ->sortable(),
+
                 TextColumn::make('current_stock')
                     ->label('Stock')
                     ->state(fn ($record) => $record->batches()->sum('quantity'))
@@ -117,6 +163,10 @@ class MedicinesTable
                 SelectFilter::make('product_type')
                     ->label('Product Type')
                     ->options(fn () => MedicineResource::productTypes()),
+
+                SelectFilter::make('packaging_type')
+                    ->label('Packaging')
+                    ->options(fn () => MedicineResource::packagingTypes()),
 
                 SelectFilter::make('category_id')
                     ->label('Category')

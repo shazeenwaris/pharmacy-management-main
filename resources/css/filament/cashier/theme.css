@@ -442,7 +442,43 @@ TABLE ROWS
 .fi-resource-list-records-page .fi-ta-row td {
     border-color: #edf4f5 !important;
 }
+/* =========================================================
+   FILAMENT TOAST NOTIFICATIONS
+   Topbar ke BILKUL NEECHE, right side par
+========================================================= */
 
+.fi-no {
+    position: fixed !important;
+
+    top: calc(var(--pms-topbar-height) + 12px) !important;
+    right: 24px !important;
+    bottom: auto !important;
+    left: auto !important;
+
+    width: 400px !important;
+    max-width: calc(100vw - 24px) !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 12px !important;
+
+    /* topbar (9999) aur dropdowns (99999) dono se upar */
+    z-index: 100000 !important;
+
+    pointer-events: none !important;
+}
+
+.fi-no .fi-no-notification {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+
+    pointer-events: auto !important;
+}
 /* ============================================================
 MOBILE
 ============================================================ */

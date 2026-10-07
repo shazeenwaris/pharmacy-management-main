@@ -115,9 +115,14 @@ class PosScreen extends Page
             ]),
 
         'searchResults' => $searchResults,
+// 'heldSales' => HeldSale::query()
+//     ->where('status', 'held')
+//     ->where('user_id', auth()->id())
+//     ->with('customer')
+//     ->latest()
+//     ->get(),
 'heldSales' => HeldSale::query()
-    ->where('status', 'held')
-    ->where('user_id', auth()->id())
+    ->where('held_by', auth()->id())
     ->with('customer')
     ->latest()
     ->get(),

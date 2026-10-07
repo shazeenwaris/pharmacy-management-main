@@ -21,6 +21,9 @@ class Medicine extends Model
         'prescription_required', 'status', 'description', 'notes','product_type',
     'packaging_type',
     'has_expiry',
+    'strips_per_box',
+    'units_per_strip',
+    'sale_price',
     ];
 
     protected $casts = [

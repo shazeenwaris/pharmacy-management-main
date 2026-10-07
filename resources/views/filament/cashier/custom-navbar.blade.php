@@ -434,7 +434,46 @@
            MAIN TOPBAR
         ========================================================== */
 
-        .pms-topbar {
+        /* .pms-topbar {
+            position: fixed !important;
+
+            top: 0 !important;
+            right: 0 !important;
+
+            left: var(--pms-sidebar-expanded) !important;
+
+            width: calc(
+                100% - var(--pms-sidebar-expanded)
+            ) !important;
+
+            height: var(--pms-topbar-height) !important;
+            min-height: var(--pms-topbar-height) !important;
+
+            margin: 0 !important;
+            padding: 0 18px !important;
+
+            display: grid !important;
+
+            grid-template-columns:
+                minmax(0, 1fr)
+                auto
+                auto !important;
+
+            align-items: center !important;
+
+            background: #ffffff !important;
+
+            border-bottom: 1px solid var(--pms-border) !important;
+
+            box-sizing: border-box !important;
+
+            z-index: 9999 !important;
+
+            transition:
+                left 0.2s ease,
+                width 0.2s ease !important;
+        } */
+                .pms-topbar {
             position: fixed !important;
 
             top: 0 !important;
@@ -470,7 +509,7 @@
 
             box-sizing: border-box !important;
 
-            z-index: 9999 !important;
+           z-index: 40 !important;
 
             transition:
                 left 0.2s ease,

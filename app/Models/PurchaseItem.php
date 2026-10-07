@@ -10,6 +10,7 @@ class PurchaseItem extends Model
     protected $fillable = [
         'purchase_id', 'medicine_id', 'batch_number',
         'expiry_date', 'manufacturing_date', 'quantity',
+        'boxes_received', 'strips_per_box', 'units_per_strip',
         'purchase_price', 'sale_price', 'discount_percent',
         'tax_percent', 'total_amount',
     ];
@@ -33,4 +34,8 @@ class PurchaseItem extends Model
     {
         return $this->belongsTo(Medicine::class);
     }
+    public function medicineBatch(): \Illuminate\Database\Eloquent\Relations\HasOne
+{
+    return $this->hasOne(\App\Models\MedicineBatch::class);
+}
 }

@@ -2,22 +2,25 @@
 
 namespace App\Filament\Resources\Purchases;
 
-use App\Filament\Resources\Purchases\Pages\ListPurchases;
 use App\Filament\Resources\Purchases\Pages\CreatePurchase;
 use App\Filament\Resources\Purchases\Pages\EditPurchase;
+use App\Filament\Resources\Purchases\Pages\ListPurchases;
 use App\Models\Purchase;
 use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -26,9 +29,6 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
-use Filament\Actions\Action;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\ViewAction;
 
 class PurchaseResource extends Resource
 {
@@ -62,19 +62,37 @@ class PurchaseResource extends Resource
         return auth()->user()?->can('manage purchases') ?? false;
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Calculations
+    |--------------------------------------------------------------------------
+    */
+
+    protected static function calculateQuantity(callable $get): int
+    {
+        // Quantity = boxes received (strips/tablets are no longer used)
+        return (int) ($get('boxes_received') ?? 0);
+    }
+
     protected static function calculateLineTotal(callable $get): float
     {
-        $qty = (float) ($get('quantity') ?? 0);
+        $boxes = (float) ($get('boxes_received') ?? 0);
         $price = (float) ($get('purchase_price') ?? 0);
         $discount = (float) ($get('discount_percent') ?? 0);
         $tax = (float) ($get('tax_percent') ?? 0);
 
-        $lineSubtotal = $qty * $price;
+        $lineSubtotal = $boxes * $price;
         $lineDiscount = $lineSubtotal * ($discount / 100);
         $lineTax = ($lineSubtotal - $lineDiscount) * ($tax / 100);
 
         return round($lineSubtotal - $lineDiscount + $lineTax, 2);
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Form
+    |--------------------------------------------------------------------------
+    */
 
     public static function form(Schema $schema): Schema
     {
@@ -111,7 +129,13 @@ class PurchaseResource extends Resource
                             ->relationship('items')
                             ->label('')
                             ->addActionLabel('Add Item')
-                            ->itemLabel(fn (array $state): ?string => $state['batch_number'] ?? null)
+                            ->itemLabel(function (array $state) {
+                                if (blank($state['medicine_id'] ?? null)) {
+                                    return null;
+                                }
+
+                                return \App\Models\Medicine::find($state['medicine_id'])?->name;
+                            })
                             ->collapsible()
                             ->live()
                             ->afterStateUpdated(function ($state, callable $set) {
@@ -119,12 +143,12 @@ class PurchaseResource extends Resource
                                 $grandTotal = 0;
 
                                 foreach ((array) $state as $item) {
-                                    $qty = (float) ($item['quantity'] ?? 0);
+                                    $boxes = (float) ($item['boxes_received'] ?? 0);
                                     $price = (float) ($item['purchase_price'] ?? 0);
                                     $discount = (float) ($item['discount_percent'] ?? 0);
                                     $tax = (float) ($item['tax_percent'] ?? 0);
 
-                                    $lineSubtotal = $qty * $price;
+                                    $lineSubtotal = $boxes * $price;
                                     $lineDiscount = $lineSubtotal * ($discount / 100);
                                     $lineTax = ($lineSubtotal - $lineDiscount) * ($tax / 100);
 
@@ -138,6 +162,7 @@ class PurchaseResource extends Resource
                             ->schema([
                                 Grid::make(4)
                                     ->schema([
+                                        // Row 1
                                         Select::make('medicine_id')
                                             ->label('Medicine')
                                             ->relationship('medicine', 'name')
@@ -145,7 +170,8 @@ class PurchaseResource extends Resource
                                             ->preload()
                                             ->required()
                                             ->live()
-                                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                            ->columnSpan(2)
+                                            ->afterStateUpdated(function ($state, callable $set) {
                                                 if (blank($state)) {
                                                     return;
                                                 }
@@ -156,120 +182,33 @@ class PurchaseResource extends Resource
                                                     return;
                                                 }
 
-                                                // Find which batch numbers (for this medicine) are already
-                                                // used by OTHER items in this same purchase, so we don't
-                                                // suggest the same batch twice.
-                                                $allItems = $get('../../items') ?? [];
-
-                                                $usedBatchNumbers = collect($allItems)
-                                                    ->filter(fn ($item) => ($item['medicine_id'] ?? null) == $state)
-                                                    ->pluck('batch_number')
-                                                    ->filter()
-                                                    ->values()
-                                                    ->all();
-
-                                                // FEFO: pick the soonest-expiring valid batch that hasn't
-                                                // already been used elsewhere in this purchase.
-                                                $validBatch = \App\Models\MedicineBatch::where('medicine_id', $state)
-                                                    ->where('expiry_date', '>', now())
-                                                    ->when(! empty($usedBatchNumbers), fn ($q) => $q->whereNotIn('batch_number', $usedBatchNumbers))
-                                                    ->orderBy('expiry_date')
-                                                    ->first();
-
-                                                if ($validBatch) {
-                                                    $set('batch_number', $validBatch->batch_number);
-                                                    $set('purchase_price', $validBatch->purchase_price);
-                                                    $set('sale_price', $validBatch->sale_price);
-                                                    $set('manufacturing_date', now()->format('Y-m-d'));
-                                                    $set('expiry_date', $validBatch->expiry_date->format('Y-m-d'));
-                                                    $set('quantity', $validBatch->quantity ?? 1);
-
-                                                    $subtotal = ($validBatch->quantity ?? 1) * $validBatch->purchase_price;
-                                                    $set('total_amount', round($subtotal, 2));
-
-                                                    return;
-                                                }
-
-                                                // No unused valid batch left. Figure out why, for a
-                                                // more helpful message.
-                                                $hasAnyBatch = \App\Models\MedicineBatch::where('medicine_id', $state)->exists();
-
-                                                if (! empty($usedBatchNumbers)) {
-                                                    \Filament\Notifications\Notification::make()
-                                                        ->title('New batch required')
-                                                        ->body("All existing valid batches of {$medicine->name} are already used in this purchase. Please enter a new batch number.")
-                                                        ->info()
-                                                        ->send();
-                                                } elseif ($hasAnyBatch) {
-                                                    \Filament\Notifications\Notification::make()
-                                                        ->title('⚠ All existing batches expired')
-                                                        ->body("Every recorded batch for {$medicine->name} has expired. Please enter a new batch number and expiry date.")
-                                                        ->warning()
-                                                        ->persistent()
-                                                        ->send();
-                                                }
-
-                                                $set('batch_number', null);
-                                                $set('expiry_date', null);
-                                                $set('manufacturing_date', now()->format('Y-m-d'));
                                                 $set('purchase_price', $medicine->purchase_price ?: 0);
                                                 $set('sale_price', $medicine->sale_price ?: 0);
-                                                $set('quantity', 1);
+                                                $set('boxes_received', 0);
+                                                $set('quantity', 0);
                                                 $set('total_amount', 0);
-                                            })
-                                            ->columnSpan(2),
-                                        TextInput::make('batch_number')
-                                            ->label('Batch Number')
-                                            ->required()
-                                            ->live(onBlur: true)
-                                            ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                                $medicineId = $get('medicine_id');
-
-                                                if (blank($state) || blank($medicineId)) {
-                                                    return;
-                                                }
-
-                                                $existing = \App\Models\MedicineBatch::where('medicine_id', $medicineId)
-                                                    ->where('batch_number', $state)
-                                                    ->latest()
-                                                    ->first();
-
-                                                if (! $existing) {
-                                                    return;
-                                                }
-
-                                                if ($existing->expiry_date && $existing->expiry_date->isPast()) {
-                                                    \Filament\Notifications\Notification::make()
-                                                        ->title('⚠ This batch has expired')
-                                                        ->body("Batch #{$existing->batch_number} expired on {$existing->expiry_date->format('d M Y')}. Please use a different batch number.")
-                                                        ->danger()
-                                                        ->persistent()
-                                                        ->send();
-
-                                                    return;
-                                                }
-
-                                                $set('manufacturing_date', $existing->manufacturing_date?->format('Y-m-d'));
-                                                $set('expiry_date', $existing->expiry_date?->format('Y-m-d'));
-                                                $set('purchase_price', $existing->purchase_price);
-                                                $set('sale_price', $existing->sale_price);
                                             }),
-                                        TextInput::make('quantity')
-                                            ->label('Quantity')
+
+                                        TextInput::make('boxes_received')
+                                            ->label('Boxes')
                                             ->numeric()
-                                            ->required()
+                                            ->minValue(0)
+                                            ->default(0)
+                                            ->suffix('Box')
                                             ->live(onBlur: true)
                                             ->afterStateUpdated(function ($set, callable $get) {
+                                                $set('quantity', self::calculateQuantity($get));
                                                 $set('total_amount', self::calculateLineTotal($get));
                                             }),
-                                    ]),
-                                Grid::make(4)
-                                    ->schema([
-                                        DatePicker::make('manufacturing_date')
-                                            ->label('Manufacturing Date'),
-                                        DatePicker::make('expiry_date')
-                                            ->label('Expiry Date')
-                                            ->required(),
+
+                                        TextInput::make('quantity')
+                                            ->label('Total Qty')
+                                            ->numeric()
+                                            ->required()
+                                            ->default(0)
+                                            ->readOnly(),
+
+                                        // Row 2
                                         TextInput::make('purchase_price')
                                             ->label('Purchase Price')
                                             ->numeric()
@@ -279,16 +218,14 @@ class PurchaseResource extends Resource
                                             ->afterStateUpdated(function ($set, callable $get) {
                                                 $set('total_amount', self::calculateLineTotal($get));
                                             }),
+
                                         TextInput::make('sale_price')
                                             ->label('Sale Price')
                                             ->numeric()
-                                            ->prefix(fn () => currency_symbol())
-                                            ->required(),
-                                    ]),
-                                Grid::make(3)
-                                    ->schema([
+                                            ->prefix(fn () => currency_symbol()),
+
                                         TextInput::make('discount_percent')
-                                            ->label('Discount Percent')
+                                            ->label('Discount')
                                             ->numeric()
                                             ->suffix('%')
                                             ->default(0)
@@ -296,8 +233,9 @@ class PurchaseResource extends Resource
                                             ->afterStateUpdated(function ($set, callable $get) {
                                                 $set('total_amount', self::calculateLineTotal($get));
                                             }),
+
                                         TextInput::make('tax_percent')
-                                            ->label('Tax Percent')
+                                            ->label('Tax')
                                             ->numeric()
                                             ->suffix('%')
                                             ->default(0)
@@ -305,12 +243,24 @@ class PurchaseResource extends Resource
                                             ->afterStateUpdated(function ($set, callable $get) {
                                                 $set('total_amount', self::calculateLineTotal($get));
                                             }),
+
+                                        // Row 3
+                                        DatePicker::make('expiry_date')
+                                            ->label('Expiry Date')
+                                            ->minDate(now()->addDay())
+                                            ->columnSpan(2),
+
                                         TextInput::make('total_amount')
-                                            ->label('Total Amount')
+                                            ->label('Line Total')
                                             ->numeric()
                                             ->prefix(fn () => currency_symbol())
                                             ->required()
-                                            ->readOnly(),
+                                            ->readOnly()
+                                            ->columnSpan(2),
+
+                                        // Kept so database columns always get a value
+                                        Hidden::make('strips_per_box')->default(1),
+                                        Hidden::make('units_per_strip')->default(1),
                                     ]),
                             ])
                             ->columnSpanFull(),
@@ -341,8 +291,7 @@ class PurchaseResource extends Resource
                                         $fail("Paid Amount cannot be greater than Total Amount ({$total}).");
                                     }
                                 };
-                            })
-                            ->helperText('Cannot exceed the Total Amount.'),
+                            }),
                         Select::make('payment_method')
                             ->label('Payment Method')
                             ->options([
@@ -378,6 +327,12 @@ class PurchaseResource extends Resource
             ]);
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Table
+    |--------------------------------------------------------------------------
+    */
+
     public static function table(Table $table): Table
     {
         return $table
@@ -400,9 +355,9 @@ class PurchaseResource extends Resource
 
                         return $record->items->map(function ($item) {
                             $name = e($item->medicine->name ?? 'N/A');
-                            $batch = e($item->batch_number ?? '-');
+                            $qty = e($item->quantity ?? 0);
 
-                            return "<div style='margin-bottom:4px;'><span style='font-weight:600;'>{$name}</span><br><span style='font-size:11px;color:#718792;'>Batch #{$batch}</span></div>";
+                            return "<div style='margin-bottom:4px;'><span style='font-weight:600;'>{$name}</span><br><span style='font-size:11px;color:#718792;'>Qty: {$qty}</span></div>";
                         })->implode('');
                     })
                     ->html()
@@ -539,10 +494,10 @@ class PurchaseResource extends Resource
                     ViewAction::make(),
                     EditAction::make(),
                     DeleteAction::make(),
-               ])
-    ->icon('heroicon-m-ellipsis-vertical')
-    ->color('gray')
-    ->size('sm'),
+                ])
+                    ->icon('heroicon-m-ellipsis-vertical')
+                    ->color('gray')
+                    ->size('sm'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

@@ -3,11 +3,11 @@
 namespace App\Filament\Pharmacist\Resources\Customers\Pages;
 
 use App\Filament\Pharmacist\Resources\Customers\CustomerResource;
+use Filament\Infolists\Components\RepeatableEntry;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Components\RepeatableEntry;
 
 class ViewCustomer extends ViewRecord
 {
@@ -21,19 +21,26 @@ class ViewCustomer extends ViewRecord
                     ->columns(3)
                     ->schema([
                         TextEntry::make('name'),
-                        TextEntry::make('phone'),
-                        TextEntry::make('email')->default('—'),
-                        TextEntry::make('address')->default('—'),
-                        TextEntry::make('date_of_birth')->date()->default('—'),
+                        TextEntry::make('phone')->placeholder('—'),
+                        TextEntry::make('email')->placeholder('—'),
+                        TextEntry::make('address')->placeholder('—'),
+                        TextEntry::make('date_of_birth')
+                            ->label('Date of Birth')
+                            ->date('d M Y')
+                            ->placeholder('—'),
                     ]),
 
                 Section::make('Purchase History')
                     ->schema([
                         RepeatableEntry::make('sales')
                             ->label('')
+                            ->placeholder('Koi purchase nahi hui')
                             ->schema([
                                 TextEntry::make('invoice_number')->label('Invoice'),
-                                TextEntry::make('created_at')->label('Date')->date(),
+                                TextEntry::make('created_at')
+                                    ->label('Date')
+                                    ->dateTime('d M Y, h:i A')
+                                    ->placeholder('—'),
                                 TextEntry::make('grand_total')
                                     ->label('Amount')
                                     ->formatStateUsing(fn ($state) => format_currency($state)),

@@ -238,9 +238,12 @@ class InventoryReports extends Page
         |--------------------------------------------------------------------------
         */
 
+        // $expiredBatches = $filteredBatches
+        //     ->filter(fn ($batch) => $batch->expiry_date->lt($today))
+        //     ->values();
         $expiredBatches = $filteredBatches
-            ->filter(fn ($batch) => $batch->expiry_date->lt($today))
-            ->values();
+    ->filter(fn ($batch) => $batch->expiry_date && $batch->expiry_date->lt($today))
+    ->values();
 
         /*
         |--------------------------------------------------------------------------
@@ -249,10 +252,11 @@ class InventoryReports extends Page
         */
 
         $nearExpiryBatches = $filteredBatches
-            ->filter(fn ($batch) =>
-                $batch->expiry_date->gte($today) &&
-                $batch->expiry_date->lte($nearExpiryDate)
-            )
+            // ->filter(fn ($batch) =>
+            //     $batch->expiry_date->gte($today) &&
+            //     $batch->expiry_date->lte($nearExpiryDate)
+            // )
+            ->filter(fn ($batch) => $batch->expiry_date?->lt($today))
             ->values();
 
         /*

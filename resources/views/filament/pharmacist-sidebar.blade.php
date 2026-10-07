@@ -439,4 +439,32 @@ html[data-pms-sidebar="collapsed"] .pms-nav-section-label {
 
     </nav>
 </div>
+<style>
+    /* Sidebar ko column banao: upar brand, neeche nav jo scroll hota hai */
+    .pms-sidebar {
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
+        overflow: hidden !important;
+    }
+
+    .pms-sidebar-brand {
+        flex: 0 0 auto !important;
+    }
+
+    .pms-sidebar-nav {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+        height: auto !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        padding-bottom: 32px !important;
+        scrollbar-width: none !important;
+    }
+
+    .pms-sidebar-nav::-webkit-scrollbar {
+        display: none !important;
+    }
+</style>
 @endpersist

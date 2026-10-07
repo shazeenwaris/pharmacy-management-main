@@ -229,12 +229,13 @@ class AppNotificationResource extends Resource
 
                 DeleteAction::make(),
             ])
-
+                ->actionsColumnLabel('Actions')
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
             ])
+                
 
             ->striped()
 
