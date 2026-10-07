@@ -6,10 +6,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-<<<<<<< HEAD
-        // Superseded by 2026_09_16_080425_create_missing_medicine_batch_packagings_table.php
-        // This migration referenced a non-existent 'medicine_packagings' table and is intentionally left empty.
-=======
+
         Schema::create('medicine_batch_packagings', function (Blueprint $table) {
             $table->id();
 
@@ -70,7 +67,7 @@ return new class extends Migration
                 'batch_unit_unique'
             );
         });
->>>>>>> 404f8ffa9cd0037be434329645d15733c8b2fee9
+
     }
 
     public function down(): void

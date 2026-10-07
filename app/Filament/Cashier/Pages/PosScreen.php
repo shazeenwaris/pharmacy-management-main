@@ -284,25 +284,7 @@ class PosScreen extends Page
     }
 
 
-<<<<<<< HEAD
-        'searchResults' => $searchResults,
-// 'heldSales' => HeldSale::query()
-//     ->where('status', 'held')
-//     ->where('user_id', auth()->id())
-//     ->with('customer')
-//     ->latest()
-//     ->get(),
-'heldSales' => HeldSale::query()
-    ->where('held_by', auth()->id())
-    ->with('customer')
-    ->latest()
-    ->get(),
-        'totals' => $this->calculateTotals(),
-    ];
-}
-=======
->>>>>>> 404f8ffa9cd0037be434329645d15733c8b2fee9
-    /*
+     /*
     |--------------------------------------------------------------------------
     | SCAN BARCODE
     |--------------------------------------------------------------------------
