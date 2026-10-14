@@ -386,13 +386,7 @@
 
                                         <div>
 
-                                            <strong>
-                                                {{ $sale->invoice_number }}
-                                            </strong>
-
-                                            <small>
-                                                Sale #{{ $sale->id }}
-                                            </small>
+                                            <strong class="pms-inv-no" title="{{ $sale->invoice_number }}">INV-{{ str_pad($sale->id, 5, '0', STR_PAD_LEFT) }}</strong>
 
                                         </div>
 
@@ -581,7 +575,8 @@
 
                                 <td>
 
-                                    <button
+                                    <a href="{{ url('/cashier/pos?editSale=' . $sale->id) }}" class="pms-view-btn" style="margin-right:6px; text-decoration:none;">Edit</a>
+<button
                                         type="button"
                                         wire:click="viewSale({{ $sale->id }})"
                                         class="pms-view-btn"
@@ -690,7 +685,7 @@
                         </span>
 
                         <h2>
-                            {{ $this->selectedSale->invoice_number }}
+                            INV-{{ str_pad($this->selectedSale->id, 5, '0', STR_PAD_LEFT) }}
                         </h2>
 
                     </div>
@@ -816,6 +811,19 @@
                                         </td>
 
                                     </tr>
+@if ($item->returns->count())
+    <tr class="pms-return-note">
+        <td colspan="5" style="padding:6px 12px 10px; background:#fff8f6; border-bottom:1px solid #f3e1dc;">
+            @foreach ($item->returns as $ret)
+                <div style="font-size:11px; color:#a8483a;">
+                    Returned {{ $ret->quantity }} &bull; {{ $ret->return_date?->format('d M Y') }} &bull;
+                    Reason: {{ $ret->reason ?: 'Not specified' }}
+                    &bull; Refund: {{ currency_symbol() }} {{ number_format((float) $ret->refund_amount, 2) }}
+                </div>
+            @endforeach
+        </td>
+    </tr>
+@endif
 
                                 @endforeach
 
@@ -1867,4 +1875,60 @@
 
     </style>
 
+
+<style>
+    .pms-inv-no {
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        letter-spacing: .02em;
+        color: #17374a !important;
+        white-space: nowrap;
+    }
+</style>
+
+@if ($editSaleId)
+    <div class="pms-modal-overlay" wire:click.self="closeEdit">
+        <div class="pms-sale-modal" style="max-width:480px;">
+            <div style="padding:20px 22px; border-bottom:1px solid #edf2f2; display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="margin:0; font-size:16px; font-weight:800; color:#17374a;">
+                    Edit INV-{{ str_pad($editSaleId, 5, '0', STR_PAD_LEFT) }}
+                </h2>
+                <button type="button" wire:click="closeEdit" class="pms-modal-close">×</button>
+            </div>
+
+            <div style="padding:20px 22px; display:grid; gap:14px;">
+                <div>
+                    <label style="display:block; font-size:12px; font-weight:700; color:#61767d; margin-bottom:6px;">Customer</label>
+                    <select wire:model="editCustomerId" style="width:100%; height:42px; border:1px solid #d3e1e1; border-radius:7px; padding:0 10px;">
+                        <option value="">Walk-in Customer</option>
+                        @foreach (\App\Models\Customer::orderBy('name')->get() as $c)
+                            <option value="{{ $c->id }}">{{ $c->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div>
+                    <label style="display:block; font-size:12px; font-weight:700; color:#61767d; margin-bottom:6px;">Payment Method</label>
+                    <select wire:model="editPaymentMethod" style="width:100%; height:42px; border:1px solid #d3e1e1; border-radius:7px; padding:0 10px;">
+                        <option value="cash">Cash</option>
+                        <option value="card">Card</option>
+                        <option value="bank">Bank Transfer</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label style="display:block; font-size:12px; font-weight:700; color:#61767d; margin-bottom:6px;">Paid Amount</label>
+                    <input type="number" min="0" step="0.01" wire:model="editPaidAmount" style="width:100%; height:42px; border:1px solid #d3e1e1; border-radius:7px; padding:0 10px;">
+                    @error('editPaidAmount') <small style="color:#c0392b;">{{ $message }}</small> @enderror
+                </div>
+            </div>
+
+            <div style="padding:14px 22px 20px; display:flex; justify-content:flex-end; gap:10px;">
+                <button type="button" wire:click="closeEdit" class="pms-modal-cancel">Cancel</button>
+                <button type="button" wire:click="saveEdit" style="background:#087b7e; color:#fff; border:0; border-radius:8px; padding:10px 18px; font-weight:800; cursor:pointer;">Save Changes</button>
+            </div>
+        </div>
+    </div>
+@endif
 </div>

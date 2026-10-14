@@ -78,6 +78,14 @@ class MedicinesTable
                     ->searchable()
                     ->toggleable(),
 
+                // NEW: shelf location of the product
+                TextColumn::make('shelf_location')
+                    ->label('Shelf')
+                    ->placeholder('—')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
+
                 TextColumn::make('category.name')
                     ->label('Category')
                     ->badge()

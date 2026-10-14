@@ -2,22 +2,36 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Filament\Schemas\Components\Section;
-use Filament\Infolists\Components\RepeatableEntry;
-use Filament\Infolists\Components\TextEntry;
 
 class HeldSale extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
-        'reference', 'customer_id', 'cart', 'discount', 'tax', 'held_by', 'note',
+        'hold_number',
+        'user_id',
+        'customer_id',
+        'cart',
+        'subtotal',
+        'discount',
+        'tax',
+        'grand_total',
+        'paid_amount',
+        'payment_method',
+        'status',
+        'note',
     ];
 
     protected $casts = [
-        'cart' => 'array',
-        'discount' => 'decimal:2',
-        'tax' => 'decimal:2',
+        'cart'        => 'array',
+        'subtotal'    => 'decimal:2',
+        'discount'    => 'decimal:2',
+        'tax'         => 'decimal:2',
+        'grand_total' => 'decimal:2',
+        'paid_amount' => 'decimal:2',
     ];
 
     public function customer(): BelongsTo
@@ -25,8 +39,13 @@ class HeldSale extends Model
         return $this->belongsTo(Customer::class);
     }
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
     public function heldBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'held_by');
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

@@ -122,6 +122,12 @@
     </div>
 
 @endif
+    @if ($editingSaleId)
+    <div style="margin:16px 28px 0; padding:12px 16px; background:#fff8df; border:1px solid #ecd9a0; border-radius:9px; color:#7a5a00; font-size:13px; font-weight:700;">
+        Editing invoice INV-{{ str_pad($editingSaleId, 5, '0', STR_PAD_LEFT) }}: add or change items, then press Update Sale.
+    </div>
+@endif
+
     <div class="pms-pos-container">
 
         {{-- ========================================================
@@ -163,6 +169,8 @@
                 <input
                     type="text"
                     wire:model.live.debounce.300ms="search"
+                    x-data
+                    x-on:keydown.enter.prevent="setTimeout(() => { document.querySelector('.pms-search-result')?.click() }, 450)"
                     placeholder="Search medicine, generic name, SKU, barcode or batch..."
                     autocomplete="off"
                     class="pms-search-input"
@@ -788,7 +796,16 @@
 
                 {{-- ACTIONS --}}
 
+                @if ($editingSaleId)
                 <div class="pms-actions">
+                    <button type="button" wire:click="cancelEdit" class="pms-hold-btn">
+                        Cancel
+                    </button>
+                    <button type="button" wire:click="updateSale" class="pms-complete-btn">
+                        Update Sale
+                    </button>
+                </div>
+                @else<div class="pms-actions">
 
                     <button
                         type="button"
@@ -809,6 +826,7 @@
                     </button>
 
                 </div>
+                @endif
 
             </div>
 
@@ -816,55 +834,7 @@
 
     </div>
 @if ($showPrintReceiptPrompt)
-    <div
-        class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 px-4"
-    >
-        <div
-            class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
-        >
-
-            <div class="mb-5 flex items-start gap-4">
-
-                <div
-                    class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600"
-                >
-                    ✓
-                </div>
-
-                <div>
-                    <h3 class="text-lg font-semibold text-gray-900">
-                        Sale Completed
-                    </h3>
-
-                    <p class="mt-1 text-sm text-gray-500">
-                        Would you like to print the receipt?
-                    </p>
-                </div>
-
-            </div>
-
-            <div class="flex justify-end gap-3">
-
-                <button
-                    type="button"
-                    wire:click="closePrintReceiptPrompt"
-                    class="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                    Not Now
-                </button>
-
-                <button
-                    type="button"
-                    wire:click="openCompletedSaleReceipt"
-                    class="rounded-lg bg-[#00838f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#006b73]"
-                >
-                    🖨 Print Receipt
-                </button>
-
-            </div>
-
-        </div>
-    </div>
+    <div wire:init="openCompletedSaleReceipt"></div>
 @endif
 
     {{-- ============================================================
@@ -1134,7 +1104,11 @@
             transition: background .12s ease;
         }
 
-        .pms-search-result:last-child {
+        .pms-search-result:first-child {
+    background: #f4fafa;
+}
+
+.pms-search-result:last-child {
             border-bottom: 0;
         }
 
@@ -1430,7 +1404,31 @@
         0 0 0 3px rgba(8, 123, 126, .07);
 }
 
+.pms-unit-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 3px;
+    min-height: 44px;
+}
+
+.pms-pos-table td .pms-unit-select {
+    margin: 0;
+    display: block;
+}
+
+.pms-unit-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 3px;
+    min-height: 44px;
+}
 .pms-conversion-info {
+    margin-top: 0 !important;
+    line-height: 1.2;
     display: block;
     margin-top: 4px;
     color: #91a0a5;
@@ -2103,6 +2101,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 0 !important;
+    border-radius: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
 }
 
 .pms-qty-input {

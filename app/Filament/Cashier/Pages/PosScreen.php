@@ -61,6 +61,8 @@ class PosScreen extends Page
 
     public ?int $completedSaleId = null;
 
+    public ?int $editingSaleId = null;
+
     public bool $showPrintReceiptPrompt = false;
 
 
@@ -1754,19 +1756,28 @@ class PosScreen extends Page
 
         try {
 
-            $heldSale =
+            // $heldSale =
+            //     HeldSale::query()
+            //         ->where(
+            //             'id',
+            //             $heldSaleId
+            //         )
+            //         ->where(
+            //             'user_id',
+            //             auth()->id()
+            //         )
+            //         ->where(
+            //             'status',
+            //             'held'
+            //         )
+            //         ->first();
+                            $heldSale =
                 HeldSale::query()
-                    ->where(
-                        'id',
-                        $heldSaleId
-                    )
-                    ->where(
-                        'user_id',
-                        auth()->id()
-                    )
-                    ->where(
-                        'status',
-                        'held'
+                    ->where('id', $heldSaleId)
+                    ->where('status', 'held')
+                    ->when(
+                        ! auth()->user()?->hasAnyRole(['Admin', 'Pharmacist']),
+                        fn ($query) => $query->where('user_id', auth()->id())
                     )
                     ->first();
 
@@ -2916,6 +2927,289 @@ class PosScreen extends Page
     |--------------------------------------------------------------------------
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | EDIT EXISTING SALE
+    |--------------------------------------------------------------------------
+    */
+
+    public function mount(): void
+    {
+        $id = (int) request()->query('editSale');
+
+        if ($id > 0) {
+            $this->loadSaleForEdit($id);
+        }
+    }
+
+    protected function loadSaleForEdit(int $saleId): void
+    {
+        $query = Sale::query()->with(['items.batch.medicine.unit']);
+
+        if (! auth()->user()?->hasAnyRole(['Admin', 'Pharmacist'])) {
+            $query->where('created_by', auth()->id());
+        }
+
+        $sale = $query->find($saleId);
+
+        if (! $sale) {
+            Notification::make()->title('Sale not found')->danger()->send();
+            return;
+        }
+
+        if ($sale->returns()->exists()) {
+            Notification::make()
+                ->title('This sale has returns')
+                ->body('A sale with returned items cannot be edited.')
+                ->danger()
+                ->send();
+            return;
+        }
+
+        $cart = [];
+        $itemDiscountSum = 0;
+
+        foreach ($sale->items as $item) {
+
+            $batch = $item->batch;
+
+            if (! $batch || ! $batch->medicine) {
+                continue;
+            }
+
+            $oldBase = (float) $item->quantity * (float) ($item->conversion_factor ?: 1);
+
+            // Current stock + this sale's own quantity (in memory only)
+            $batch->quantity = (float) $batch->quantity + $oldBase;
+
+            $units = $this->buildSaleUnits($batch);
+
+            $unit = collect($units)->first(
+                fn ($u) => strcasecmp((string) $u['name'], (string) $item->sale_unit) === 0
+            ) ?? collect($units)->first(
+                fn ($u) => abs((float) $u['conversion_factor'] - (float) $item->conversion_factor) < 0.0001
+            );
+
+            if (! $unit) {
+                continue;
+            }
+
+            $key = $batch->id . '_' . $unit['key'];
+            $qty = (int) $item->quantity;
+            $discount = (float) $item->discount;
+            $price = (float) $unit['price'];
+
+            if (isset($cart[$key])) {
+                $cart[$key]['quantity'] += $qty;
+                $cart[$key]['total'] = max(0, ($price * $cart[$key]['quantity']) - $cart[$key]['discount']);
+                continue;
+            }
+
+            $itemDiscountSum += $discount;
+
+            $cart[$key] = [
+                'batch_id'          => $batch->id,
+                'medicine_id'       => $batch->medicine_id,
+                'name'              => $batch->medicine->name,
+                'generic_name'      => $batch->medicine->generic_name,
+                'batch_number'      => $batch->batch_number,
+                'expiry_date'       => $batch->expiry_date,
+                'stock_quantity'    => (float) $batch->quantity,
+                'sale_unit'         => $unit['name'],
+                'unit_key'          => $unit['key'],
+                'conversion_factor' => (float) $unit['conversion_factor'],
+                'price'             => $price,
+                'base_price'        => $price,
+                'quantity'          => $qty,
+                'discount'          => $discount,
+                'total'             => max(0, ($price * $qty) - $discount),
+                'available_units'   => $units,
+            ];
+        }
+
+        $this->cart = $cart;
+        $this->customerId = $sale->customer_id;
+        $this->paymentMethod = $sale->payment_method ?: 'cash';
+        $this->discount = max(0, (float) $sale->discount - $itemDiscountSum);
+        $this->tax = (float) $sale->tax;
+        $this->paidAmount = (float) $sale->paid_amount;
+        $this->editingSaleId = $sale->id;
+    }
+
+    public function cancelEdit(): void
+    {
+        $this->resetPos();
+        $this->editingSaleId = null;
+
+        $this->redirect(url('/cashier/sale-history'));
+    }
+
+    public function updateSale(): void
+    {
+        if (! $this->editingSaleId) {
+            return;
+        }
+
+        if (empty($this->cart)) {
+            Notification::make()
+                ->title('Cart is empty')
+                ->body('Add at least one product before updating the sale.')
+                ->danger()
+                ->send();
+            return;
+        }
+
+        $totals = $this->calculateTotals();
+        $paidAmount = max(0, (float) ($this->paidAmount ?? 0));
+        $grandTotal = max(0, (float) ($totals['grandTotal'] ?? 0));
+
+        if ($grandTotal <= 0) {
+            Notification::make()
+                ->title('Invalid sale amount')
+                ->body('The sale total must be greater than zero.')
+                ->danger()
+                ->send();
+            return;
+        }
+
+        $changeAmount = max(0, $paidAmount - $grandTotal);
+
+        try {
+
+            $sale = DB::transaction(function () use ($totals, $paidAmount, $grandTotal, $changeAmount) {
+
+                $sale = Sale::query()->lockForUpdate()->findOrFail($this->editingSaleId);
+
+                if ($sale->returns()->exists()) {
+                    throw new \RuntimeException('A sale with returned items cannot be edited.');
+                }
+
+                // Delete old items one by one so the observer restores stock
+                foreach ($sale->items()->get() as $oldItem) {
+                    $oldItem->delete();
+                }
+
+                foreach ($this->cart as $item) {
+
+                    $batchId = (int) ($item['batch_id'] ?? 0);
+                    $quantity = (int) ($item['quantity'] ?? 0);
+                    $unitKey = (string) ($item['unit_key'] ?? '');
+
+                    if ($batchId <= 0 || $quantity <= 0 || $unitKey === '') {
+                        throw new \RuntimeException('Invalid product, quantity or unit in cart.');
+                    }
+
+                    $batch = MedicineBatch::query()
+                        ->with(['medicine.unit'])
+                        ->lockForUpdate()
+                        ->find($batchId);
+
+                    if (! $batch || ! $batch->medicine) {
+                        throw new \RuntimeException('Product batch #' . $batchId . ' was not found.');
+                    }
+
+                    if (! $batch->status) {
+                        throw new \RuntimeException('Batch ' . ($batch->batch_number ?: '#' . $batch->id) . ' is inactive.');
+                    }
+
+                    if ($batch->medicine->has_expiry) {
+                        if (empty($batch->expiry_date)) {
+                            throw new \RuntimeException('Batch ' . ($batch->batch_number ?: '#' . $batch->id) . ' has no expiry date.');
+                        }
+
+                        if (Carbon::parse($batch->expiry_date)->startOfDay()->lt(today()->startOfDay())) {
+                            throw new \RuntimeException('Batch ' . ($batch->batch_number ?: '#' . $batch->id) . ' has expired.');
+                        }
+                    }
+
+                    $selectedUnit = collect($this->buildSaleUnits($batch))->firstWhere('key', $unitKey);
+
+                    if (! $selectedUnit) {
+                        throw new \RuntimeException('Sale unit is no longer available for ' . $batch->medicine->name . '.');
+                    }
+
+                    $conversionFactor = (float) $selectedUnit['conversion_factor'];
+                    $unitPrice = (float) $selectedUnit['price'];
+                    $saleUnit = trim((string) $selectedUnit['name']);
+
+                    if ($conversionFactor <= 0 || $unitPrice <= 0 || $saleUnit === '') {
+                        throw new \RuntimeException('Invalid unit or price for ' . $batch->medicine->name . '.');
+                    }
+
+                    if ((float) $batch->quantity < ($quantity * $conversionFactor)) {
+                        throw new \RuntimeException(
+                            'Insufficient stock for ' . $batch->medicine->name .
+                            '. Available base stock: ' . $batch->quantity .
+                            ', required: ' . ($quantity * $conversionFactor) . '.'
+                        );
+                    }
+
+                    $itemDiscount = max(0, (float) ($item['discount'] ?? 0));
+
+                    // Observer decrements stock on create
+                    SaleItem::create([
+                        'sale_id'           => $sale->id,
+                        'medicine_id'       => $batch->medicine_id,
+                        'medicine_batch_id' => $batch->id,
+                        'sale_unit'         => $saleUnit,
+                        'conversion_factor' => $conversionFactor,
+                        'quantity'          => $quantity,
+                        'unit_price'        => $unitPrice,
+                        'discount'          => $itemDiscount,
+                        'total'             => max(0, ($unitPrice * $quantity) - $itemDiscount),
+                    ]);
+                }
+
+                $sale->update([
+                    'customer_id'    => $this->customerId ?: null,
+                    'subtotal'       => (float) ($totals['subtotal'] ?? 0),
+                    'discount'       => (float) ($totals['discount'] ?? 0),
+                    'tax'            => (float) ($totals['tax'] ?? 0),
+                    'grand_total'    => $grandTotal,
+                    'paid_amount'    => $paidAmount,
+                    'change_amount'  => $changeAmount,
+                    'payment_method' => $this->paymentMethod ?: 'cash',
+                ]);
+
+                SalePayment::where('sale_id', $sale->id)->delete();
+
+                if ($paidAmount > 0) {
+                    SalePayment::create([
+                        'sale_id'          => $sale->id,
+                        'amount'           => $paidAmount,
+                        'payment_method'   => $this->paymentMethod ?: 'cash',
+                        'reference_number' => null,
+                        'notes'            => 'Updated from POS edit',
+                        'received_by'      => auth()->id(),
+                        'paid_at'          => now(),
+                    ]);
+                }
+
+                return $sale;
+            });
+
+            $this->resetPos();
+            $this->editingSaleId = null;
+
+            Notification::make()
+                ->title('Sale updated successfully')
+                ->body('Invoice ' . $sale->invoice_number . ' updated. Total: ' . $this->money($grandTotal))
+                ->success()
+                ->send();
+
+            $this->redirect(url('/cashier/sale-history'));
+
+        } catch (\Throwable $e) {
+
+            report($e);
+
+            Notification::make()
+                ->title('Sale could not be updated')
+                ->body($e->getMessage())
+                ->danger()
+                ->send();
+        }
+    }
     protected function resetPos(): void
     {
         $this->cart = [];

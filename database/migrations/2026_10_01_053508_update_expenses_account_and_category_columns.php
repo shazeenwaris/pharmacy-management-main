@@ -6,6 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Does a foreign key with this name exist on the table?
+     */
+    private function hasForeignKey(string $table, string $name): bool
+    {
+        return collect(Schema::getForeignKeys($table))
+            ->contains(fn ($fk) => $fk['name'] === $name);
+    }
+
     public function up(): void
     {
         Schema::table('expenses', function (Blueprint $table) {
@@ -25,7 +34,10 @@ return new class extends Migration
 
             // Remove old account_id only if it still exists
             if (Schema::hasColumn('expenses', 'account_id')) {
-                $table->dropForeign(['account_id']);
+                if ($this->hasForeignKey('expenses', 'expenses_account_id_foreign')) {
+                    $table->dropForeign('expenses_account_id_foreign');
+                }
+
                 $table->dropColumn('account_id');
             }
 
@@ -41,7 +53,10 @@ return new class extends Migration
         Schema::table('expenses', function (Blueprint $table) {
 
             if (Schema::hasColumn('expenses', 'expense_category_id')) {
-                $table->dropForeign(['expense_category_id']);
+                if ($this->hasForeignKey('expenses', 'expenses_expense_category_id_foreign')) {
+                    $table->dropForeign('expenses_expense_category_id_foreign');
+                }
+
                 $table->dropColumn('expense_category_id');
             }
 

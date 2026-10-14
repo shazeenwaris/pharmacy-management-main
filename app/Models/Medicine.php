@@ -24,6 +24,7 @@ class Medicine extends Model
     'strips_per_box',
     'units_per_strip',
     'sale_price',
+     'shelf_location',
     ];
 
     protected $casts = [

@@ -152,11 +152,16 @@
 
                    
                      <div class="mt-5 flex gap-2">
-    <a href="{{ route('filament.admin.pages.sales') }}"
+    <!-- <a href="{{ route('filament.admin.pages.sales') }}"
        wire:navigate
        class="rounded-lg bg-[#00838F] px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-[#00707A]">
         + New Sale
-    </a>
+    </a> -->
+   <a href="{{ url('/admin/purchases/create') }}"
+   wire:navigate
+   class="rounded-lg bg-[#00838F] px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-[#00707A]">
+    + New Purchase
+</a>
     <a href="{{ route('filament.admin.resources.medicines.create') }}"
        wire:navigate
        class="rounded-lg bg-white px-4 py-2 text-xs font-semibold text-[#00838F] ring-1 ring-[#00838F]/25 transition hover:bg-[#E0F7FA]">

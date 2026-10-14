@@ -108,8 +108,9 @@
     </svg>
     My Profile
 </a>
-
-                <form method="POST" action="{{ route('filament.admin.auth.logout') }}">
+<!-- 
+                <form method="POST" action="{{ route('filament.admin.auth.logout') }}"> -->
+                    <form method="POST" action="{{ route('filament.' . \Filament\Facades\Filament::getCurrentPanel()->getId() . '.auth.logout') }}">
                     @csrf
                     <button type="submit" style="display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px 14px; font-size: 13px; color: #DC4C4C; background: transparent; border: 0; border-top: 1px solid #eef2f3; cursor: pointer; text-align: left;">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;">

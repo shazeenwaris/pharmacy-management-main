@@ -185,7 +185,7 @@ public function selectInvoice(int $saleId): void
 
     // Put selected invoice in input
     $this->invoiceSearch =
-        $sale->invoice_number ?: 'INV-' . $sale->id;
+        'INV-' . str_pad($sale->id, 5, '0', STR_PAD_LEFT);
 
     // Close dropdown
     $this->showInvoiceDropdown = false;
@@ -206,9 +206,7 @@ public function invoiceOptions(): array
                     "%{$search}%"
                 );
 
-                if (is_numeric($search)) {
-                    $q->orWhereKey((int) $search);
-                }
+                if (preg_match('/^(?:INV-?)?0*(\d+)$/i', $search, $mm)) { $q->orWhereKey((int) $mm[1]); }
 
                 $q->orWhereHas('customer', function ($customerQuery) use ($search) {
                     $customerQuery->where(
@@ -224,7 +222,7 @@ public function invoiceOptions(): array
         ->get()
         ->map(fn ($sale) => [
             'id' => $sale->id,
-            'invoice_number' => $sale->invoice_number ?: 'INV-' . $sale->id,
+            'invoice_number' => 'INV-' . str_pad($sale->id, 5, '0', STR_PAD_LEFT),
             'customer' => $sale->customer?->name ?? 'Walk-in Customer',
             'date' => $sale->created_at?->format('d M Y h:i A'),
             'total' => (float) ($sale->grand_total ?? 0),
@@ -260,7 +258,7 @@ public function closeInvoiceDropdown(): void
         'id' => $sale->id,
 
         'invoice_number' =>
-            $sale->invoice_number ?: 'INV-' . $sale->id,
+            'INV-' . str_pad($sale->id, 5, '0', STR_PAD_LEFT),
 
         'date' =>
             $sale->created_at?->format('d M Y h:i A'),
@@ -469,6 +467,7 @@ public function closeInvoiceDropdown(): void
             ->where('s.created_by', auth()->id())
             ->select([
                 'sr.id',
+                's.id as sale_id',
                 's.invoice_number',
                 'm.name as medicine_name',
                 'sr.quantity',
@@ -488,6 +487,7 @@ public function closeInvoiceDropdown(): void
                     'like',
                     "%{$search}%"
                 )
+                    ->orWhere('s.id', preg_match('/^(?:INV-?)?0*(\d+)$/i', $search, $mm2) ? (int) $mm2[1] : 0)
                     ->orWhere(
                         'm.name',
                         'like',
@@ -509,7 +509,7 @@ public function closeInvoiceDropdown(): void
                     'id' => $row->id,
 
                     'invoice_number' =>
-                        $row->invoice_number ?: '-',
+                        $row->sale_id ? 'INV-' . str_pad($row->sale_id, 5, '0', STR_PAD_LEFT) : '-',
 
                     'medicine_name' =>
                         $row->medicine_name ?: '-',
@@ -799,8 +799,7 @@ public function closeInvoiceDropdown(): void
                         round($refundTotal, 2),
 
                     'invoice' =>
-                        $sale->invoice_number
-                        ?: '#' . $sale->id,
+                        'INV-' . str_pad($sale->id, 5, '0', STR_PAD_LEFT),
                 ];
             });
 

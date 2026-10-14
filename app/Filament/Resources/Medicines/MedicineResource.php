@@ -354,6 +354,12 @@ class MedicineResource extends Resource
                                     ->visible(fn (Get $get) => self::isMedicine($get))
                                     ->placeholder('e.g. 500mg'),
 
+                                // NEW: where this product is kept in the store
+                                TextInput::make('shelf_location')
+                                    ->label('Shelf Location')
+                                    ->maxLength(100)
+                                    ->placeholder('e.g. Rack A - Shelf 3'),
+
                                 FileUpload::make('image')
                                     ->label('Product Photo')
                                     ->image()
@@ -680,6 +686,10 @@ class MedicineResource extends Resource
                                     TextEntry::make('barcode')
                                         ->label('Barcode')
                                         ->placeholder('—'),
+                                    // NEW: shelf location on the view page
+                                    TextEntry::make('shelf_location')
+                                        ->label('Shelf Location')
+                                        ->placeholder('—'),
                                     IconEntry::make('has_expiry')
                                         ->label('Has Expiry')
                                         ->boolean(),
@@ -831,7 +841,7 @@ class MedicineResource extends Resource
 
     public static function getGloballySearchableAttributes(): array
     {
-        return ['name', 'sku', 'generic_name', 'barcode'];
+        return ['name', 'sku', 'generic_name', 'barcode', 'shelf_location'];
     }
 
     public static function getGlobalSearchResultTitle(Model $record): string

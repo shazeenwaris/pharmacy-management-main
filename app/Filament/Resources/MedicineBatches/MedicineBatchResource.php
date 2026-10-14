@@ -37,6 +37,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\HtmlString;
+use Illuminate\Validation\Rules\Unique;
 use UnitEnum;
 
 class MedicineBatchResource extends Resource
@@ -129,14 +130,78 @@ class MedicineBatchResource extends Resource
         }
     }
 
+    /**
+     * The batch number the admin must enter for the NEXT batch of this product:
+     * number of existing batches + 1 (skips a number that is already taken,
+     * e.g. after a batch was deleted).
+     */
+    protected static function nextBatchNumber(int $medicineId): int
+    {
+        $number = MedicineBatch::where('medicine_id', $medicineId)->count() + 1;
+
+        while (MedicineBatch::where('medicine_id', $medicineId)
+            ->where('batch_number', (string) $number)
+            ->exists()) {
+            $number++;
+        }
+
+        return $number;
+    }
+
+    /**
+     * Popup shown when a Product is selected.
+     *
+     * It only INFORMS the admin about the batches this product already has
+     * (how many, batch numbers, quantity, expiry). Nothing is added or changed
+     * automatically — the admin adds the new batch manually.
+     */
     protected static function notifyCurrentStock(Medicine $product): void
     {
-        $currentStock = MedicineBatch::where('medicine_id', $product->id)->sum('quantity');
+        $batches = MedicineBatch::where('medicine_id', $product->id)
+            ->orderBy('expiry_date')
+            ->get();
+
+        $count = $batches->count();
+
+        // First batch for this product
+        if ($count === 0) {
+            Notification::make()
+                ->info()
+                ->title("{$product->name} — no existing batches")
+                ->body('This product has no batch yet. The batch you add now will be its first batch — enter 1 as the batch number.')
+                ->duration(8000)
+                ->send();
+
+            return;
+        }
+
+        $totalStock = (int) $batches->sum('quantity');
+        $nextNumber = self::nextBatchNumber($product->id);
+
+        // Show up to 5 batches in the popup, the rest as "+ N more"
+        $lines = $batches->take(5)->map(function ($batch) {
+            $expiry = $batch->expiry_date
+                ? Carbon::parse($batch->expiry_date)->format('d M Y')
+                : 'No expiry';
+
+            return 'Batch <strong>' . e($batch->batch_number) . '</strong> — '
+                . number_format((int) $batch->quantity) . ' units (Exp: ' . e($expiry) . ')';
+        })->implode('<br>');
+
+        if ($count > 5) {
+            $lines .= '<br>+ ' . ($count - 5) . ' more batch(es)';
+        }
+
+        $body = "This product already has <strong>{$count}</strong> batch" . ($count === 1 ? '' : 'es')
+            . " ({$totalStock} units in total).<br><br>"
+            . $lines
+            . "<br><br>The batch you add now will be batch <strong>#{$nextNumber}</strong>. Enter <strong>{$nextNumber}</strong> as the batch number and fill in the other details manually.";
 
         Notification::make()
-            ->info()
-            ->title("{$product->name} — current stock")
-            ->body("Current total stock: {$currentStock} units (all batches combined). This new batch will be added to it.")
+            ->warning()
+            ->title("{$product->name} — existing batches")
+            ->body(new HtmlString($body))
+            ->duration(12000)
             ->send();
     }
 
@@ -305,6 +370,9 @@ class MedicineBatchResource extends Resource
                     ->title('Details loaded from Purchase')
                     ->body('Just enter the Batch Number, then save.')
                     ->send();
+
+                // Let the admin see the batches this product already has
+                self::notifyCurrentStock($product);
             })
             ->columnSpan(4);
     }
@@ -366,6 +434,71 @@ class MedicineBatchResource extends Resource
         return TextInput::make('batch_number')
             ->required()
             ->maxLength(255)
+            ->trim()
+            // The same product cannot have two batches with the same batch number
+            // (a different product may still use the same number).
+            ->unique(
+                ignoreRecord: true,
+                modifyRuleUsing: fn (Unique $rule, Get $get) => $rule->where('medicine_id', $get('medicine_id')),
+            )
+            ->validationMessages([
+                'unique' => 'This batch number already exists for this product. Please enter a new batch number.',
+            ])
+            // On the Create page the batch number must be the next number in sequence
+            // (1st batch = 1, 2nd batch = 2, ...). Editing an old batch is not restricted.
+            ->rule(function (Get $get, $livewire) {
+                return function (string $attribute, $value, \Closure $fail) use ($get, $livewire) {
+                    if ($livewire instanceof EditRecord || blank($get('medicine_id'))) {
+                        return;
+                    }
+
+                    $next = self::nextBatchNumber((int) $get('medicine_id'));
+
+                    if (trim((string) $value) !== (string) $next) {
+                        $fail("The batch number for this product must be {$next}.");
+                    }
+                };
+            })
+            ->helperText(function (Get $get, $livewire) {
+                if ($livewire instanceof EditRecord || blank($get('medicine_id'))) {
+                    return null;
+                }
+
+                return 'Next batch number for this product: ' . self::nextBatchNumber((int) $get('medicine_id'));
+            })
+            ->live(onBlur: true)
+            ->afterStateUpdated(function ($state, Get $get, Set $set, ?Model $record, $livewire) {
+                if (blank($state) || blank($get('medicine_id'))) {
+                    return;
+                }
+
+                $exists = MedicineBatch::where('medicine_id', $get('medicine_id'))
+                    ->where('batch_number', trim((string) $state))
+                    ->when($record, fn ($query) => $query->where('id', '!=', $record->id))
+                    ->exists();
+
+                if ($exists) {
+                    self::warn(
+                        'Batch number already exists',
+                        "Batch \"{$state}\" is already added for this product. Please enter the next batch number."
+                    );
+                    $set('batch_number', null);
+
+                    return;
+                }
+
+                if (! ($livewire instanceof EditRecord)) {
+                    $next = self::nextBatchNumber((int) $get('medicine_id'));
+
+                    if (trim((string) $state) !== (string) $next) {
+                        self::warn(
+                            'Wrong batch number',
+                            "The next batch number for this product must be {$next}."
+                        );
+                        $set('batch_number', null);
+                    }
+                }
+            })
             ->columnSpan(2);
     }
 

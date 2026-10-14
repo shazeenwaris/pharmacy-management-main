@@ -9,19 +9,19 @@ class EditUser extends EditRecord
 {
     protected static string $resource = UserResource::class;
 
-    protected function mutateFormDataBeforeFill(array $data): array
-    {
-        $data['role'] = $this->record->roles->first()?->name;
+    // protected function mutateFormDataBeforeFill(array $data): array
+    // {
+    //     $data['role'] = $this->record->roles->first()?->name;
 
-        return $data;
-    }
+    //     return $data;
+    // }
 
-    protected function afterSave(): void
-    {
-        $role = $this->data['role'] ?? null;
+    // protected function afterSave(): void
+    // {
+    //     $role = $this->data['role'] ?? null;
 
-        if ($role) {
-            $this->record->syncRoles([$role]);
-        }
-    }
+    //     if ($role) {
+    //         $this->record->syncRoles([$role]);
+    //     }
+    // }
 }

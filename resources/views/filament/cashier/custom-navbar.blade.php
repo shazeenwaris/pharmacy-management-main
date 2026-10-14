@@ -18,9 +18,7 @@
 
     <div class="pms-topbar">
 
-        {{-- =====================================================
-            LEFT SIDE
-        ====================================================== --}}
+        {{-- LEFT SIDE --}}
         <div class="pms-topbar-left">
 
             {{-- Mobile Menu --}}
@@ -91,240 +89,174 @@
         </div>
 
 
-        {{-- =====================================================
-            CENTER
-            Empty intentionally for layout balance
-        ====================================================== --}}
+        {{-- CENTER --}}
         <div class="pms-topbar-center"></div>
 
 
-        {{-- =====================================================
-            RIGHT SIDE
-        ====================================================== --}}
+        {{-- RIGHT SIDE --}}
         <div class="pms-topbar-right">
 
-          {{-- =================================================
-    CASHIER NOTIFICATIONS
-================================================== --}}
-
-@php
-    use App\Models\CashierNotification;
-
-    $cashierUnreadNotifications = CashierNotification::query()
-        ->unread()
-        ->latest()
-        ->take(8)
-        ->get();
-
-    $cashierUnreadCount = CashierNotification::query()
-        ->unread()
-        ->count();
-@endphp
-
-<div
-    class="pms-cashier-notification-wrapper"
-    x-data="{ open: false }"
-    @click.outside="open = false"
->
-
-    {{-- Notification Button --}}
-    <button
-        type="button"
-        class="pms-topbar-action pms-notification-button"
-        @click="open = !open"
-        title="Notifications"
-        aria-label="Notifications"
-    >
-
-        <x-heroicon-o-bell class="w-5 h-5" />
-
-        @if ($cashierUnreadCount > 0)
-
-            <span class="pms-notification-badge">
-                {{ $cashierUnreadCount > 99 ? '99+' : $cashierUnreadCount }}
-            </span>
-
-        @endif
-
-    </button>
-
-
-    {{-- =================================================
-        NOTIFICATION DROPDOWN
-    ================================================== --}}
-
-    <div
-        x-show="open"
-        x-transition.origin.top.right
-        x-cloak
-        class="pms-cashier-notification-dropdown"
-    >
-
-        {{-- Header --}}
-        <div class="pms-notification-header">
-
-            <div>
-
-                <h3>
-                    Notifications
-                </h3>
-
-                <span>
-                    {{ $cashierUnreadCount }}
-                    {{ $cashierUnreadCount === 1 ? 'unread' : 'unread' }}
-                </span>
-
-            </div>
-
-            <div class="pms-notification-header-icon">
-
-                <x-heroicon-o-bell class="w-5 h-5" />
-
-            </div>
-
-        </div>
-
-
-        {{-- Notification List --}}
-        <div class="pms-notification-list">
-
-            @forelse ($cashierUnreadNotifications as $notification)
-
-                @php
-
-                    $icon = match ($notification->type) {
-
-                        'sale_completed'
-                            => 'heroicon-o-shopping-cart',
-
-                        'payment_received'
-                            => 'heroicon-o-banknotes',
-
-                        'return_processed'
-                            => 'heroicon-o-arrow-uturn-left',
-
-                        'refund'
-                            => 'heroicon-o-arrow-path',
-
-                        default
-                            => 'heroicon-o-information-circle',
-
-                    };
-
-
-                    $iconClass = match ($notification->level) {
-
-                        'success'
-                            => 'success',
-
-                        'warning'
-                            => 'warning',
-
-                        'danger'
-                            => 'danger',
-
-                        default
-                            => 'info',
-
-                    };
-
-                @endphp
-
-
-                {{-- Notification --}}
-                <div
-                    class="pms-notification-item"
-                    onclick="markCashierNotificationRead({{ $notification->id }})"
-                >
-
-                    <div
-                        class="pms-notification-icon {{ $iconClass }}"
-                    >
-
-                        <x-dynamic-component
-                            :component="$icon"
-                            class="w-5 h-5"
-                        />
-
-                    </div>
-
-
-                    <div class="pms-notification-content">
-
-                        <div class="pms-notification-title">
-                            {{ $notification->title }}
-                        </div>
-
-                        <div class="pms-notification-message">
-                            {{ $notification->message }}
-                        </div>
-
-                        <div class="pms-notification-time">
-                            {{ $notification->created_at?->diffForHumans() }}
-                        </div>
-
-                    </div>
-
-                </div>
-
-            @empty
-
-                <div class="pms-notification-empty">
-
-                    <div class="pms-notification-empty-icon">
-
-                        <x-heroicon-o-bell-slash class="w-6 h-6" />
-
-                    </div>
-
-                    <h4>
-                        No notifications
-                    </h4>
-
-                    <p>
-                        You're all caught up.
-                    </p>
-
-                </div>
-
-            @endforelse
-
-        </div>
-
-
-        {{-- Footer --}}
-        @if ($cashierUnreadCount > 0)
-
-            <div class="pms-notification-footer">
-
+            {{-- CASHIER NOTIFICATIONS --}}
+            @php
+                use App\Models\CashierNotification;
+
+                $cashierUnreadNotifications = CashierNotification::query()
+                    ->unread()
+                    ->latest()
+                    ->take(8)
+                    ->get();
+
+                $cashierUnreadCount = CashierNotification::query()
+                    ->unread()
+                    ->count();
+            @endphp
+
+            <div
+                class="pms-cashier-notification-wrapper"
+                x-data="{ open: false }"
+                @click.outside="open = false"
+            >
+
+                {{-- Notification Button --}}
                 <button
                     type="button"
-                    onclick="markAllCashierNotificationsRead()"
-                    class="pms-notification-mark-all"
+                    class="pms-topbar-action pms-notification-button"
+                    @click="open = !open"
+                    title="Notifications"
+                    aria-label="Notifications"
                 >
-                    Mark all as read
+
+                    <x-heroicon-o-bell class="w-5 h-5" />
+
+                    @if ($cashierUnreadCount > 0)
+                        <span class="pms-notification-badge">
+                            {{ $cashierUnreadCount > 99 ? '99+' : $cashierUnreadCount }}
+                        </span>
+                    @endif
+
                 </button>
+
+
+                {{-- NOTIFICATION DROPDOWN --}}
+                <div
+                    x-show="open"
+                    x-transition.origin.top.right
+                    x-cloak
+                    class="pms-cashier-notification-dropdown"
+                >
+
+                    {{-- Header --}}
+                    <div class="pms-notification-header">
+
+                        <div>
+                            <h3>Notifications</h3>
+
+                            <span>
+                                {{ $cashierUnreadCount }} unread
+                            </span>
+                        </div>
+
+                        <div class="pms-notification-header-icon">
+                            <x-heroicon-o-bell class="w-5 h-5" />
+                        </div>
+
+                    </div>
+
+
+                    {{-- Notification List --}}
+                    <div class="pms-notification-list">
+
+                        @forelse ($cashierUnreadNotifications as $notification)
+
+                            @php
+                                $icon = match ($notification->type) {
+                                    'sale_completed' => 'heroicon-o-shopping-cart',
+                                    'payment_received' => 'heroicon-o-banknotes',
+                                    'return_processed' => 'heroicon-o-arrow-uturn-left',
+                                    'refund' => 'heroicon-o-arrow-path',
+                                    default => 'heroicon-o-information-circle',
+                                };
+
+                                $iconClass = match ($notification->level) {
+                                    'success' => 'success',
+                                    'warning' => 'warning',
+                                    'danger' => 'danger',
+                                    default => 'info',
+                                };
+                            @endphp
+
+                            <div
+                                class="pms-notification-item"
+                                onclick="markCashierNotificationRead({{ $notification->id }})"
+                            >
+
+                                <div class="pms-notification-icon {{ $iconClass }}">
+                                    <x-dynamic-component
+                                        :component="$icon"
+                                        class="w-5 h-5"
+                                    />
+                                </div>
+
+                                <div class="pms-notification-content">
+
+                                    <div class="pms-notification-title">
+                                        {{ $notification->title }}
+                                    </div>
+
+                                    <div class="pms-notification-message">
+                                        {{ $notification->message }}
+                                    </div>
+
+                                    <div class="pms-notification-time">
+                                        {{ $notification->created_at?->diffForHumans() }}
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        @empty
+
+                            <div class="pms-notification-empty">
+
+                                <div class="pms-notification-empty-icon">
+                                    <x-heroicon-o-bell-slash class="w-6 h-6" />
+                                </div>
+
+                                <h4>No notifications</h4>
+
+                                <p>You're all caught up.</p>
+
+                            </div>
+
+                        @endforelse
+
+                    </div>
+
+
+                    {{-- Footer --}}
+                    @if ($cashierUnreadCount > 0)
+                        <div class="pms-notification-footer">
+                            <button
+                                type="button"
+                                onclick="markAllCashierNotificationsRead()"
+                                class="pms-notification-mark-all"
+                            >
+                                Mark all as read
+                            </button>
+                        </div>
+                    @endif
+
+                </div>
 
             </div>
 
-        @endif
 
-    </div>
-
-</div>
-
-
-
-
-            {{-- =================================================
-                DIVIDER
-            ================================================== --}}
+            {{-- DIVIDER --}}
             <div class="pms-topbar-divider"></div>
 
 
-            {{-- =================================================
-                USER
-            ================================================== --}}
+            {{-- USER --}}
             <div
                 class="pms-user"
                 x-data="{ open: false }"
@@ -341,16 +273,12 @@
                     <div class="pms-user-avatar">
 
                         @if (auth()->user()->avatar)
-
                             <img
                                 src="{{ \Illuminate\Support\Facades\Storage::url(auth()->user()->avatar) }}"
                                 alt="Avatar"
                             >
-
                         @else
-
                             {{ strtoupper(substr(auth()->user()->name ?? 'A', 0, 1)) }}
-
                         @endif
 
                         <span class="pms-online-dot"></span>
@@ -362,7 +290,7 @@
                     <div class="pms-user-info">
 
                         <span class="pms-user-name">
-                            {{ auth()->user()->name ?? 'Admin' }}
+                            {{ auth()->user()->name ?? 'Cashier' }}
                         </span>
 
                         <span class="pms-user-role">
@@ -400,9 +328,9 @@
                     class="pms-user-dropdown"
                 >
 
-                    {{-- Profile --}}
+                    {{-- Profile (CASHIER PANEL) --}}
                     <a
-                        href="{{ \App\Filament\Pages\EditProfile::getUrl() }}"
+                        href="{{ url('/cashier/my-profile') }}"
                         class="pms-user-dropdown-item"
                     >
 
@@ -425,10 +353,10 @@
                     </a>
 
 
-                    {{-- Logout --}}
+                    {{-- Logout (CASHIER PANEL) --}}
                     <form
                         method="POST"
-                        action="{{ route('filament.admin.auth.logout') }}"
+                        action="{{ route('filament.cashier.auth.logout') }}"
                     >
                         @csrf
 
@@ -471,10 +399,6 @@
     ========================================================== --}}
     <style>
 
-        /* =========================================================
-           VARIABLES
-        ========================================================== */
-
         :root {
             --pms-sidebar-expanded: 280px;
             --pms-sidebar-collapsed: 70px;
@@ -491,22 +415,12 @@
             --pms-soft: #eaf7f8;
         }
 
-
-        /* =========================================================
-           HIDE FILAMENT DEFAULT TOPBAR
-        ========================================================== */
-
         body:has(.pms-topbar) .fi-topbar-ctn,
         body:has(.pms-topbar) .fi-topbar {
             display: none !important;
         }
 
-
-        /* =========================================================
-           MAIN TOPBAR
-        ========================================================== */
-
-        /* .pms-topbar {
+        .pms-topbar {
             position: fixed !important;
 
             top: 0 !important;
@@ -539,59 +453,12 @@
 
             box-sizing: border-box !important;
 
-            z-index: 9999 !important;
-
-            transition:
-                left 0.2s ease,
-                width 0.2s ease !important;
-        } */
-                .pms-topbar {
-            position: fixed !important;
-
-            top: 0 !important;
-            right: 0 !important;
-
-            left: var(--pms-sidebar-expanded) !important;
-
-            width: calc(
-                100% - var(--pms-sidebar-expanded)
-            ) !important;
-
-            height: var(--pms-topbar-height) !important;
-            min-height: var(--pms-topbar-height) !important;
-
-            margin: 0 !important;
-            padding: 0 18px !important;
-
-            display: grid !important;
-
-            /*
-             * LEFT | CENTER | RIGHT
-             */
-            grid-template-columns:
-                minmax(0, 1fr)
-                auto
-                auto !important;
-
-            align-items: center !important;
-
-            background: #ffffff !important;
-
-            border-bottom: 1px solid var(--pms-border) !important;
-
-            box-sizing: border-box !important;
-
-           z-index: 40 !important;
+            z-index: 40 !important;
 
             transition:
                 left 0.2s ease,
                 width 0.2s ease !important;
         }
-
-
-        /* =========================================================
-           EXPANDED SIDEBAR
-        ========================================================== */
 
         html[data-pms-sidebar="expanded"] .pms-topbar {
             left: var(--pms-sidebar-expanded) !important;
@@ -601,11 +468,6 @@
             ) !important;
         }
 
-
-        /* =========================================================
-           COLLAPSED SIDEBAR
-        ========================================================== */
-
         html[data-pms-sidebar="collapsed"] .pms-topbar {
             left: var(--pms-sidebar-collapsed) !important;
 
@@ -613,11 +475,6 @@
                 100% - var(--pms-sidebar-collapsed)
             ) !important;
         }
-
-
-        /* =========================================================
-           LEFT
-        ========================================================== */
 
         .pms-topbar-left {
             grid-column: 1 !important;
@@ -634,11 +491,6 @@
 
             gap: 10px !important;
         }
-
-
-        /* =========================================================
-           SEARCH
-        ========================================================== */
 
         .pms-topbar-search-wrap {
             display: flex !important;
@@ -671,11 +523,6 @@
             white-space: nowrap !important;
         }
 
-
-        /* =========================================================
-           CENTER
-        ========================================================== */
-
         .pms-topbar-center {
             grid-column: 2 !important;
 
@@ -685,13 +532,6 @@
             margin: 0 !important;
             padding: 0 !important;
         }
-
-
-        /* =========================================================
-           RIGHT SIDE
-           IMPORTANT: Notifications + Divider + User
-           are ALL inside this wrapper.
-        ========================================================== */
 
         .pms-topbar-right {
             grid-column: 3 !important;
@@ -710,11 +550,6 @@
 
             height: 100% !important;
         }
-
-
-        /* =========================================================
-           TOPBAR BUTTON
-        ========================================================== */
 
         .pms-topbar-action {
             position: relative !important;
@@ -760,11 +595,6 @@
             min-height: 19px !important;
         }
 
-
-        /* =========================================================
-           NOTIFICATION WRAPPER
-        ========================================================== */
-
         .pms-cashier-notification-wrapper {
             position: relative !important;
 
@@ -774,19 +604,9 @@
             flex-shrink: 0 !important;
         }
 
-
-        /* =========================================================
-           NOTIFICATION BUTTON
-        ========================================================== */
-
         .pms-notification-button {
             position: relative !important;
         }
-
-
-        /* =========================================================
-           NOTIFICATION BADGE
-        ========================================================== */
 
         .pms-notification-badge {
             position: absolute !important;
@@ -819,11 +639,6 @@
             box-sizing: border-box !important;
         }
 
-
-        /* =========================================================
-           NOTIFICATION DROPDOWN
-        ========================================================== */
-
         .pms-cashier-notification-dropdown {
             position: absolute !important;
 
@@ -847,11 +662,6 @@
 
             z-index: 99999 !important;
         }
-
-
-        /* =========================================================
-           NOTIFICATION HEADER
-        ========================================================== */
 
         .pms-notification-header {
             display: flex !important;
@@ -901,21 +711,11 @@
             color: var(--pms-primary) !important;
         }
 
-
-        /* =========================================================
-           NOTIFICATION LIST
-        ========================================================== */
-
         .pms-notification-list {
             max-height: 390px !important;
 
             overflow-y: auto !important;
         }
-
-
-        /* =========================================================
-           NOTIFICATION ITEM
-        ========================================================== */
 
         .pms-notification-item {
             display: flex !important;
@@ -935,11 +735,6 @@
         .pms-notification-item:hover {
             background: #f7fcfc !important;
         }
-
-
-        /* =========================================================
-           NOTIFICATION ICON
-        ========================================================== */
 
         .pms-notification-icon {
             flex: 0 0 40px !important;
@@ -975,11 +770,6 @@
             color: var(--pms-primary) !important;
         }
 
-
-        /* =========================================================
-           NOTIFICATION CONTENT
-        ========================================================== */
-
         .pms-notification-content {
             min-width: 0 !important;
             flex: 1 !important;
@@ -1011,11 +801,6 @@
 
             font-size: 10px !important;
         }
-
-
-        /* =========================================================
-           EMPTY NOTIFICATIONS
-        ========================================================== */
 
         .pms-notification-empty {
             padding: 42px 20px !important;
@@ -1058,11 +843,6 @@
             font-size: 12px !important;
         }
 
-
-        /* =========================================================
-           NOTIFICATION SCROLLBAR
-        ========================================================== */
-
         .pms-notification-list::-webkit-scrollbar {
             width: 5px !important;
         }
@@ -1071,11 +851,6 @@
             background: #b8dfe2 !important;
             border-radius: 10px !important;
         }
-
-
-        /* =========================================================
-           DIVIDER
-        ========================================================== */
 
         .pms-topbar-divider {
             width: 1px !important;
@@ -1087,11 +862,6 @@
 
             flex-shrink: 0 !important;
         }
-
-
-        /* =========================================================
-           USER
-        ========================================================== */
 
         .pms-user {
             position: relative !important;
@@ -1105,11 +875,6 @@
             flex-shrink: 0 !important;
         }
 
-
-        /* =========================================================
-           USER TRIGGER
-        ========================================================== */
-
         .pms-user-trigger {
             display: flex !important;
 
@@ -1121,11 +886,6 @@
 
             user-select: none !important;
         }
-
-
-        /* =========================================================
-           AVATAR
-        ========================================================== */
 
         .pms-user-avatar {
             position: relative !important;
@@ -1163,11 +923,6 @@
             border-radius: inherit !important;
         }
 
-
-        /* =========================================================
-           ONLINE DOT
-        ========================================================== */
-
         .pms-online-dot {
             position: absolute !important;
 
@@ -1198,11 +953,6 @@
 
             background: #2ecc71 !important;
         }
-
-
-        /* =========================================================
-           USER INFO
-        ========================================================== */
 
         .pms-user-info {
             display: flex !important;
@@ -1236,11 +986,6 @@
             line-height: 14px !important;
         }
 
-
-        /* =========================================================
-           CHEVRON
-        ========================================================== */
-
         .pms-user-chevron {
             width: 15px !important;
             height: 15px !important;
@@ -1252,11 +997,6 @@
             transition:
                 transform 0.2s ease !important;
         }
-
-
-        /* =========================================================
-           USER DROPDOWN
-        ========================================================== */
 
         .pms-user-dropdown {
             position: absolute !important;
@@ -1280,11 +1020,6 @@
 
             z-index: 99999 !important;
         }
-
-
-        /* =========================================================
-           USER DROPDOWN ITEMS
-        ========================================================== */
 
         .pms-user-dropdown-item,
         .pms-user-dropdown-logout {
@@ -1325,11 +1060,6 @@
             flex-shrink: 0 !important;
         }
 
-
-        /* =========================================================
-           LOGOUT
-        ========================================================== */
-
         .pms-user-dropdown-logout {
             color: #dc4c4c !important;
 
@@ -1347,11 +1077,6 @@
         .pms-user-dropdown-logout:hover {
             background: #fff5f5 !important;
         }
-
-
-        /* =========================================================
-           MOBILE MENU
-        ========================================================== */
 
         .pms-mobile-menu {
             display: none !important;
@@ -1391,11 +1116,6 @@
             height: 20px !important;
         }
 
-
-        /* =========================================================
-           TABLET / MOBILE
-        ========================================================== */
-
         @media (max-width: 1023px) {
 
             .pms-topbar {
@@ -1410,7 +1130,6 @@
                     auto !important;
             }
 
-
             .pms-topbar-left {
                 grid-column: 1 !important;
 
@@ -1419,21 +1138,17 @@
                 min-width: 0 !important;
             }
 
-
             .pms-mobile-menu {
                 display: flex !important;
             }
-
 
             .pms-topbar-search-wrap {
                 max-width: 300px !important;
             }
 
-
             .pms-topbar-center {
                 display: none !important;
             }
-
 
             .pms-topbar-right {
                 grid-column: 2 !important;
@@ -1441,23 +1156,16 @@
                 gap: 5px !important;
             }
 
-
             .pms-user-info,
             .pms-user-chevron {
                 display: none !important;
             }
-
 
             .pms-topbar-divider {
                 margin: 0 2px !important;
             }
 
         }
-
-
-        /* =========================================================
-           SMALL MOBILE
-        ========================================================== */
 
         @media (max-width: 640px) {
 
@@ -1468,11 +1176,9 @@
                 padding: 0 8px !important;
             }
 
-
             .pms-topbar-search-wrap {
                 max-width: 220px !important;
             }
-
 
             .pms-topbar-action,
             .pms-mobile-menu button {
@@ -1480,14 +1186,12 @@
                 height: 36px !important;
             }
 
-
             .pms-user-avatar {
                 width: 36px !important;
                 height: 36px !important;
 
                 min-width: 36px !important;
             }
-
 
             .pms-cashier-notification-dropdown {
                 position: fixed !important;
@@ -1501,18 +1205,42 @@
                 ) !important;
             }
 
-
             .pms-user-dropdown {
                 right: 0 !important;
             }
 
         }
 
-    </style>
-{{-- =================================================
-    NOTIFICATION JAVASCRIPT
-================================================== --}}
+        
 
+
+
+
+
+       /* // */
+               /* =========================================================
+           CASHIER PAGES: SPACE FROM SIDEBAR
+        ========================================================== */
+
+        .fi-main-ctn .fi-main {
+            padding-left: 32px !important;
+            padding-right: 32px !important;
+            padding-top: 84px !important;
+            padding-bottom: 40px !important;
+            box-sizing: border-box !important;
+        }
+
+        @media (max-width: 640px) {
+            .fi-main-ctn .fi-main {
+                padding-left: 14px !important;
+                padding-right: 14px !important;
+                padding-top: 76px !important;
+            }
+        }
+    </style>
+
+
+{{-- NOTIFICATION JAVASCRIPT --}}
 <script>
 
     function markCashierNotificationRead(notificationId)
@@ -1547,9 +1275,9 @@
         })
         .then(() => {
 
-    open = false;
+            window.location.reload();
 
-})
+        })
         .catch(error => {
 
             console.error(

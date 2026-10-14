@@ -273,6 +273,52 @@ protected $queryString = [
     /**
      * Close details modal.
      */
+    public ?int $editSaleId = null;
+    public $editCustomerId = null;
+    public string $editPaymentMethod = 'cash';
+    public $editPaidAmount = 0;
+
+    public function editSale(int $saleId): void
+    {
+        $sale = $this->baseQuery()->findOrFail($saleId);
+
+        $this->editSaleId = $sale->id;
+        $this->editCustomerId = $sale->customer_id;
+        $this->editPaymentMethod = (string) $sale->payment_method;
+        $this->editPaidAmount = (float) $sale->paid_amount;
+    }
+
+    public function closeEdit(): void
+    {
+        $this->editSaleId = null;
+    }
+
+    public function saveEdit(): void
+    {
+        $this->validate([
+            'editPaymentMethod' => 'required|in:cash,card,bank,other',
+            'editPaidAmount' => 'required|numeric|min:0',
+        ]);
+
+        $sale = $this->baseQuery()->findOrFail($this->editSaleId);
+
+        $paid = (float) $this->editPaidAmount;
+        $grand = (float) $sale->grand_total;
+
+        $sale->update([
+            'customer_id' => $this->editCustomerId ?: null,
+            'payment_method' => $this->editPaymentMethod,
+            'paid_amount' => $paid,
+            'change_amount' => max(0, $paid - $grand),
+        ]);
+
+        \Filament\Notifications\Notification::make()
+            ->title('Sale updated')
+            ->success()
+            ->send();
+
+        $this->editSaleId = null;
+    }
     public function closeSale(): void
     {
         $this->showSaleModal = false;
@@ -295,6 +341,7 @@ protected $queryString = [
                 'creator',
                 'items.medicine',
                 'items.batch',
+                'items.returns',
                 'payments.receiver',
             ])
             ->where('created_by', auth()->id())

@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Models\User;
 use BackedEnum;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -13,6 +14,7 @@ use Filament\Pages\Page;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use UnitEnum;
@@ -49,12 +51,12 @@ class EditProfile extends Page implements HasForms
                     ->icon(Heroicon::OutlinedCamera)
                     ->columnSpanFull()
                     ->schema([
-                       FileUpload::make('avatar')
-    ->label('Avatar')
-    ->image()
-    ->disk('public')
-    ->directory('avatars')
-    ->avatar(),
+                        FileUpload::make('avatar')
+                            ->label('Avatar')
+                            ->image()
+                            ->disk('public')
+                            ->directory('avatars')
+                            ->avatar(),
                     ]),
 
                 Section::make('Account Information')
@@ -67,10 +69,10 @@ class EditProfile extends Page implements HasForms
                             ->required()
                             ->maxLength(255),
 
-                       TextInput::make('email')
-    ->email()
-    ->required()
-    ->unique(table: 'users', ignorable: fn () => Auth::user()),
+                        TextInput::make('email')
+                            ->email()
+                            ->required()
+                            ->unique(table: 'users', ignorable: fn () => Auth::user()),
                     ]),
 
                 Section::make('Change Password')
@@ -96,27 +98,42 @@ class EditProfile extends Page implements HasForms
     }
 
     public function save(): void
-{
-    $data = $this->form->getState();
+    {
+        $data = $this->form->getState();
 
-    if (! empty($data['password'])) {
-        $data['password'] = Hash::make($data['password']);
-    } else {
-        unset($data['password']);
+        if (! empty($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        } else {
+            unset($data['password']);
+        }
+
+        Auth::user()->update($data);
+
+        Notification::make()
+            ->title('Profile updated successfully')
+            ->success()
+            ->send();
+
+        $this->redirect('/' . self::currentPanelId());
     }
 
-    Auth::user()->update($data);
+    /**
+     * Builds the "My Profile" URL for whichever panel is currently active
+     * (admin, cashier, pharmacist, ...), instead of always pointing at admin.
+     */
+    public static function getUrl(array $parameters = [], bool $isAbsolute = true, ?string $panel = null, ?Model $tenant = null, bool $shouldGuessMissingParameters = false, ?string $configuration = null): string
+    {
+        $panel ??= self::currentPanelId();
 
-    Notification::make()
-        ->title('Profile updated successfully')
-        ->success()
-        ->send();
+        return route("filament.{$panel}.pages.my-profile");
+    }
 
-    $this->redirect('/admin');
-}
-
-    public static function getUrl(array $parameters = [], bool $isAbsolute = true, ?string $panel = null, ?\Illuminate\Database\Eloquent\Model $tenant = null, bool $shouldGuessMissingParameters = false, ?string $configuration = null): string
-{
-    return route('filament.admin.pages.my-profile');
-}
+    /**
+     * The id of the panel currently being browsed (e.g. "admin", "cashier",
+     * "pharmacist"), falling back to "admin" only if none can be detected.
+     */
+    protected static function currentPanelId(): string
+    {
+        return Filament::getCurrentPanel()?->getId() ?? 'admin';
+    }
 }

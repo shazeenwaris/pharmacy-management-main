@@ -4,6 +4,11 @@
     $can = function (string $permission) use ($user): bool {
         return $user?->can($permission) ?? false;
     };
+
+    // Which dropdown group contains the current page (opens automatically)
+    $salesActive = request()->is('cashier/pos')
+        || request()->is('cashier/sale-history*')
+        || request()->is('cashier/sale-returns*');
 @endphp
 
 <div class="pms-sidebar-wrapper">
@@ -17,20 +22,12 @@
         <div class="pms-brand">
 
             <div class="pms-brand-logo">
-                <img
-                    src="{{ asset('images/logo.jpeg') }}"
-                    alt="MediCare Health"
-                >
+                <img src="{{ asset('images/logo.jpeg') }}" alt="MediCare Health">
             </div>
 
             <div class="pms-brand-info">
-                <div class="pms-brand-title">
-                    MediCare Health
-                </div>
-
-                <div class="pms-brand-subtitle">
-                    Pharmacy System
-                </div>
+                <div class="pms-brand-title">MediCare Health</div>
+                <div class="pms-brand-subtitle">Pharmacy System</div>
             </div>
 
             <button
@@ -40,18 +37,8 @@
                 aria-label="Toggle sidebar"
                 title="Collapse sidebar"
             >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.8"
-                    stroke="currentColor"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M4 7h16M4 12h16M4 17h16"
-                    />
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16" />
                 </svg>
             </button>
 
@@ -62,292 +49,131 @@
             SEARCH
         ============================================================ --}}
 
-       <div class="pms-sidebar-search"> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" > <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m1.35-5.65a7 7 0 1 1-14 0 7 7 0 0 1 14 0z" /> </svg> <input type="text" placeholder="Search menu..." autocomplete="off" > </div>
+        <div class="pms-sidebar-search">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-4.35-4.35m1.35-5.65a7 7 0 1 1-14 0 7 7 0 0 1 14 0z" />
+            </svg>
+            <input type="text" id="pmsSidebarSearch" placeholder="Search menu..." autocomplete="off">
+        </div>
+
+
         {{-- ============================================================
             MAIN MENU
         ============================================================ --}}
 
         <div class="pms-nav-section">
 
-            <div class="pms-nav-section-title">
-                Main Menu
-            </div>
-
+            <div class="pms-nav-section-title">Main Menu</div>
 
             {{-- Dashboard --}}
             <a
                 href="{{ url('/cashier') }}"
+                title="Dashboard"
                 class="pms-nav-item {{ request()->is('cashier') ? 'active' : '' }}"
             >
-
                 <span class="pms-nav-icon">
-
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.8"
-                        stroke="currentColor"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1V10"
-                        />
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h4v-6h4v6h4a1 1 0 001-1V10" />
                     </svg>
-
                 </span>
-
-                <span class="pms-nav-label">
-                    Dashboard
-                </span>
-
+                <span class="pms-nav-label">Dashboard</span>
             </a>
 
         </div>
 
 
         {{-- ============================================================
-            SALES
+            SALES  (section title + dropdown group)
         ============================================================ --}}
 
-        @if (
-            $can('create sales') ||
-            $can('handle returns')
-        )
+        @if ($can('create sales') || $can('handle returns'))
 
             <div class="pms-nav-section">
 
-                <div class="pms-nav-section-title">
-                    Sales
+                <div class="pms-nav-section-title">Sales</div>
+
+                <div class="pms-nav-group {{ $salesActive ? 'is-open' : '' }}" data-group="sales">
+
+                    <button type="button" class="pms-group-toggle" title="Sales &amp; POS" aria-expanded="{{ $salesActive ? 'true' : 'false' }}">
+                        <span class="pms-nav-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h2l2.4 11.2a1 1 0 001 .8h8.9a1 1 0 001-.76L20 8H6.2" />
+                                <circle cx="9.5" cy="19.5" r="1.2" />
+                                <circle cx="16.5" cy="19.5" r="1.2" />
+                            </svg>
+                        </span>
+                        <span class="pms-nav-label">Sales &amp; POS</span>
+                        <svg class="pms-chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m9 6 6 6-6 6" />
+                        </svg>
+                    </button>
+
+                    <div class="pms-group-items">
+                        <div class="pms-group-items-inner">
+
+                            {{-- New Sale --}}
+                            @if ($can('create sales'))
+                                <a
+                                    href="{{ url('/cashier/pos') }}"
+                                    class="pms-nav-item {{ request()->is('cashier/pos') ? 'active' : '' }}"
+                                >
+                                    <span class="pms-nav-label">New Sale</span>
+                                </a>
+                            @endif
+
+                            {{-- Sales History --}}
+                            @if ($can('create sales'))
+                                <a
+                                    href="{{ url('/cashier/sale-history') }}"
+                                    class="pms-nav-item {{ request()->is('cashier/sale-history*') ? 'active' : '' }}"
+                                >
+                                    <span class="pms-nav-label">Sales History</span>
+                                </a>
+                            @endif
+
+                            {{-- Sale Returns --}}
+                            @if ($can('handle returns'))
+                                <a
+                                    href="{{ url('/cashier/sale-returns') }}"
+                                    class="pms-nav-item {{ request()->is('cashier/sale-returns*') ? 'active' : '' }}"
+                                >
+                                    <span class="pms-nav-label">Sale Returns</span>
+                                </a>
+                            @endif
+
+                        </div>
+                    </div>
+
                 </div>
-
-
-                {{-- New Sale --}}
-                @if ($can('create sales'))
-
-                    <a
-                        href="{{ url('/cashier/pos') }}"
-                        class="pms-nav-item {{ request()->is('cashier/pos') ? 'active' : '' }}"
-                    >
-
-                        <span class="pms-nav-icon">
-
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke-width="1.8"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M12 4v16m8-8H4"
-                                />
-                            </svg>
-
-                        </span>
-
-                        <span class="pms-nav-label">
-                            New Sale
-                        </span>
-
-                    </a>
-
-                @endif
-
-
-                {{-- Sales History --}}
-                @if ($can('create sales'))
-
-                    <a
-                        href="{{ url('/cashier/sale-history') }}"
-                        class="pms-nav-item {{ request()->is('cashier/sale-history*') ? 'active' : '' }}"
-                    >
-
-                        <span class="pms-nav-icon">
-
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke-width="1.8"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M9 5h6M9 9h6M9 13h6M9 17h6M5 5h.01M5 9h.01M5 13h.01M5 17h.01"
-                                />
-                            </svg>
-
-                        </span>
-
-                        <span class="pms-nav-label">
-                            Sales History
-                        </span>
-
-                    </a>
-
-                @endif
-
-
-                {{-- Sale Returns --}}
-                @if ($can('handle returns'))
-
-                    <a
-                        href="{{ url('/cashier/sale-returns') }}"
-                        class="pms-nav-item {{ request()->is('cashier/sale-returns*') ? 'active' : '' }}"
-                    >
-
-                        <span class="pms-nav-icon">
-
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke-width="1.8"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M9 14l-4-4 4-4"
-                                />
-
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    d="M5 10h9a5 5 0 010 10h-1"
-                                />
-                            </svg>
-
-                        </span>
-
-                        <span class="pms-nav-label">
-                            Sale Returns
-                        </span>
-
-                    </a>
-
-                @endif
 
             </div>
 
         @endif
 
 
-
-{{-- ============================================================
-    CUSTOMERS
-============================================================ --}}
-
-<div class="pms-nav-section">
-
-    <div class="pms-nav-section-title">
-        Customers
-    </div>
-
-    {{-- Customers --}}
-    <!-- <a
-        href="{{ url('/cashier/customers') }}"
-        class="pms-nav-item {{ request()->is('cashier/customers*') ? 'active' : '' }}"
-    >
-
-        <span class="pms-nav-icon">
-
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.8"
-                stroke="currentColor"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M15 19a4 4 0 00-8 0"
-                />
-
-                <circle
-                    cx="11"
-                    cy="8"
-                    r="3"
-                />
-
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M19 19a4 4 0 00-3-3.87"
-                />
-
-                <path
-                    stroke-linecap="round"
-                    stroke-linecap="round"
-                    d="M16 5.13a3 3 0 010 5.74"
-                />
-            </svg>
-
-        </span>
-
-        <span class="pms-nav-label">
-            Customers
-        </span>
-
-    </a>
-
-</div> -->
-
-
         {{-- ============================================================
-            REPORTS
+            REPORTS  (section title + direct link)
         ============================================================ --}}
 
         @if ($can('view daily sales'))
 
             <div class="pms-nav-section">
 
-                <div class="pms-nav-section-title">
-                    Reports
-                </div>
-
+                <div class="pms-nav-section-title">Reports</div>
 
                 {{-- Daily Sales --}}
                 <a
                     href="{{ url('/cashier/daily-sales') }}"
+                    title="Daily Sales"
                     class="pms-nav-item {{ request()->is('cashier/daily-sales*') ? 'active' : '' }}"
                 >
-
                     <span class="pms-nav-icon">
-
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.8"
-                            stroke="currentColor"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M3 3v18h18"
-                            />
-
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                d="M7 16l4-5 3 3 5-7"
-                            />
-
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18h18" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 16l4-5 3 3 5-7" />
                         </svg>
-
                     </span>
-
-                    <span class="pms-nav-label">
-                        Daily Sales
-                    </span>
-
+                    <span class="pms-nav-label">Daily Sales</span>
                 </a>
 
             </div>
@@ -362,8 +188,6 @@
 
 <style>
 
-
-
 /* =========================================================
    1. SIDEBAR VARIABLES
    ========================================================= */
@@ -372,6 +196,15 @@
     --pms-sidebar-expanded: 280px;
     --pms-sidebar-collapsed: 70px;
     --pms-sidebar-width: 280px;
+
+    --pms-bg: #e6f4f4;
+    --pms-bg-soft: #d4ebeb;
+    --pms-border: #cfe5e6;
+    --pms-text: #1d4e5c;
+    --pms-text-muted: #6b8f98;
+    --pms-accent: #00838f;
+    --pms-accent-dark: #006d77;
+    --pms-hover: #d2eaea;
 }
 
 html[data-pms-sidebar="expanded"] {
@@ -404,22 +237,15 @@ html[data-pms-sidebar="collapsed"] {
 
         box-sizing: border-box !important;
 
-        transition:
-            grid-template-columns 0.2s ease !important;
+        transition: grid-template-columns 0.2s ease !important;
     }
-/* =========================================================
-   HIDE FILAMENT NATIVE NAVIGATION
-   KEEP NATIVE SIDEBAR CONTAINER
-   CUSTOM CASHIER SIDEBAR REMAINS VISIBLE
-   ========================================================= */
 
-body:has(.pms-sidebar-wrapper) .fi-sidebar-nav {
-    display: none !important;
-}
+    /* Hide Filament native navigation, keep the sidebar container */
+    body:has(.pms-sidebar-wrapper) .fi-sidebar-nav {
+        display: none !important;
+    }
 
-    /* =====================================================
-       3. NATIVE FILAMENT SIDEBAR = CONTAINER ONLY
-       ===================================================== */
+    /* ---------- Native Filament sidebar = container only ---------- */
 
     body:has(.pms-sidebar-wrapper) .fi-sidebar {
         position: fixed !important;
@@ -452,16 +278,7 @@ body:has(.pms-sidebar-wrapper) .fi-sidebar-nav {
             max-width 0.2s ease !important;
     }
 
-/* =========================================================
-   HIDE NATIVE FILAMENT NAVIGATION
-   ========================================================= */
-
-body:has(.pms-sidebar-wrapper) .fi-sidebar-nav {
-    display: none !important;
-}
-    /* =====================================================
-       4. CUSTOM SIDEBAR WRAPPER
-       ===================================================== */
+    /* ---------- Custom sidebar wrapper ---------- */
 
     body:has(.pms-sidebar-wrapper) .pms-sidebar-wrapper {
         position: absolute !important;
@@ -480,10 +297,7 @@ body:has(.pms-sidebar-wrapper) .fi-sidebar-nav {
         box-sizing: border-box !important;
     }
 
-
-    /* =====================================================
-       5. CUSTOM SIDEBAR
-       ===================================================== */
+    /* ---------- Custom sidebar ---------- */
 
     body:has(.pms-sidebar-wrapper) .pms-sidebar {
         position: absolute !important;
@@ -503,17 +317,14 @@ body:has(.pms-sidebar-wrapper) .fi-sidebar-nav {
         overflow-x: hidden !important;
         overflow-y: auto !important;
 
-        background: #eaf7f8 !important;
+        background: linear-gradient(180deg, #e6f4f4 0%, #dff0f0 100%) !important;
 
-        border-right: 1px solid #d5e9eb !important;
+        border-right: 1px solid var(--pms-border) !important;
 
         box-sizing: border-box !important;
     }
 
-
-    /* =====================================================
-       6. MAIN CONTENT
-       ===================================================== */
+    /* ---------- Main content ---------- */
 
     body:has(.pms-sidebar-wrapper) .fi-main-ctn {
         position: relative !important;
@@ -539,11 +350,6 @@ body:has(.pms-sidebar-wrapper) .fi-sidebar-nav {
             margin-left 0.2s ease !important;
     }
 
-
-    /* =====================================================
-       7. MAIN
-       ===================================================== */
-
     body:has(.pms-sidebar-wrapper) .fi-main {
         width: 100% !important;
         max-width: none !important;
@@ -556,7 +362,6 @@ body:has(.pms-sidebar-wrapper) .fi-sidebar-nav {
         box-sizing: border-box !important;
     }
 
-
     body:has(.pms-sidebar-wrapper) .fi-page {
         width: 100% !important;
         max-width: none !important;
@@ -565,7 +370,6 @@ body:has(.pms-sidebar-wrapper) .fi-sidebar-nav {
 
         box-sizing: border-box !important;
     }
-
 
     body:has(.pms-sidebar-wrapper) .fi-page-content {
         width: 100% !important;
@@ -576,10 +380,7 @@ body:has(.pms-sidebar-wrapper) .fi-sidebar-nav {
         box-sizing: border-box !important;
     }
 
-
-    /* =====================================================
-       8. COLLAPSED MAIN
-       ===================================================== */
+    /* ---------- Collapsed main ---------- */
 
     html[data-pms-sidebar="collapsed"]
     body:has(.pms-sidebar-wrapper)
@@ -589,10 +390,7 @@ body:has(.pms-sidebar-wrapper) .fi-sidebar-nav {
         margin-left: 70px !important;
     }
 
-
-    /* =====================================================
-       9. EXPANDED MAIN
-       ===================================================== */
+    /* ---------- Expanded main ---------- */
 
     html[data-pms-sidebar="expanded"]
     body:has(.pms-sidebar-wrapper)
@@ -605,7 +403,7 @@ body:has(.pms-sidebar-wrapper) .fi-sidebar-nav {
 
 
 /* =========================================================
-   10. FILAMENT TOPBAR CONTAINER
+   3. FILAMENT TOPBAR
    ========================================================= */
 
 body:has(.pms-sidebar-wrapper) .fi-topbar-ctn {
@@ -634,11 +432,6 @@ body:has(.pms-sidebar-wrapper) .fi-topbar-ctn {
         width 0.2s ease !important;
 }
 
-
-/* =========================================================
-   11. FILAMENT TOPBAR
-   ========================================================= */
-
 body:has(.pms-sidebar-wrapper) .fi-topbar {
     position: relative !important;
 
@@ -660,12 +453,7 @@ body:has(.pms-sidebar-wrapper) .fi-topbar {
     box-sizing: border-box !important;
 }
 
-
-/* =========================================================
-   12. THE REAL FIX
-   REMOVE FILAMENT TOPBAR START SPACE
-   ========================================================= */
-
+/* Remove Filament topbar start space */
 body:has(.pms-sidebar-wrapper) .fi-topbar-start {
     display: none !important;
 
@@ -679,12 +467,7 @@ body:has(.pms-sidebar-wrapper) .fi-topbar-start {
     padding: 0 !important;
 }
 
-
-/* =========================================================
-   13. TOPBAR END
-   Global Search + Notifications + User
-   ========================================================= */
-
+/* Topbar end: global search + notifications + user */
 body:has(.pms-sidebar-wrapper) .fi-topbar-end {
     width: 100% !important;
     min-width: 0 !important;
@@ -702,11 +485,6 @@ body:has(.pms-sidebar-wrapper) .fi-topbar-end {
     box-sizing: border-box !important;
 }
 
-
-/* =========================================================
-   14. GLOBAL SEARCH
-   ========================================================= */
-
 body:has(.pms-sidebar-wrapper) .fi-topbar-end .fi-global-search {
     flex: 0 0 auto !important;
 
@@ -720,11 +498,6 @@ body:has(.pms-sidebar-wrapper) .fi-topbar-end .fi-global-search {
     transform: none !important;
 }
 
-
-/* =========================================================
-   15. GLOBAL SEARCH CONTAINER
-   ========================================================= */
-
 body:has(.pms-sidebar-wrapper) .fi-global-search-ctn {
     margin: 0 !important;
     padding: 0 !important;
@@ -732,29 +505,13 @@ body:has(.pms-sidebar-wrapper) .fi-global-search-ctn {
     transform: none !important;
 }
 
-
-/* =========================================================
-   16. TOPBAR RIGHT SIDE
-   Notifications / Mail / User
-   ========================================================= */
-
 body:has(.pms-sidebar-wrapper) .fi-topbar-end > * {
     flex-shrink: 0 !important;
 }
 
-
-/* =========================================================
-   17. REMOVE EXTRA LEFT SPACING
-   ========================================================= */
-
 body:has(.pms-sidebar-wrapper) .fi-topbar-end > .fi-global-search {
     margin-left: 0 !important;
 }
-
-
-/* =========================================================
-   18. COLLAPSED TOPBAR
-   ========================================================= */
 
 html[data-pms-sidebar="collapsed"]
 body:has(.pms-sidebar-wrapper)
@@ -763,11 +520,6 @@ body:has(.pms-sidebar-wrapper)
 
     width: calc(100% - 70px) !important;
 }
-
-
-/* =========================================================
-   19. EXPANDED TOPBAR
-   ========================================================= */
 
 html[data-pms-sidebar="expanded"]
 body:has(.pms-sidebar-wrapper)
@@ -779,7 +531,7 @@ body:has(.pms-sidebar-wrapper)
 
 
 /* =========================================================
-   20. SIDEBAR INTERNAL STYLING
+   4. SIDEBAR BASE
    ========================================================= */
 
 .pms-sidebar {
@@ -795,28 +547,20 @@ body:has(.pms-sidebar-wrapper)
     height: 100vh;
 
     margin: 0;
-    padding: 0;
+    padding: 0 0 18px;
 
     overflow-x: hidden;
     overflow-y: auto;
 
-    background: #eaf7f8;
+    background: linear-gradient(180deg, #e6f4f4 0%, #dff0f0 100%);
 
-    border-right: 1px solid #d5e9eb;
+    border-right: 1px solid var(--pms-border);
 
     box-sizing: border-box;
 
     scrollbar-width: thin;
-
-    scrollbar-color:
-        #b9d8dc
-        transparent;
+    scrollbar-color: #b9d8dc transparent;
 }
-
-
-/* =========================================================
-   21. SCROLLBAR
-   ========================================================= */
 
 .pms-sidebar::-webkit-scrollbar {
     width: 5px;
@@ -833,7 +577,7 @@ body:has(.pms-sidebar-wrapper)
 
 
 /* =========================================================
-   22. BRAND
+   5. BRAND
    ========================================================= */
 
 .pms-brand {
@@ -847,20 +591,18 @@ body:has(.pms-sidebar-wrapper)
 
     padding: 14px 12px;
 
-    background: #eaf7f8;
+    background: transparent;
 
-    border-bottom: 1px solid #d8ebed;
+    border-bottom: 1px solid var(--pms-border);
 
     box-sizing: border-box;
 
     flex-shrink: 0;
 }
 
-
 .pms-brand-logo {
     width: 42px;
     min-width: 42px;
-
     height: 42px;
 
     display: flex;
@@ -869,14 +611,12 @@ body:has(.pms-sidebar-wrapper)
 
     overflow: hidden;
 
-    border-radius: 10px;
+    border-radius: 12px;
 
     background: #ffffff;
 
-    box-shadow:
-        0 1px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 8px rgba(0, 109, 119, 0.12);
 }
-
 
 .pms-brand-logo img {
     display: block;
@@ -892,36 +632,34 @@ body:has(.pms-sidebar-wrapper)
 
     object-fit: cover;
 
-    border-radius: 10px;
+    border-radius: 12px;
 }
-
 
 .pms-brand-info {
     min-width: 0;
 
-    margin-left: 10px;
+    margin-left: 11px;
     margin-right: 38px;
 
     overflow: hidden;
 }
-
 
 .pms-brand-title {
     color: #075985;
 
     font-size: 15px;
     font-weight: 700;
+    letter-spacing: -0.01em;
 
     line-height: 20px;
 
     white-space: nowrap;
 }
 
-
 .pms-brand-subtitle {
     margin-top: 1px;
 
-    color: #5f8190;
+    color: var(--pms-text-muted);
 
     font-size: 11px;
     font-weight: 500;
@@ -933,7 +671,7 @@ body:has(.pms-sidebar-wrapper)
 
 
 /* =========================================================
-   23. SIDEBAR TOGGLE
+   6. SIDEBAR TOGGLE
    ========================================================= */
 
 .pms-sidebar-toggle {
@@ -952,7 +690,7 @@ body:has(.pms-sidebar-wrapper)
     padding: 0;
 
     border: 0;
-    border-radius: 7px;
+    border-radius: 8px;
 
     background: transparent;
 
@@ -965,12 +703,10 @@ body:has(.pms-sidebar-wrapper)
         color 0.15s ease;
 }
 
-
 .pms-sidebar-toggle:hover {
-    background: #d4eff1;
-    color: #006d77;
+    background: var(--pms-hover);
+    color: var(--pms-accent-dark);
 }
-
 
 .pms-sidebar-toggle svg {
     display: block;
@@ -989,7 +725,7 @@ body:has(.pms-sidebar-wrapper)
 
 
 /* =========================================================
-   24. SEARCH
+   7. SEARCH
    ========================================================= */
 
 .pms-sidebar-search {
@@ -1001,17 +737,26 @@ body:has(.pms-sidebar-wrapper)
 
     box-sizing: border-box;
 
-    margin: 15px 12px 0;
+    margin: 16px 12px 4px;
 
-    padding: 0 10px;
+    padding: 0 12px;
     gap: 9px;
 
     background: #ffffff;
     border: 1px solid #d7e8ea;
-    border-radius: 10px;
+    border-radius: 11px;
 
-    color: #6b8589;
+    color: var(--pms-text-muted);
     overflow: hidden;
+
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.pms-sidebar-search:focus-within {
+    border-color: var(--pms-accent);
+    box-shadow: 0 0 0 3px rgba(0, 131, 143, 0.12);
 }
 
 .pms-sidebar-search svg {
@@ -1029,49 +774,66 @@ body:has(.pms-sidebar-wrapper)
     margin: 0;
     border: 0;
     outline: 0;
+    box-shadow: none;
     background: transparent;
+
+    font-size: 13px;
+    color: var(--pms-text);
 }
+
+.pms-sidebar-search input::placeholder {
+    color: #93aeb4;
+}
+
+
 /* =========================================================
-   25. NAVIGATION
+   8. NAVIGATION SECTIONS
    ========================================================= */
 
 .pms-nav-section {
     width: 100%;
 
-    padding: 7px 8px 3px;
+    padding: 6px 10px 0;
 
     box-sizing: border-box;
 
     flex-shrink: 0;
 }
 
-
 .pms-nav-section-title {
-    padding: 6px 5px 8px;
+    padding: 12px 8px 6px;
 
-    color: #5c8490;
+    color: #5f8791;
 
-    font-size: 11px;
-    font-weight: 600;
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
 
-    line-height: 16px;
+    line-height: 12px;
 }
 
 
+/* =========================================================
+   9. NAV ITEMS (top level)
+   ========================================================= */
+
 .pms-nav-item {
+    position: relative;
+
     display: flex;
     align-items: center;
 
     width: 100%;
-    min-height: 40px;
+    min-height: 38px;
 
     padding: 0 10px;
 
-    margin-bottom: 3px;
+    margin-bottom: 2px;
 
-    border-radius: 8px;
+    border-radius: 9px;
 
-    color: #155466;
+    color: var(--pms-text);
 
     text-decoration: none !important;
 
@@ -1087,21 +849,18 @@ body:has(.pms-sidebar-wrapper)
         color 0.15s ease;
 }
 
-
 .pms-nav-item:hover {
-    background: #d8f0f2;
-    color: #006d77;
+    background: var(--pms-hover);
+    color: var(--pms-accent-dark);
 }
-
 
 .pms-nav-item.active {
-    background: #00838f;
+    background: linear-gradient(135deg, #00919d 0%, #00737d 100%);
     color: #ffffff;
+    font-weight: 600;
 
-    box-shadow:
-        0 2px 5px rgba(0, 131, 143, 0.16);
+    box-shadow: 0 3px 10px rgba(0, 131, 143, 0.25);
 }
-
 
 .pms-nav-icon {
     display: flex;
@@ -1118,8 +877,8 @@ body:has(.pms-sidebar-wrapper)
     flex-shrink: 0;
 }
 
-
-.pms-nav-item svg {
+.pms-nav-item svg,
+.pms-group-toggle .pms-nav-icon svg {
     display: block;
 
     width: 18px !important;
@@ -1131,21 +890,19 @@ body:has(.pms-sidebar-wrapper)
     max-width: 18px !important;
     max-height: 18px !important;
 
-    color: #668b94;
+    color: #5f8791;
 
     flex-shrink: 0;
 }
 
-
-.pms-nav-item:hover svg {
-    color: #006d77;
+.pms-nav-item:hover svg,
+.pms-group-toggle:hover .pms-nav-icon svg {
+    color: var(--pms-accent-dark);
 }
-
 
 .pms-nav-item.active svg {
     color: #ffffff;
 }
-
 
 .pms-nav-label {
     display: block;
@@ -1159,17 +916,181 @@ body:has(.pms-sidebar-wrapper)
     white-space: nowrap;
 }
 
+/* Clean keyboard focus instead of the heavy default outline */
+.pms-nav-item:focus,
+.pms-group-toggle:focus {
+    outline: none;
+}
+
+.pms-nav-item:focus-visible,
+.pms-group-toggle:focus-visible {
+    outline: 2px solid var(--pms-accent);
+    outline-offset: 1px;
+}
+
 
 /* =========================================================
-   26. COLLAPSED SIDEBAR
+   10. DROPDOWN GROUPS
    ========================================================= */
 
-/* html[data-pms-sidebar="collapsed"] .pms-brand {
-    justify-content: center;
+.pms-group-toggle {
+    display: flex;
+    align-items: center;
 
-    padding-left: 8px;
-    padding-right: 8px;
-} */
+    width: 100%;
+    min-height: 38px;
+
+    padding: 0 10px;
+
+    margin: 0 0 2px;
+
+    border: 0;
+    border-radius: 9px;
+
+    background: transparent;
+
+    color: var(--pms-text);
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+
+    cursor: pointer;
+
+    box-sizing: border-box;
+
+    transition:
+        background 0.15s ease,
+        color 0.15s ease;
+}
+
+.pms-group-toggle:hover {
+    background: var(--pms-hover);
+    color: var(--pms-accent-dark);
+}
+
+.pms-group-toggle .pms-nav-label {
+    flex: 1 1 auto;
+}
+
+/* Chevron: points right when closed, down when open */
+.pms-chevron {
+    display: block;
+
+    width: 14px !important;
+    height: 14px !important;
+
+    min-width: 14px !important;
+    min-height: 14px !important;
+
+    margin-left: 6px;
+
+    color: #7fa0a8;
+
+    flex-shrink: 0;
+
+    transition: transform 0.22s ease;
+}
+
+.pms-nav-group.is-open > .pms-group-toggle .pms-chevron {
+    transform: rotate(90deg);
+}
+
+/* Smooth open / close */
+.pms-group-items {
+    display: grid;
+    grid-template-rows: 0fr;
+
+    transition: grid-template-rows 0.25s ease;
+}
+
+.pms-nav-group.is-open > .pms-group-items {
+    grid-template-rows: 1fr;
+}
+
+.pms-group-items-inner {
+    min-height: 0;
+
+    overflow: hidden;
+}
+
+.pms-nav-group.is-open > .pms-group-items > .pms-group-items-inner {
+    padding-top: 2px;
+    padding-bottom: 4px;
+}
+
+/* Sub items: small dot bullet, no icon */
+.pms-group-items-inner .pms-nav-item {
+    min-height: 33px;
+
+    padding: 0 10px 0 41px;
+
+    margin-bottom: 1px;
+
+    background: transparent;
+    box-shadow: none;
+
+    color: #5a7d87;
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.pms-group-items-inner .pms-nav-item::before {
+    content: '';
+
+    position: absolute;
+
+    left: 25px;
+    top: 50%;
+
+    width: 4px;
+    height: 4px;
+
+    margin-top: -2px;
+
+    border-radius: 50%;
+
+    background: #9dbbc2;
+
+    transition:
+        background 0.15s ease,
+        transform 0.15s ease;
+}
+
+.pms-group-items-inner .pms-nav-item:hover {
+    background: var(--pms-hover);
+    color: var(--pms-accent-dark);
+}
+
+.pms-group-items-inner .pms-nav-item:hover::before {
+    background: var(--pms-accent);
+}
+
+.pms-group-items-inner .pms-nav-item.active {
+    background: rgba(0, 131, 143, 0.12);
+    color: var(--pms-accent-dark);
+    font-weight: 700;
+
+    box-shadow: none;
+}
+
+.pms-group-items-inner .pms-nav-item.active::before {
+    background: var(--pms-accent);
+
+    transform: scale(1.5);
+}
+
+.pms-nav-group.pms-search-hidden,
+.pms-nav-item.pms-search-hidden {
+    display: none !important;
+}
+
+
+/* =========================================================
+   11. COLLAPSED SIDEBAR
+   ========================================================= */
 
 html[data-pms-sidebar="collapsed"] .pms-brand {
     flex-direction: column;
@@ -1191,42 +1112,30 @@ html[data-pms-sidebar="collapsed"] .pms-sidebar-toggle {
 
     margin: 0;
 }
+
 html[data-pms-sidebar="collapsed"] .pms-brand-info {
     display: none !important;
 }
-
 
 html[data-pms-sidebar="collapsed"] .pms-brand-logo {
     margin: 0;
 }
 
-
-/* html[data-pms-sidebar="collapsed"] .pms-sidebar-toggle {
-    top: 8px;
-    right: 7px;
-
-    width: 26px;
-    height: 26px;
-} */
-
-
 html[data-pms-sidebar="collapsed"] .pms-sidebar-search {
     display: none !important;
 }
 
-
 html[data-pms-sidebar="collapsed"] .pms-nav-section-title {
     display: none !important;
 }
-
 
 html[data-pms-sidebar="collapsed"] .pms-nav-section {
     padding-left: 7px;
     padding-right: 7px;
 }
 
-
-html[data-pms-sidebar="collapsed"] .pms-nav-item {
+html[data-pms-sidebar="collapsed"] .pms-nav-item,
+html[data-pms-sidebar="collapsed"] .pms-group-toggle {
     justify-content: center;
 
     width: 100%;
@@ -1237,19 +1146,27 @@ html[data-pms-sidebar="collapsed"] .pms-nav-item {
     font-size: 0;
 }
 
-
 html[data-pms-sidebar="collapsed"] .pms-nav-icon {
     margin-right: 0;
 }
-
 
 html[data-pms-sidebar="collapsed"] .pms-nav-item svg {
     margin-right: 0;
 }
 
+/* Collapsed: group shows only its icon (click expands the sidebar) */
+html[data-pms-sidebar="collapsed"] .pms-group-toggle .pms-chevron,
+html[data-pms-sidebar="collapsed"] .pms-group-toggle .pms-nav-label {
+    display: none !important;
+}
+
+html[data-pms-sidebar="collapsed"] .pms-group-items {
+    display: none !important;
+}
+
 
 /* =========================================================
-   27. NO HORIZONTAL OVERFLOW
+   12. NO HORIZONTAL OVERFLOW
    ========================================================= */
 
 body:has(.pms-sidebar-wrapper) {
@@ -1258,7 +1175,7 @@ body:has(.pms-sidebar-wrapper) {
 
 
 /* =========================================================
-   28. MOBILE
+   13. MOBILE
    ========================================================= */
 
 @media (max-width: 1023px) {
@@ -1280,6 +1197,11 @@ body:has(.pms-sidebar-wrapper) {
 (function () {
 
     const STORAGE_KEY = 'pms_sidebar_collapsed';
+    const GROUPS_KEY  = 'pms_cashier_groups';
+
+    /* ---------------------------------------------------------
+       Sidebar collapse / expand
+       --------------------------------------------------------- */
 
     function setSidebarState(collapsed) {
 
@@ -1292,15 +1214,8 @@ body:has(.pms-sidebar-wrapper) {
             collapsed ? 'collapsed' : 'expanded'
         );
 
-        html.style.setProperty(
-            '--pms-sidebar-width',
-            width
-        );
-
-        html.style.setProperty(
-            '--sidebar-width',
-            width
-        );
+        html.style.setProperty('--pms-sidebar-width', width);
+        html.style.setProperty('--sidebar-width', width);
 
         localStorage.setItem(
             STORAGE_KEY,
@@ -1310,137 +1225,237 @@ body:has(.pms-sidebar-wrapper) {
         updateToggleButton();
     }
 
-
     function updateToggleButton() {
 
-        const button = document.getElementById(
-            'pmsCashierSidebarToggle'
-        );
+        const button = document.getElementById('pmsCashierSidebarToggle');
 
         if (!button) {
             return;
         }
 
         const collapsed =
-            document.documentElement.getAttribute(
-                'data-pms-sidebar'
-            ) === 'collapsed';
+            document.documentElement.getAttribute('data-pms-sidebar') === 'collapsed';
 
-        button.setAttribute(
-            'aria-expanded',
-            collapsed ? 'false' : 'true'
-        );
+        button.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
 
         button.setAttribute(
             'title',
-            collapsed
-                ? 'Expand sidebar'
-                : 'Collapse sidebar'
+            collapsed ? 'Expand sidebar' : 'Collapse sidebar'
         );
     }
 
-
     function initializeSidebar() {
 
-        const savedState =
-            localStorage.getItem(STORAGE_KEY);
+        const savedState = localStorage.getItem(STORAGE_KEY);
 
-        const collapsed =
-            savedState === 'true';
-
-        setSidebarState(collapsed);
+        setSidebarState(savedState === 'true');
     }
-
 
     function attachToggle() {
 
-        const button =
-            document.getElementById(
-                'pmsCashierSidebarToggle'
-            );
+        const button = document.getElementById('pmsCashierSidebarToggle');
 
         if (!button) {
             return;
         }
 
-        if (
-            button.dataset.sidebarReady === 'true'
-        ) {
+        if (button.dataset.sidebarReady === 'true') {
             updateToggleButton();
             return;
         }
 
         button.dataset.sidebarReady = 'true';
 
-        button.addEventListener(
-            'click',
-            function (event) {
+        button.addEventListener('click', function (event) {
 
-                event.preventDefault();
-                event.stopPropagation();
+            event.preventDefault();
+            event.stopPropagation();
 
-                const collapsed =
-                    document.documentElement.getAttribute(
-                        'data-pms-sidebar'
-                    ) === 'collapsed';
+            const collapsed =
+                document.documentElement.getAttribute('data-pms-sidebar') === 'collapsed';
 
-                setSidebarState(!collapsed);
-            }
-        );
+            setSidebarState(!collapsed);
+        });
 
         updateToggleButton();
     }
 
+    /* ---------------------------------------------------------
+       Dropdown groups
+       --------------------------------------------------------- */
+
+    function readGroups() {
+        try {
+            return JSON.parse(localStorage.getItem(GROUPS_KEY)) || {};
+        } catch (e) {
+            return {};
+        }
+    }
+
+    function saveGroup(name, open) {
+        const groups = readGroups();
+        groups[name] = open;
+        localStorage.setItem(GROUPS_KEY, JSON.stringify(groups));
+    }
+
+    function setGroup(group, open) {
+        group.classList.toggle('is-open', open);
+
+        const toggle = group.querySelector('.pms-group-toggle');
+
+        if (toggle) {
+            toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+    }
+
+    function restoreGroups() {
+
+        const saved = readGroups();
+
+        document.querySelectorAll('.pms-nav-group').forEach(function (group) {
+
+            const name = group.dataset.group;
+
+            // A group holding the current page always stays open
+            const hasActive = group.querySelector('.pms-nav-item.active');
+
+            if (hasActive) {
+                setGroup(group, true);
+                return;
+            }
+
+            if (Object.prototype.hasOwnProperty.call(saved, name)) {
+                setGroup(group, !!saved[name]);
+            }
+        });
+    }
+
+    // One delegated listener survives Livewire page navigation
+    if (!window.__pmsCashierGroupsBound) {
+
+        window.__pmsCashierGroupsBound = true;
+
+        document.addEventListener('click', function (event) {
+
+            const toggle = event.target.closest('.pms-group-toggle');
+
+            if (!toggle) {
+                return;
+            }
+
+            const group = toggle.closest('.pms-nav-group');
+
+            if (!group) {
+                return;
+            }
+
+            const isCollapsed =
+                document.documentElement.getAttribute('data-pms-sidebar') === 'collapsed';
+
+            if (isCollapsed) {
+                setSidebarState(false);
+                setGroup(group, true);
+                saveGroup(group.dataset.group, true);
+                return;
+            }
+
+            const open = !group.classList.contains('is-open');
+
+            setGroup(group, open);
+            saveGroup(group.dataset.group, open);
+        });
+
+        // Menu search: filters items, opens matching groups
+        document.addEventListener('input', function (event) {
+
+            if (event.target.id !== 'pmsSidebarSearch') {
+                return;
+            }
+
+            const query = event.target.value.trim().toLowerCase();
+
+            document.querySelectorAll('.pms-nav-group').forEach(function (group) {
+
+                let matches = 0;
+
+                group.querySelectorAll('.pms-nav-item').forEach(function (item) {
+
+                    const label = item.textContent.trim().toLowerCase();
+                    const show  = query === '' || label.includes(query);
+
+                    item.classList.toggle('pms-search-hidden', !show);
+
+                    if (show) {
+                        matches++;
+                    }
+                });
+
+                group.classList.toggle(
+                    'pms-search-hidden',
+                    query !== '' && matches === 0
+                );
+
+                if (query !== '' && matches > 0) {
+                    setGroup(group, true);
+                }
+            });
+
+            document
+                .querySelectorAll('.pms-nav-section > a.pms-nav-item')
+                .forEach(function (item) {
+
+                    const label = item.textContent.trim().toLowerCase();
+
+                    item.classList.toggle(
+                        'pms-search-hidden',
+                        query !== '' && !label.includes(query)
+                    );
+                });
+
+            if (query === '') {
+                restoreGroups();
+            }
+        });
+    }
+
+    /* ---------------------------------------------------------
+       Boot
+       --------------------------------------------------------- */
 
     function boot() {
 
         initializeSidebar();
+        restoreGroups();
 
         setTimeout(function () {
             attachToggle();
         }, 100);
     }
 
-
     if (document.readyState === 'loading') {
-
-        document.addEventListener(
-            'DOMContentLoaded',
-            boot
-        );
-
+        document.addEventListener('DOMContentLoaded', boot);
     } else {
-
         boot();
     }
 
+    document.addEventListener('livewire:navigated', function () {
 
-    document.addEventListener(
-        'livewire:navigated',
-        function () {
+        setTimeout(function () {
 
-            setTimeout(function () {
+            const collapsed =
+                document.documentElement.getAttribute('data-pms-sidebar') === 'collapsed';
 
-                const collapsed =
-                    document.documentElement.getAttribute(
-                        'data-pms-sidebar'
-                    ) === 'collapsed';
+            setSidebarState(collapsed);
 
-                setSidebarState(collapsed);
+            restoreGroups();
+            attachToggle();
 
-                attachToggle();
+        }, 150);
+    });
 
-            }, 150);
-        }
-    );
-
-
-    window.addEventListener(
-        'resize',
-        function () {
-            updateToggleButton();
-        }
-    );
+    window.addEventListener('resize', function () {
+        updateToggleButton();
+    });
 
 })();
 </script>
