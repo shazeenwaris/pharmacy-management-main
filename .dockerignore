@@ -1,5 +1,6 @@
-.git
-node_modules
-vendor
 .env
+.git
+vendor
+node_modules
 storage/logs/*
+public/build
