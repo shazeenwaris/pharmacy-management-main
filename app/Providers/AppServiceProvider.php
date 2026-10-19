@@ -52,6 +52,9 @@ class AppServiceProvider extends ServiceProvider
     // }
     public function boot(): void
 {
+     if (app()->environment('production')) {
+        \Illuminate\Support\Facades\URL::forceScheme('https');
+    }
     Relation::enforceMorphMap([
         'expense'      => Expense::class,
         'user'         => \App\Models\User::class,
